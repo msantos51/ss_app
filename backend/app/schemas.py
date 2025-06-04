@@ -18,6 +18,16 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class VendorProfileUpdate(BaseModel):
+    email: Optional[str] = None
+    password: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    product: Optional[Literal["Bolas de Berlim", "Gelados", "Acess\u00f3rios"]] = None
+
 class VendorUpdate(BaseModel):
     current_lat: float
     current_lng: float

@@ -1,8 +1,7 @@
 # models.py - define as tabelas no PostgreSQL
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Date
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from .database import Base
-from datetime import datetime
 
 class User(Base):
     __tablename__ = "users"  # tabela de utilizadores
@@ -10,8 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    role = Column(String)  # 'vendor' ou 'customer'
-    date_of_birth = Column(Date)
+    role = Column(String, default="vendor")
 
     vendor = relationship("Vendor", back_populates="user", uselist=False)
 
@@ -21,8 +19,6 @@ class Vendor(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     product = Column(String)
-    current_lat = Column(Float)
-    current_lng = Column(Float)
-    last_update = Column(DateTime, default=datetime.utcnow)
+    profile_photo = Column(String)
 
     user = relationship("User", back_populates="vendor")

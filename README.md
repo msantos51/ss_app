@@ -1,9 +1,10 @@
 # sunny_sales - Aplicativo de Vendedores de Praia
 
-Este projeto, chamado `sunny_sales`, tem como objetivo criar uma aplicação para Android e iOS que permita:
+Este projeto, chamado `sunny_sales`, tem como objetivo criar uma aplicação simples onde os vendedores de praia podem:
 
-* Vendedores de praia (bolas de Berlim, gelados e acessórios) registarem-se e partilharem a localização do seu smartphone.
-* Clientes visualizarem num mapa, em tempo real, a localização dos vendedores ativos.
+* Registar-se fornecendo e-mail, password, foto de perfil e o produto que vendem (bolas de Berlim, gelados ou acessórios).
+* Fazer login na aplicação.
+* Alterar os seus dados de registo após autenticados.
 
 As instruções abaixo estão em português e fornecem um guia passo a passo para configuração e desenvolvimento.
 
@@ -196,39 +197,20 @@ def get_db():
     finally:
         db.close()
 
-# Rota de registro de utilizador
-@app.post("/users/", response_model=schemas.UserOut)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.username == user.username).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    hashed_password = pwd_context.hash(user.password)
-    new_user = models.User(username=user.username, hashed_password=hashed_password, role=user.role)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    if user.role == 'vendor':
-        vendor = models.Vendor(user_id=new_user.id)
-        db.add(vendor)
-        db.commit()
-    return new_user
+# Rota para registro de vendedor
+@app.post("/vendors/", response_model=schemas.VendorOut)
+def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
+    ...
 
-# Rota para atualizar localização do vendedor
-@app.put("/vendors/{vendor_id}", response_model=schemas.VendorOut)
-def update_vendor(vendor_id: int, update: schemas.VendorUpdate, db: Session = Depends(get_db)):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
-    if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
-    vendor.current_lat = update.current_lat
-    vendor.current_lng = update.current_lng
-    db.commit()
-    db.refresh(vendor)
-    return vendor
+# Rota de login
+@app.post("/login", response_model=schemas.VendorOut)
+def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
+    ...
 
-# Rota para obter vendedores ativos
-@app.get("/vendors/", response_model=list[schemas.VendorOut])
-def list_vendors(db: Session = Depends(get_db)):
-    return db.query(models.Vendor).all()
+# Rota para atualizar dados do vendedor
+@app.put("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
+def update_vendor_profile(vendor_id: int, update: schemas.VendorProfileUpdate, db: Session = Depends(get_db)):
+    ...
 ```
 
 ### 2.6 Execução do servidor
@@ -245,52 +227,36 @@ O backend ficará disponível em `http://localhost:8000`.
 
 ### 3.1 Instalação de dependências
 
-Dentro da pasta `sunny_sales_app`, instale bibliotecas úteis como `react-native-maps` e `axios`:
+Dentro da pasta `sunny_sales_app`, instale a biblioteca `axios`:
 
 ```bash
 cd sunny_sales_app
-npm install axios react-native-maps
+npm install axios
 ```
 
-### 3.2 Exemplo de código em `App.js`
+### 3.2 Exemplo simples de uso no `App.js`
 
 ```javascript
-// Exemplo simples de mapa que busca os vendedores do backend
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React from 'react';
+import { Button, View } from 'react-native';
 import axios from 'axios';
 
 export default function App() {
-  // Estado para guardar os vendedores
-  const [vendors, setVendors] = useState([]);
-
-  useEffect(() => {
-    // Buscar vendedores do backend
-    axios.get('http://localhost:8000/vendors/')
-      .then(res => setVendors(res.data))
-      .catch(err => console.log(err));
-  }, []);
+  const register = () => {
+    axios.post('http://localhost:8000/vendors/', {
+      email: 'vendedor@example.com',
+      password: 'senha',
+      product: 'Bolas de Berlim',
+      profile_photo: 'foto.png'
+    });
+  };
 
   return (
-    <View style={styles.container}>
-      <MapView style={styles.map}>
-        {vendors.map(vendor => (
-          <Marker
-            key={vendor.id}
-            coordinate={{ latitude: vendor.current_lat, longitude: vendor.current_lng }}
-            title={vendor.user.username}
-          />
-        ))}
-      </MapView>
+    <View>
+      <Button title="Registar" onPress={register} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 }
-});
 ```
 
 ### 3.3 Execução do aplicativo

@@ -12,6 +12,14 @@ app = FastAPI()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# Rota de login
+@app.post("/login", response_model=schemas.UserOut)
+def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == credentials.email).first()
+    if not user or not pwd_context.verify(credentials.password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    return user
+
 # Dependência para obter a sessão
 def get_db():
     db = SessionLocal()
@@ -75,3 +83,26 @@ def update_vendor(vendor_id: int, update: schemas.VendorUpdate, db: Session = De
 @app.get("/vendors/", response_model=list[schemas.VendorOut])
 def list_vendors(db: Session = Depends(get_db)):
     return db.query(models.Vendor).all()
+
+# Rota para atualizar informações do perfil do vendedor
+@app.put("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
+def update_vendor_profile(
+    vendor_id: int,
+    update: schemas.VendorProfileUpdate,
+    db: Session = Depends(get_db),
+):
+    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    user = vendor.user
+    if update.email is not None:
+        user.email = update.email
+    if update.password is not None:
+        user.hashed_password = pwd_context.hash(update.password)
+    if update.date_of_birth is not None:
+        user.date_of_birth = update.date_of_birth
+    if update.product is not None:
+        vendor.product = update.product
+    db.commit()
+    db.refresh(vendor)
+    return vendor

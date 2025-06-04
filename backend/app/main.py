@@ -1,18 +1,33 @@
 # main.py - aplicação FastAPI com rotas principais
+
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 from . import models, schemas
 from .database import SessionLocal, engine
-from passlib.context import CryptContext
 
 # Criar as tabelas
 models.Base.metadata.create_all(bind=engine)
 
+# Inicializar app
 app = FastAPI()
 
+# Contexto para hash de password
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# --------------------------
+# Dependência para obter a sessão
+# --------------------------
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# --------------------------
 # Rota de login do vendedor
+# --------------------------
 @app.post("/login", response_model=schemas.VendorOut)
 def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == credentials.email).first()
@@ -23,16 +38,9 @@ def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Vendor not found")
     return vendor
 
-# Dependência para obter a sessão
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
+# --------------------------
 # Rota de registro de vendedor
+# --------------------------
 @app.post("/vendors/", response_model=schemas.VendorOut)
 def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == vendor.email).first()
@@ -57,8 +65,9 @@ def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
     db.refresh(new_vendor)
     return new_vendor
 
-
-# Rota para atualizar informações do perfil do vendedor
+# --------------------------
+# Rota para atualizar perfil do vendedor
+# --------------------------
 @app.put("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
 def update_vendor_profile(
     vendor_id: int,

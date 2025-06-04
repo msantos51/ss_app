@@ -1,6 +1,6 @@
-# Aplicativo de Vendedores de Praia
+# sunny_sales - Aplicativo de Vendedores de Praia
 
-Este projeto tem como objetivo criar uma aplicação para Android e iOS que permita:
+Este projeto, chamado `sunny_sales`, tem como objetivo criar uma aplicação para Android e iOS que permita:
 
 * Vendedores de praia (bolas de Berlim, gelados e acessórios) registarem-se e partilharem a localização do seu smartphone.
 * Clientes visualizarem num mapa, em tempo real, a localização dos vendedores ativos.
@@ -63,7 +63,7 @@ npm install -g expo-cli
 
 ```bash
 cd mobile
-expo init beach_vendors_app
+expo init sunny_sales_app
 ```
 
 Escolha o template "blank" para simplicidade.
@@ -245,10 +245,10 @@ O backend ficará disponível em `http://localhost:8000`.
 
 ### 3.1 Instalação de dependências
 
-Dentro da pasta `beach_vendors_app`, instale bibliotecas úteis como `react-native-maps` e `axios`:
+Dentro da pasta `sunny_sales_app`, instale bibliotecas úteis como `react-native-maps` e `axios`:
 
 ```bash
-cd beach_vendors_app
+cd sunny_sales_app
 npm install axios react-native-maps
 ```
 
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
 
 ### 3.3 Execução do aplicativo
 
-Com o Expo instalado, dentro da pasta `beach_vendors_app` execute:
+Com o Expo instalado, dentro da pasta `sunny_sales_app` execute:
 
 ```bash
 expo start

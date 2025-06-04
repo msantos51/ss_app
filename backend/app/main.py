@@ -23,11 +23,11 @@ def get_db():
 # Rota de registro de utilizador
 @app.post("/users/", response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.username == user.username).first()
+    db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = pwd_context.hash(user.password)
-    new_user = models.User(username=user.username, hashed_password=hashed_password, role=user.role)
+    new_user = models.User(email=user.email, hashed_password=hashed_password, role=user.role, date_of_birth=user.date_of_birth)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -36,6 +36,28 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         db.add(vendor)
         db.commit()
     return new_user
+
+# Rota de registro de vendedor
+@app.post("/vendors/", response_model=schemas.VendorOut)
+def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.email == vendor.email).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    hashed_password = pwd_context.hash(vendor.password)
+    new_user = models.User(
+        email=vendor.email,
+        hashed_password=hashed_password,
+        role="vendor",
+        date_of_birth=vendor.date_of_birth,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    new_vendor = models.Vendor(user_id=new_user.id, product=vendor.product)
+    db.add(new_vendor)
+    db.commit()
+    db.refresh(new_vendor)
+    return new_vendor
 
 # Rota para atualizar localização do vendedor
 @app.put("/vendors/{vendor_id}", response_model=schemas.VendorOut)

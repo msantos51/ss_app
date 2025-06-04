@@ -1,36 +1,21 @@
-// Exemplo simples de mapa que busca os vendedores do backend
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import axios from 'axios';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import MapScreen from './screens/MapScreen';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  // Estado para guardar os vendedores
-  const [vendors, setVendors] = useState([]);
-
-  useEffect(() => {
-    // Buscar vendedores do backend
-    axios.get('http://localhost:8000/vendors/')
-      .then(res => setVendors(res.data))
-      .catch(err => console.log(err));
-  }, []);
-
   return (
-    <View style={styles.container}>
-      <MapView style={styles.map}>
-        {vendors.map(vendor => (
-          <Marker
-            key={vendor.id}
-            coordinate={{ latitude: vendor.current_lat, longitude: vendor.current_lng }}
-            title={vendor.user.username}
-          />
-        ))}
-      </MapView>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Map" component={MapScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 }
-});

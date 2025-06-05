@@ -8,12 +8,15 @@ from .database import SessionLocal, engine
 import os
 import shutil
 from uuid import uuid4
-
+from fastapi.staticfiles import StaticFiles
 # Criar as tabelas
 models.Base.metadata.create_all(bind=engine)
 
 # Inicializar app
 app = FastAPI()
+
+# (em português) Permite aceder às imagens pela URL (ex: /profile_photos/nome.png)
+app.mount("/profile_photos", StaticFiles(directory="profile_photos"), name="profile_photos")
 
 # Contexto para hash de password
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

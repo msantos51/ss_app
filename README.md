@@ -285,3 +285,8 @@ Siga as instruções do terminal para abrir o app em um emulador ou no dispositi
 * Use o Visual Studio Code para editar os arquivos e acompanhar o desenvolvimento.
 * Em caso de dúvidas, consulte a documentação do FastAPI e do React Native.
 
+
+## Licença
+
+Este projeto está licenciado sob os termos da licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+

@@ -8,23 +8,34 @@ export default function MapScreen() {
 
   useEffect(() => {
     axios
-      .get('http://10.0.2.2:8000/login')
+      .get('http://10.0.2.2:8000/vendors/')
       .then(res => setVendors(res.data))
-      .catch(err => console.log(err));
+      .catch(err => console.log('Erro ao buscar vendedores:', err));
   }, []);
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map}>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 38.736946, // Exemplo: Lisboa
+          longitude: -9.142685,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+      >
         {vendors.map(vendor => (
-          <Marker
-            key={vendor.id}
-            coordinate={{
-              latitude: vendor.current_lat,
-              longitude: vendor.current_lng,
-            }}
-            title={vendor.user.email}
-          />
+          vendor.current_lat && vendor.current_lng && (
+            <Marker
+              key={vendor.id}
+              coordinate={{
+                latitude: vendor.current_lat,
+                longitude: vendor.current_lng,
+              }}
+              title={vendor.user.email}
+              description={vendor.product}
+            />
+          )
         ))}
       </MapView>
     </View>

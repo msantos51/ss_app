@@ -121,3 +121,21 @@ async def update_vendor_profile(
     db.commit()
     db.refresh(vendor)
     return vendor
+
+from fastapi import Body
+
+@app.put("/vendors/{vendor_id}/location")
+def update_vendor_location(
+    vendor_id: int,
+    lat: float = Body(...),
+    lng: float = Body(...),
+    db: Session = Depends(get_db)
+):
+    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    vendor.current_lat = lat
+    vendor.current_lng = lng
+    db.commit()
+    return {"message": "Localização atualizada com sucesso"}

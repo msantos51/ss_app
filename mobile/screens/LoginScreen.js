@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 export default function LoginScreen({ navigation }) {
@@ -9,19 +10,30 @@ export default function LoginScreen({ navigation }) {
 
   const login = async () => {
     try {
-      await axios.post('http://10.0.2.2:8000/login', {
+      const response = await axios.post('http://10.0.2.2:8000/login', {
         email,
         password,
       });
+
+      // Guardar os dados do utilizador (vendedor) localmente
+      await AsyncStorage.setItem('user', JSON.stringify(response.data));
+
+      // Navegar para o mapa
       navigation.navigate('Map');
     } catch (err) {
-      setError('Falha no login');
+      console.error(err);
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError('Falha no login');
+      }
     }
   };
 
   return (
     <View style={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -29,6 +41,7 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setEmail}
         autoCapitalize="none"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -36,7 +49,9 @@ export default function LoginScreen({ navigation }) {
         value={password}
         onChangeText={setPassword}
       />
+
       <Button title="Entrar" onPress={login} />
+
       <Button
         title="Registar"
         onPress={() => navigation.navigate('Register')}

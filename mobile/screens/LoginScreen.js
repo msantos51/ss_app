@@ -50,12 +50,10 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setPassword}
       />
 
-      <Button title="Entrar" onPress={login} />
+     <Button title="Entrar" onPress={login} />
+<View style={{ marginTop: 12 }} />
+<Button title="Registar" onPress={() => navigation.navigate('Register')} />
 
-      <Button
-        title="Registar"
-        onPress={() => navigation.navigate('Register')}
-      />
     </View>
   );
 }

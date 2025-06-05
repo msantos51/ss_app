@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import {
+  startLocationSharing,
+  stopLocationSharing,
+  isLocationSharing,
+} from '../locationService';
 
-export default function DashboardScreen() {
+export default function DashboardScreen({ navigation }) {
   const [vendor, setVendor] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +18,12 @@ export default function DashboardScreen() {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
-  const [locationSub, setLocationSub] = useState(null);
+
+  const logout = async () => {
+    await stopLocationSharing();
+    await AsyncStorage.removeItem('user');
+    navigation.replace('Login');
+  };
 
   useEffect(() => {
     const loadVendor = async () => {
@@ -24,6 +33,16 @@ export default function DashboardScreen() {
         setVendor(v);
         setEmail(v.user.email);
         setProduct(v.product);
+
+        const share = await isLocationSharing();
+        setSharingLocation(share);
+        if (share) {
+          try {
+            await startLocationSharing(v.id);
+          } catch (err) {
+            setError(err.message);
+          }
+        }
       }
     };
     loadVendor();
@@ -77,45 +96,20 @@ export default function DashboardScreen() {
   };
 
   const toggleLocation = async () => {
+    if (!vendor) return;
     if (sharingLocation) {
-      if (locationSub) {
-        locationSub.remove();
-        setLocationSub(null);
-      }
+      await stopLocationSharing();
       setSharingLocation(false);
     } else {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Permissão de localização negada');
-        return;
+      try {
+        await startLocationSharing(vendor.id);
+        setSharingLocation(true);
+      } catch (err) {
+        setError(err.message);
       }
-      const sub = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 10000,
-          distanceInterval: 10,
-        },
-        ({ coords }) => {
-          axios
-            .put(`http://10.0.2.2:8000/vendors/${vendor.id}/location`, {
-              lat: coords.latitude,
-              lng: coords.longitude,
-            })
-            .catch(err => console.log('Erro ao enviar localização:', err));
-        }
-      );
-      setLocationSub(sub);
-      setSharingLocation(true);
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (locationSub) {
-        locationSub.remove();
-      }
-    };
-  }, [locationSub]);
 
   if (!vendor) {
     return (
@@ -128,6 +122,21 @@ export default function DashboardScreen() {
   return (
     <View style={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
+
+      <Text style={styles.title}>Perfil do Vendedor</Text>
+
+      {profilePhoto ? (
+        <Image source={{ uri: profilePhoto.uri }} style={styles.imagePreview} />
+      ) : (
+        vendor.profile_photo && (
+          <Image
+            source={{ uri: `http://10.0.2.2:8000/${vendor.profile_photo}` }}
+            style={styles.imagePreview}
+          />
+        )
+      )}
+
+      <Button title="Escolher Foto de Perfil" onPress={pickImage} />
 
       <TextInput
         style={styles.input}
@@ -155,25 +164,52 @@ export default function DashboardScreen() {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      <Button title="Escolher Foto de Perfil" onPress={pickImage} />
-
-      {profilePhoto && (
-        <Image source={{ uri: profilePhoto.uri }} style={styles.imagePreview} />
-      )}
-
       <Button title="Atualizar" onPress={updateProfile} />
 
       <Button
         title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
         onPress={toggleLocation}
       />
+
+      <Text style={{
+        color: sharingLocation ? 'green' : 'gray',
+        marginVertical: 8,
+        textAlign: 'center',
+      }}>
+        {sharingLocation ? 'Partilha de localização ativa' : 'Localização não partilhada'}
+      </Text>
+
+      <Button title="Logout" onPress={logout} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: { borderWidth: 1, borderColor: '#ccc', marginBottom: 12, padding: 8 },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 12,
+    padding: 8,
+    borderRadius: 8,
+    width: '100%',
+  },
   error: { color: 'red', marginBottom: 12 },
-  imagePreview: { width: 100, height: 100, marginVertical: 12, alignSelf: 'center' },
+  imagePreview: {
+    width: 120,
+    height: 120,
+    marginVertical: 12,
+    borderRadius: 60,
+  },
 });

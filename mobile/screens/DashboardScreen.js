@@ -6,7 +6,7 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-export default function DashboardScreen() {
+export default function DashboardScreen({ navigation }) {
   const [vendor, setVendor] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,6 +15,11 @@ export default function DashboardScreen() {
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
   const [locationSub, setLocationSub] = useState(null);
+
+  const logout = async () => {
+    await AsyncStorage.removeItem('user');
+    navigation.replace('Login');
+  };
 
   useEffect(() => {
     const loadVendor = async () => {
@@ -157,8 +162,15 @@ export default function DashboardScreen() {
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />
 
-      {profilePhoto && (
+      {profilePhoto ? (
         <Image source={{ uri: profilePhoto.uri }} style={styles.imagePreview} />
+      ) : (
+        vendor.profile_photo && (
+          <Image
+            source={{ uri: `http://10.0.2.2:8000/${vendor.profile_photo}` }}
+            style={styles.imagePreview}
+          />
+        )
       )}
 
       <Button title="Atualizar" onPress={updateProfile} />
@@ -167,6 +179,16 @@ export default function DashboardScreen() {
         title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
         onPress={toggleLocation}
       />
+
+      <Text style={{
+        color: sharingLocation ? 'green' : 'gray',
+        marginVertical: 8,
+        textAlign: 'center',
+      }}>
+        {sharingLocation ? 'Partilha de localização ativa' : 'Localização não partilhada'}
+      </Text>
+
+      <Button title="Logout" onPress={logout} />
     </View>
   );
 }

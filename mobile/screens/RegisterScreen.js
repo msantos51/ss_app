@@ -11,11 +11,19 @@ const [error, setError] = useState(null);
 
 const register = async () => {
   try {
-    await axios.post('http://10.0.2.2:8000/vendors/', {
-      email,
-      password,
-      product,
-      profile_photo: profilePhoto,
+    const data = new FormData();
+    data.append('email', email);
+    data.append('password', password);
+    data.append('product', product);
+    if (profilePhoto) {
+      data.append('profile_photo', {
+        uri: profilePhoto,
+        name: 'profile.jpg',
+        type: 'image/jpeg',
+      });
+    }
+    await axios.post('http://10.0.2.2:8000/vendors/', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     navigation.navigate('Login');
   } catch (err) {

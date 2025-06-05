@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
+import { BASE_URL } from '../config';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -16,7 +17,7 @@ export default function MapScreen({ navigation }) {
   useEffect(() => {
     const fetchVendors = () => {
       axios
-        .get('http://10.0.2.2:8000/vendors/')
+        .get(`${BASE_URL}/vendors/`)
         .then((res) => setVendors(res.data))
         .catch((err) => console.log('Erro ao buscar vendedores:', err));
     };

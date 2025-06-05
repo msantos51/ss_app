@@ -25,11 +25,6 @@ export default function DashboardScreen({ navigation }) {
     navigation.replace('Login');
   };
 
-  const logout = async () => {
-    await AsyncStorage.removeItem('user');
-    navigation.replace('Login');
-  };
-
   useEffect(() => {
     const loadVendor = async () => {
       const stored = await AsyncStorage.getItem('user');

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Button } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 
-export default function MapScreen() {
+export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
 
   useEffect(() => {
@@ -38,6 +38,13 @@ export default function MapScreen() {
           )
         ))}
       </MapView>
+      <View style={styles.buttonContainer}>
+        <Button title="Login" onPress={() => navigation.navigate('Login')} />
+        <Button
+          title="Registar"
+          onPress={() => navigation.navigate('Register')}
+        />
+      </View>
     </View>
   );
 }
@@ -45,4 +52,12 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+  },
 });

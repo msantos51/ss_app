@@ -18,8 +18,8 @@ export default function LoginScreen({ navigation }) {
       // Guardar os dados do utilizador (vendedor) localmente
       await AsyncStorage.setItem('user', JSON.stringify(response.data));
 
-      // Navegar para o mapa
-      navigation.navigate('Map');
+      // Navegar para o dashboard
+      navigation.navigate('Dashboard');
     } catch (err) {
       console.error(err);
       if (err.response?.data?.detail) {

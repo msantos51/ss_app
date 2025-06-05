@@ -11,14 +11,15 @@ import os
 import shutil
 from uuid import uuid4
 
-# Criar as tabelas
-models.Base.metadata.create_all(bind=engine)
+# Diretório para guardar fotos de perfil
+PROFILE_PHOTO_DIR = "profile_photos"
+os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)  # ← Garantir que existe antes do mount
 
 # Inicializar app
 app = FastAPI()
 
-# Habilitar CORS para permitir requisições do frontend
-origins = ["*"]  # Em produção, defina os domínios permitidos
+# Habilitar CORS (permitir acesso do frontend)
+origins = ["*"]  # Em produção, usar domínios específicos
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -27,17 +28,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# (em português) Montar rota para servir imagens (http://localhost:8000/profile_photos/abc.jpg)
-app.mount("/profile_photos", StaticFiles(directory="profile_photos"), name="profile_photos")
+# Montar rota para servir fotos (ex: http://localhost:8000/profile_photos/foto.jpg)
+app.mount("/profile_photos", StaticFiles(directory=PROFILE_PHOTO_DIR), name="profile_photos")
+
+# Criar as tabelas na base de dados
+models.Base.metadata.create_all(bind=engine)
 
 # Contexto para hash de password
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Diretório para guardar fotos de perfil
-PROFILE_PHOTO_DIR = "profile_photos"
-os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)
-
-# Gerenciador simples para conexões WebSocket
+# Gerenciador de WebSockets
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -54,7 +54,6 @@ class ConnectionManager:
         for connection in list(self.active_connections):
             await connection.send_json(message)
 
-
 manager = ConnectionManager()
 
 # --------------------------
@@ -68,7 +67,7 @@ def get_db():
         db.close()
 
 # --------------------------
-# Rota de login do vendedor
+# Login do vendedor
 # --------------------------
 @app.post("/login", response_model=schemas.VendorOut)
 def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
@@ -91,10 +90,12 @@ async def create_vendor(
     profile_photo: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
+    # Verificar se email já está registado
     db_user = db.query(models.User).filter(models.User.email == email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Criar utilizador
     hashed_password = pwd_context.hash(password)
     new_user = models.User(email=email, hashed_password=hashed_password, role="vendor")
     db.add(new_user)
@@ -108,9 +109,9 @@ async def create_vendor(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(profile_photo.file, buffer)
 
-    # Caminho visível no frontend
     public_path = f"profile_photos/{file_name}"
 
+    # Criar vendedor
     new_vendor = models.Vendor(
         user_id=new_user.id,
         product=product,
@@ -161,8 +162,7 @@ async def update_vendor_profile(
         file_path = os.path.join(PROFILE_PHOTO_DIR, file_name)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(profile_photo.file, buffer)
-        public_path = f"profile_photos/{file_name}"
-        vendor.profile_photo = public_path
+        vendor.profile_photo = f"profile_photos/{file_name}"
 
     db.commit()
     db.refresh(vendor)
@@ -190,13 +190,13 @@ async def update_vendor_location(
     return {"message": "Localização atualizada com sucesso"}
 
 # --------------------------
-# WebSocket para atualizações em tempo real
+# WebSocket para localização em tempo real
 # --------------------------
 @app.websocket("/ws/locations")
 async def websocket_locations(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            await websocket.receive_text()  # Mantém a conexão ativa
+            await websocket.receive_text()  # Apenas para manter conexão ativa
     except WebSocketDisconnect:
         manager.disconnect(websocket)

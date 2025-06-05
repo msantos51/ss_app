@@ -87,7 +87,20 @@ async def create_vendor(
     db.add(new_vendor)
     db.commit()
     db.refresh(new_vendor)
+    # Garantir que a relação com o utilizador está carregada antes de fechar a sessão
+    _ = new_vendor.user
     return new_vendor
+
+# --------------------------
+# Rota para listar vendedores
+# --------------------------
+@app.get("/vendors/", response_model=list[schemas.VendorOut])
+def list_vendors(db: Session = Depends(get_db)):
+    vendors = db.query(models.Vendor).all()
+    # Carregar relação com o utilizador para cada vendedor
+    for v in vendors:
+        _ = v.user
+    return vendors
 
 # --------------------------
 # Rota para atualizar perfil do vendedor

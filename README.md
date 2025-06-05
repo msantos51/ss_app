@@ -243,11 +243,17 @@ import axios from 'axios';
 
 export default function App() {
   const register = () => {
-    axios.post('http://localhost:8000/vendors/', {
-      email: 'vendedor@example.com',
-      password: 'senha',
-      product: 'Bolas de Berlim',
-      profile_photo: 'foto.png'
+    const data = new FormData();
+    data.append('email', 'vendedor@example.com');
+    data.append('password', 'senha');
+    data.append('product', 'Bolas de Berlim');
+    data.append('profile_photo', {
+      uri: 'caminho/para/foto.png',
+      name: 'foto.png',
+      type: 'image/png',
+    });
+    axios.post('http://localhost:8000/vendors/', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   };
 

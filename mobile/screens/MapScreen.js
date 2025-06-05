@@ -58,8 +58,8 @@ export default function MapScreen({ navigation }) {
           longitudeDelta: 0.05,
         }}
       >
-        {vendors.map(vendor => (
-          vendor.current_lat && vendor.current_lng && (
+        {vendors.map(vendor =>
+          vendor.current_lat != null && vendor.current_lng != null && (
             <Marker
               key={vendor.id}
               coordinate={{
@@ -70,7 +70,7 @@ export default function MapScreen({ navigation }) {
               description={vendor.product}
             />
           )
-        ))}
+        )}
       </MapView>
 
       {/* Botões por cima do mapa */}

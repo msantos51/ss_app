@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  FlatList,
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
@@ -13,6 +20,8 @@ import {
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState('Todos');
+  const mapRef = useRef(null);
 
   useEffect(() => {
     const fetchVendors = () => {
@@ -48,9 +57,17 @@ export default function MapScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
+  const activeVendors = vendors.filter(
+    (v) => v.current_lat != null && v.current_lng != null
+  );
+  const filteredVendors = activeVendors.filter(
+    (v) => selectedProduct === 'Todos' || v.product === selectedProduct
+  );
+
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
           latitude: 38.736946, // Exemplo: Lisboa
@@ -59,20 +76,54 @@ export default function MapScreen({ navigation }) {
           longitudeDelta: 0.05,
         }}
       >
-        {vendors.map(vendor =>
-          vendor.current_lat != null && vendor.current_lng != null && (
-            <Marker
-              key={vendor.id}
-              coordinate={{
-                latitude: vendor.current_lat,
-                longitude: vendor.current_lng,
-              }}
-              title={vendor.user.email}
-              description={vendor.product}
-            />
-          )
-        )}
+        {filteredVendors.map((vendor) => (
+          <Marker
+            key={vendor.id}
+            coordinate={{
+              latitude: vendor.current_lat,
+              longitude: vendor.current_lng,
+            }}
+            title={vendor.user.email}
+            description={vendor.product}
+          />
+        ))}
       </MapView>
+
+      <View style={styles.filterContainer}>
+        <Picker
+          selectedValue={selectedProduct}
+          onValueChange={(itemValue) => setSelectedProduct(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Todos" value="Todos" />
+          <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
+          <Picker.Item label="Acessórios" value="Acessórios" />
+          <Picker.Item label="Gelados" value="Gelados" />
+        </Picker>
+        <FlatList
+          data={filteredVendors}
+          keyExtractor={(item) => item.id.toString()}
+          style={styles.vendorList}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.vendorItem}
+              onPress={() =>
+                mapRef.current?.animateToRegion(
+                  {
+                    latitude: item.current_lat,
+                    longitude: item.current_lng,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  },
+                  1000
+                )
+              }
+            >
+              <Text>{item.user.email}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
 
       {/* Botões por cima do mapa */}
       <View style={styles.buttonsContainer}>
@@ -108,6 +159,22 @@ export default function MapScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
+  filterContainer: {
+    position: 'absolute',
+    top: 40,
+    left: 10,
+    right: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 8,
+  },
+  picker: { backgroundColor: '#eee', marginBottom: 8 },
+  vendorList: { maxHeight: 150 },
+  vendorItem: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
   buttonsContainer: {
     position: 'absolute',
     bottom: 40,

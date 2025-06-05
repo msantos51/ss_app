@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Image } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
@@ -73,12 +74,16 @@ const register = async () => {
         onChangeText={setPassword}
       />
 
-      <TextInput
+      <Picker
+        selectedValue={product}
+        onValueChange={(itemValue) => setProduct(itemValue)}
         style={styles.input}
-        placeholder="Produto"
-        value={product}
-        onChangeText={setProduct}
-      />
+      >
+        <Picker.Item label="Selecione um produto" value="" />
+        <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
+        <Picker.Item label="Gelados" value="Gelados" />
+        <Picker.Item label="Acessórios" value="Acessórios" />
+      </Picker>
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />
 

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Image } from 'react-native';
+import {
+  View,
+  TextInput,
+  Button,
+  StyleSheet,
+  Text,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,22 +36,29 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     const loadVendor = async () => {
-      const stored = await AsyncStorage.getItem('user');
-      if (stored) {
-        const v = JSON.parse(stored);
-        setVendor(v);
-        setEmail(v.user.email);
-        setProduct(v.product);
+      try {
+        const stored = await AsyncStorage.getItem('user');
+        if (stored) {
+          const v = JSON.parse(stored);
+          setVendor(v);
+          setEmail(v.user.email);
+          setProduct(v.product);
 
-        const share = await isLocationSharing();
-        setSharingLocation(share);
-        if (share) {
-          try {
-            await startLocationSharing(v.id);
-          } catch (err) {
-            setError(err.message);
+          const share = await isLocationSharing();
+          setSharingLocation(share);
+          if (share) {
+            try {
+              await startLocationSharing(v.id);
+            } catch (err) {
+              setError(err.message);
+            }
           }
+        } else {
+          setError('Utilizador não encontrado.');
         }
+      } catch (e) {
+        console.log('Erro ao carregar vendor:', e);
+        setError('Erro ao carregar dados do utilizador');
       }
     };
     loadVendor();
@@ -111,14 +126,21 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-
   if (!vendor) {
     return (
       <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
         <Text>A carregar...</Text>
+        {error && <Text style={styles.error}>{error}</Text>}
       </View>
     );
   }
+
+  const profileUri = profilePhoto
+    ? profilePhoto.uri
+    : vendor.profile_photo
+    ? `${BASE_URL.replace(/\/$/, '')}/${vendor.profile_photo}`
+    : null;
 
   return (
     <View style={styles.container}>
@@ -126,15 +148,8 @@ export default function DashboardScreen({ navigation }) {
 
       <Text style={styles.title}>Perfil do Vendedor</Text>
 
-      {profilePhoto ? (
-        <Image source={{ uri: profilePhoto.uri }} style={styles.imagePreview} />
-      ) : (
-        vendor.profile_photo && (
-          <Image
-            source={{ uri: `${BASE_URL}/${vendor.profile_photo}` }}
-            style={styles.imagePreview}
-          />
-        )
+      {profileUri && (
+        <Image source={{ uri: profileUri }} style={styles.imagePreview} />
       )}
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />
@@ -172,12 +187,16 @@ export default function DashboardScreen({ navigation }) {
         onPress={toggleLocation}
       />
 
-      <Text style={{
-        color: sharingLocation ? 'green' : 'gray',
-        marginVertical: 8,
-        textAlign: 'center',
-      }}>
-        {sharingLocation ? 'Partilha de localização ativa' : 'Localização não partilhada'}
+      <Text
+        style={{
+          color: sharingLocation ? 'green' : 'gray',
+          marginVertical: 8,
+          textAlign: 'center',
+        }}
+      >
+        {sharingLocation
+          ? 'Partilha de localização ativa'
+          : 'Localização não partilhada'}
       </Text>
 
       <Button title="Logout" onPress={logout} />
@@ -206,7 +225,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '100%',
   },
-  error: { color: 'red', marginBottom: 12 },
+  error: {
+    color: 'red',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
   imagePreview: {
     width: 120,
     height: 120,

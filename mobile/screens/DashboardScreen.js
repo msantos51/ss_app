@@ -134,6 +134,21 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
 
+      <Text style={styles.title}>Perfil do Vendedor</Text>
+
+      {profilePhoto ? (
+        <Image source={{ uri: profilePhoto.uri }} style={styles.imagePreview} />
+      ) : (
+        vendor.profile_photo && (
+          <Image
+            source={{ uri: `http://10.0.2.2:8000/${vendor.profile_photo}` }}
+            style={styles.imagePreview}
+          />
+        )
+      )}
+
+      <Button title="Escolher Foto de Perfil" onPress={pickImage} />
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -160,19 +175,6 @@ export default function DashboardScreen({ navigation }) {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      <Button title="Escolher Foto de Perfil" onPress={pickImage} />
-
-      {profilePhoto ? (
-        <Image source={{ uri: profilePhoto.uri }} style={styles.imagePreview} />
-      ) : (
-        vendor.profile_photo && (
-          <Image
-            source={{ uri: `http://10.0.2.2:8000/${vendor.profile_photo}` }}
-            style={styles.imagePreview}
-          />
-        )
-      )}
-
       <Button title="Atualizar" onPress={updateProfile} />
 
       <Button
@@ -194,8 +196,31 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: { borderWidth: 1, borderColor: '#ccc', marginBottom: 12, padding: 8 },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 12,
+    padding: 8,
+    borderRadius: 8,
+    width: '100%',
+  },
   error: { color: 'red', marginBottom: 12 },
-  imagePreview: { width: 100, height: 100, marginVertical: 12, alignSelf: 'center' },
+  imagePreview: {
+    width: 120,
+    height: 120,
+    marginVertical: 12,
+    borderRadius: 60,
+  },
 });

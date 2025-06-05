@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     axios
@@ -12,6 +14,20 @@ export default function MapScreen({ navigation }) {
       .then(res => setVendors(res.data))
       .catch(err => console.log('Erro ao buscar vendedores:', err));
   }, []);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const stored = await AsyncStorage.getItem('user');
+      if (stored) {
+        setCurrentUser(JSON.parse(stored));
+      } else {
+        setCurrentUser(null);
+      }
+    };
+    const unsubscribe = navigation.addListener('focus', loadUser);
+    loadUser();
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -41,19 +57,30 @@ export default function MapScreen({ navigation }) {
 
       {/* Botões por cima do mapa */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+        {currentUser ? (
+          <TouchableOpacity
+            style={styles.button}
+              onPress={() => navigation.navigate('Dashboard')}
+          >
+            <Text style={styles.buttonText}>Perfil</Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.button}
+                onPress={() => navigation.navigate('Login')}
+            >
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('Register')}
-        >
-          <Text style={styles.buttonText}>Registar</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Register')}
+            >
+              <Text style={styles.buttonText}>Registar</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );

@@ -14,37 +14,50 @@ export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
 
-  useEffect(() => {
-    const fetchVendors = () => {
-      axios
-        .get(`${BASE_URL}/vendors/`)
-        .then((res) => setVendors(res.data))
-        .catch((err) => console.log('Erro ao buscar vendedores:', err));
-    };
-    const unsubscribe = navigation.addListener('focus', fetchVendors);
-    fetchVendors();
-    return unsubscribe;
-  }, [navigation]);
+  const fetchVendors = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/vendors/`);
+      setVendors(res.data);
+    } catch (err) {
+      console.log('Erro ao buscar vendedores:', err);
+    }
+  };
 
-  useEffect(() => {
-    const loadUser = async () => {
+  const loadUser = async () => {
+    try {
       const stored = await AsyncStorage.getItem('user');
       if (stored) {
         const v = JSON.parse(stored);
         setCurrentUser(v);
+
         const share = await isLocationSharing();
         if (share) {
-          startLocationSharing(v.id).catch((err) =>
-            console.log('Erro ao iniciar localização:', err)
-          );
+          try {
+            await startLocationSharing(v.id);
+          } catch (err) {
+            console.log('Erro ao iniciar localização:', err);
+          }
         }
       } else {
         setCurrentUser(null);
         await stopLocationSharing();
       }
-    };
-    const unsubscribe = navigation.addListener('focus', loadUser);
+    } catch (err) {
+      console.log('Erro ao carregar utilizador:', err);
+      setCurrentUser(null);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchVendors();
+      loadUser();
+    });
+
+    // Também carregar na primeira vez
+    fetchVendors();
     loadUser();
+
     return unsubscribe;
   }, [navigation]);
 
@@ -53,14 +66,14 @@ export default function MapScreen({ navigation }) {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 38.736946, // Exemplo: Lisboa
+          latitude: 38.736946, // Lisboa
           longitude: -9.142685,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
       >
-        {vendors.map(vendor =>
-          vendor.current_lat != null && vendor.current_lng != null && (
+        {vendors.map((vendor) =>
+          vendor.current_lat != null && vendor.current_lng != null ? (
             <Marker
               key={vendor.id}
               coordinate={{
@@ -70,7 +83,7 @@ export default function MapScreen({ navigation }) {
               title={vendor.user.email}
               description={vendor.product}
             />
-          )
+          ) : null
         )}
       </MapView>
 
@@ -79,7 +92,7 @@ export default function MapScreen({ navigation }) {
         {currentUser ? (
           <TouchableOpacity
             style={styles.button}
-              onPress={() => navigation.navigate('Dashboard')}
+            onPress={() => navigation.navigate('Dashboard')}
           >
             <Text style={styles.buttonText}>Perfil</Text>
           </TouchableOpacity>
@@ -87,7 +100,7 @@ export default function MapScreen({ navigation }) {
           <>
             <TouchableOpacity
               style={styles.button}
-                onPress={() => navigation.navigate('Login')}
+              onPress={() => navigation.navigate('Login')}
             >
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>

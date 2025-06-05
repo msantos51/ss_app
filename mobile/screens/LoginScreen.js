@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import {
+  View,
+  TextInput,
+  Button,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -8,18 +15,19 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const login = async () => {
+    if (!email || !password) return;
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.post(`${BASE_URL}/login`, {
         email,
         password,
       });
 
-      // Guardar os dados do utilizador (vendedor) localmente
       await AsyncStorage.setItem('user', JSON.stringify(response.data));
-
-      // Navegar para o dashboard
       navigation.navigate('Dashboard');
     } catch (err) {
       console.error(err);
@@ -28,6 +36,8 @@ export default function LoginScreen({ navigation }) {
       } else {
         setError('Falha no login');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,7 +49,10 @@ export default function LoginScreen({ navigation }) {
         style={styles.input}
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => {
+          setEmail(text);
+          setError(null);
+        }}
         autoCapitalize="none"
       />
 
@@ -48,19 +61,36 @@ export default function LoginScreen({ navigation }) {
         placeholder="Password"
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          setError(null);
+        }}
       />
 
-     <Button title="Entrar" onPress={login} />
-<View style={{ marginTop: 12 }} />
-<Button title="Registar" onPress={() => navigation.navigate('Register')} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <Button
+          title="Entrar"
+          onPress={login}
+          disabled={!email || !password}
+        />
+      )}
 
+      <View style={{ marginTop: 12 }} />
+      <Button title="Registar" onPress={() => navigation.navigate('Register')} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: { borderWidth: 1, borderColor: '#ccc', marginBottom: 12, padding: 8 },
-  error: { color: 'red', marginBottom: 12 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 12,
+    padding: 8,
+    borderRadius: 8,
+  },
+  error: { color: 'red', marginBottom: 12, textAlign: 'center' },
 });

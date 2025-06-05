@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import {
+  startLocationSharing,
+  stopLocationSharing,
+  isLocationSharing,
+} from '../locationService';
 
 export default function DashboardScreen({ navigation }) {
   const [vendor, setVendor] = useState(null);
@@ -14,7 +18,12 @@ export default function DashboardScreen({ navigation }) {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
-  const [locationSub, setLocationSub] = useState(null);
+
+  const logout = async () => {
+    await stopLocationSharing();
+    await AsyncStorage.removeItem('user');
+    navigation.replace('Login');
+  };
 
   const logout = async () => {
     await AsyncStorage.removeItem('user');
@@ -29,6 +38,16 @@ export default function DashboardScreen({ navigation }) {
         setVendor(v);
         setEmail(v.user.email);
         setProduct(v.product);
+
+        const share = await isLocationSharing();
+        setSharingLocation(share);
+        if (share) {
+          try {
+            await startLocationSharing(v.id);
+          } catch (err) {
+            setError(err.message);
+          }
+        }
       }
     };
     loadVendor();
@@ -82,45 +101,20 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const toggleLocation = async () => {
+    if (!vendor) return;
     if (sharingLocation) {
-      if (locationSub) {
-        locationSub.remove();
-        setLocationSub(null);
-      }
+      await stopLocationSharing();
       setSharingLocation(false);
     } else {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Permissão de localização negada');
-        return;
+      try {
+        await startLocationSharing(vendor.id);
+        setSharingLocation(true);
+      } catch (err) {
+        setError(err.message);
       }
-      const sub = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 10000,
-          distanceInterval: 10,
-        },
-        ({ coords }) => {
-          axios
-            .put(`http://10.0.2.2:8000/vendors/${vendor.id}/location`, {
-              lat: coords.latitude,
-              lng: coords.longitude,
-            })
-            .catch(err => console.log('Erro ao enviar localização:', err));
-        }
-      );
-      setLocationSub(sub);
-      setSharingLocation(true);
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (locationSub) {
-        locationSub.remove();
-      }
-    };
-  }, [locationSub]);
 
   if (!vendor) {
     return (

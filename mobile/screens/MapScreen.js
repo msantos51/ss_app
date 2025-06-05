@@ -3,6 +3,11 @@ import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
+import {
+  startLocationSharing,
+  stopLocationSharing,
+  isLocationSharing,
+} from '../locationService';
 
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
@@ -19,9 +24,20 @@ export default function MapScreen({ navigation }) {
     const loadUser = async () => {
       const stored = await AsyncStorage.getItem('user');
       if (stored) {
-        setCurrentUser(JSON.parse(stored));
-      } else {
-        setCurrentUser(null);
+const stored = await AsyncStorage.getItem('user');
+if (stored) {
+  const v = JSON.parse(stored);
+  setCurrentUser(v);
+  const share = await isLocationSharing();
+  if (share) {
+    startLocationSharing(v.id).catch(err =>
+      console.log('Erro ao iniciar localização:', err)
+    );
+  }
+} else {
+  setCurrentUser(null);
+  await stopLocationSharing();
+}
       }
     };
     const unsubscribe = navigation.addListener('focus', loadUser);

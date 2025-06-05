@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { BASE_URL } from '../config';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -76,7 +77,7 @@ export default function DashboardScreen({ navigation }) {
       }
 
       const response = await axios.put(
-        `http://10.0.2.2:8000/vendors/${vendor.id}/profile`,
+        `${BASE_URL}/vendors/${vendor.id}/profile`,
         data,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -130,7 +131,7 @@ export default function DashboardScreen({ navigation }) {
       ) : (
         vendor.profile_photo && (
           <Image
-            source={{ uri: `http://10.0.2.2:8000/${vendor.profile_photo}` }}
+            source={{ uri: `${BASE_URL}/${vendor.profile_photo}` }}
             style={styles.imagePreview}
           />
         )

@@ -1,6 +1,7 @@
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { BASE_URL } from './config';
 
 let locationSubscription = null;
 
@@ -20,7 +21,7 @@ export const startLocationSharing = async (vendorId) => {
     },
     ({ coords }) => {
       axios
-        .put(`http://10.0.2.2:8000/vendors/${vendorId}/location`, {
+        .put(`${BASE_URL}/vendors/${vendorId}/location`, {
           lat: coords.latitude,
           lng: coords.longitude,
         })

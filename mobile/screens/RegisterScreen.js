@@ -3,6 +3,7 @@ import { View, TextInput, Button, StyleSheet, Text, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { BASE_URL } from '../config';
 
 export default function RegisterScreen({ navigation }) {
 const [email, setEmail] = useState('');
@@ -38,7 +39,7 @@ try {
     });
   }
 
-  await axios.post('http://10.0.2.2:8000/vendors/', data, {
+  await axios.post(`${BASE_URL}/vendors/`, data, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 

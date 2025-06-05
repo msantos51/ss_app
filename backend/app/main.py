@@ -1,7 +1,8 @@
 # main.py - aplicação FastAPI com rotas principais
 
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Body
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Body, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from . import models, schemas
@@ -16,6 +17,16 @@ models.Base.metadata.create_all(bind=engine)
 # Inicializar app
 app = FastAPI()
 
+# Habilitar CORS para permitir requisições do frontend
+origins = ["*"]  # Em produção, defina os domínios permitidos
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # (em português) Montar rota para servir imagens (http://localhost:8000/profile_photos/abc.jpg)
 app.mount("/profile_photos", StaticFiles(directory="profile_photos"), name="profile_photos")
 
@@ -25,6 +36,26 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Diretório para guardar fotos de perfil
 PROFILE_PHOTO_DIR = "profile_photos"
 os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)
+
+# Gerenciador simples para conexões WebSocket
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in list(self.active_connections):
+            await connection.send_json(message)
+
+
+manager = ConnectionManager()
 
 # --------------------------
 # Sessão de base de dados
@@ -141,7 +172,7 @@ async def update_vendor_profile(
 # Atualizar localização do vendedor
 # --------------------------
 @app.put("/vendors/{vendor_id}/location")
-def update_vendor_location(
+async def update_vendor_location(
     vendor_id: int,
     lat: float = Body(...),
     lng: float = Body(...),
@@ -154,4 +185,18 @@ def update_vendor_location(
     vendor.current_lat = lat
     vendor.current_lng = lng
     db.commit()
+
+    await manager.broadcast({"vendor_id": vendor_id, "lat": lat, "lng": lng})
     return {"message": "Localização atualizada com sucesso"}
+
+# --------------------------
+# WebSocket para atualizações em tempo real
+# --------------------------
+@app.websocket("/ws/locations")
+async def websocket_locations(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()  # Mantém a conexão ativa
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)

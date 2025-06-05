@@ -8,7 +8,7 @@ export default function MapScreen() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:8000/vendors/')
+      .get('http://10.0.2.2:8000/login')
       .then(res => setVendors(res.data))
       .catch(err => console.log(err));
   }, []);

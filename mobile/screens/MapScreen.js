@@ -14,30 +14,32 @@ export default function MapScreen({ navigation }) {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    axios
-      .get('http://10.0.2.2:8000/vendors/')
-      .then(res => setVendors(res.data))
-      .catch(err => console.log('Erro ao buscar vendedores:', err));
-  }, []);
+    const fetchVendors = () => {
+      axios
+        .get('http://10.0.2.2:8000/vendors/')
+        .then((res) => setVendors(res.data))
+        .catch((err) => console.log('Erro ao buscar vendedores:', err));
+    };
+    const unsubscribe = navigation.addListener('focus', fetchVendors);
+    fetchVendors();
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     const loadUser = async () => {
       const stored = await AsyncStorage.getItem('user');
       if (stored) {
-const stored = await AsyncStorage.getItem('user');
-if (stored) {
-  const v = JSON.parse(stored);
-  setCurrentUser(v);
-  const share = await isLocationSharing();
-  if (share) {
-    startLocationSharing(v.id).catch(err =>
-      console.log('Erro ao iniciar localização:', err)
-    );
-  }
-} else {
-  setCurrentUser(null);
-  await stopLocationSharing();
-}
+        const v = JSON.parse(stored);
+        setCurrentUser(v);
+        const share = await isLocationSharing();
+        if (share) {
+          startLocationSharing(v.id).catch((err) =>
+            console.log('Erro ao iniciar localização:', err)
+          );
+        }
+      } else {
+        setCurrentUser(null);
+        await stopLocationSharing();
       }
     };
     const unsubscribe = navigation.addListener('focus', loadUser);

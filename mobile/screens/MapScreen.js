@@ -24,17 +24,20 @@ export default function MapScreen({ navigation }) {
     const loadUser = async () => {
       const stored = await AsyncStorage.getItem('user');
       if (stored) {
-        const v = JSON.parse(stored);
-        setCurrentUser(v);
-        const share = await isLocationSharing();
-        if (share) {
-          startLocationSharing(v.id).catch(err =>
-            console.log('Erro ao iniciar localização:', err)
-          );
-        }
-      } else {
-        setCurrentUser(null);
-        await stopLocationSharing();
+const stored = await AsyncStorage.getItem('user');
+if (stored) {
+  const v = JSON.parse(stored);
+  setCurrentUser(v);
+  const share = await isLocationSharing();
+  if (share) {
+    startLocationSharing(v.id).catch(err =>
+      console.log('Erro ao iniciar localização:', err)
+    );
+  }
+} else {
+  setCurrentUser(null);
+  await stopLocationSharing();
+}
       }
     };
     const unsubscribe = navigation.addListener('focus', loadUser);

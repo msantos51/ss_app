@@ -7,10 +7,16 @@ export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('http://10.0.2.2:8000/vendors/')
-      .then(res => setVendors(res.data))
-      .catch(err => console.log('Erro ao buscar vendedores:', err));
+    const fetchVendors = () => {
+      axios
+        .get('http://10.0.2.2:8000/vendors/')
+        .then(res => setVendors(res.data))
+        .catch(err => console.log('Erro ao buscar vendedores:', err));
+    };
+
+    fetchVendors();
+    const interval = setInterval(fetchVendors, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

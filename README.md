@@ -223,6 +223,10 @@ uvicorn app.main:app --reload
 
 O backend ficará disponível em `http://localhost:8000`.
 
+### 2.7 CORS e WebSockets
+
+O arquivo `backend/app/main.py` agora configura o middleware `CORSMiddleware` para permitir que o aplicativo móvel aceda ao backend durante o desenvolvimento. Foi também criado um endpoint WebSocket (`/ws/locations`) que emite atualizações de localização dos vendedores em tempo real para todos os clientes conectados.
+
 ## 3. Frontend (React Native)
 
 ### 3.1 Instalação de dependências

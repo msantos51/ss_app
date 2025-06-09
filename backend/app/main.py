@@ -71,12 +71,9 @@ def get_db():
 # --------------------------
 @app.post("/login", response_model=schemas.VendorOut)
 def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == credentials.email).first()
-    if not user or not pwd_context.verify(credentials.password, user.hashed_password):
+    vendor = db.query(models.Vendor).filter(models.Vendor.email == credentials.email).first()
+    if not vendor or not pwd_context.verify(credentials.password, vendor.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    vendor = user.vendor
-    if vendor is None:
-        raise HTTPException(status_code=400, detail="Vendor not found")
     return vendor
 
 # --------------------------
@@ -92,16 +89,11 @@ async def create_vendor(
     db: Session = Depends(get_db),
 ):
     # Verificar se email já está registado
-    db_user = db.query(models.User).filter(models.User.email == email).first()
-    if db_user:
+    db_vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
+    if db_vendor:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # Criar utilizador
+
     hashed_password = pwd_context.hash(password)
-    new_user = models.User(name=name, email=email, hashed_password=hashed_password, role="vendor")
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
 
     # Guardar imagem em disco
     ext = os.path.splitext(profile_photo.filename)[1]
@@ -114,14 +106,15 @@ async def create_vendor(
 
     # Criar vendedor
     new_vendor = models.Vendor(
-        user_id=new_user.id,
+        name=name,
+        email=email,
+        hashed_password=hashed_password,
         product=product,
         profile_photo=public_path,
     )
     db.add(new_vendor)
     db.commit()
     db.refresh(new_vendor)
-    _ = new_vendor.user  # Forçar carregamento da relação
     return new_vendor
 
 # --------------------------
@@ -130,8 +123,6 @@ async def create_vendor(
 @app.get("/vendors/", response_model=list[schemas.VendorOut])
 def list_vendors(db: Session = Depends(get_db)):
     vendors = db.query(models.Vendor).all()
-    for v in vendors:
-        _ = v.user
     return vendors
 
 # --------------------------
@@ -151,13 +142,12 @@ async def update_vendor_profile(
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found")
 
-    user = vendor.user
     if name:
-        user.name = name
+        vendor.name = name
     if email:
-        user.email = email
+        vendor.email = email
     if password:
-        user.hashed_password = pwd_context.hash(password)
+        vendor.hashed_password = pwd_context.hash(password)
     if product:
         vendor.product = product
     if profile_photo:

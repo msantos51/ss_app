@@ -91,7 +91,7 @@ export default function MapScreen({ navigation }) {
         markers={filteredVendors.map((v) => ({
           latitude: v.current_lat,
           longitude: v.current_lng,
-          title: v.user?.name || 'Vendedor',
+          title: v.name || 'Vendedor',
         }))}
       />
 
@@ -121,7 +121,7 @@ export default function MapScreen({ navigation }) {
                 )
               }
             >
-              <Text>{item.user?.name || 'Vendedor'}</Text>
+              <Text>{item.name || 'Vendedor'}</Text>
             </TouchableOpacity>
           )}
         />

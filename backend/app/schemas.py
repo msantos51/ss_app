@@ -2,14 +2,6 @@
 from pydantic import BaseModel
 from typing import Optional, Literal
 
-class UserOut(BaseModel):
-    id: int
-    name: str
-    email: str
-
-    class Config:
-        orm_mode = True
-
 class UserLogin(BaseModel):
     email: str
     password: str
@@ -30,11 +22,12 @@ class VendorCreate(BaseModel):
 
 class VendorOut(BaseModel):
     id: int
+    name: str
+    email: str
     product: str
     profile_photo: str
     current_lat: Optional[float] = None
     current_lng: Optional[float] = None
-    user: UserOut
 
     class Config:
         orm_mode = True

@@ -42,7 +42,7 @@ def test_vendor_registration(client):
     resp = register_vendor(client)
     assert resp.status_code == 200
     payload = resp.json()
-    assert payload["user"]["email"] == "vendor@example.com"
+    assert payload["email"] == "vendor@example.com"
     assert payload["product"] == "Bolas de Berlim"
 
 
@@ -51,7 +51,7 @@ def test_login(client):
     resp = client.post("/login", json={"email": "vendor@example.com", "password": "secret"})
     assert resp.status_code == 200
     payload = resp.json()
-    assert payload["user"]["email"] == "vendor@example.com"
+    assert payload["email"] == "vendor@example.com"
 
 
 def test_vendor_listing(client):
@@ -60,7 +60,7 @@ def test_vendor_listing(client):
     resp = client.get("/vendors/")
     assert resp.status_code == 200
     vendors = resp.json()
-    emails = [v["user"]["email"] for v in vendors]
+    emails = [v["email"] for v in vendors]
     assert "first@example.com" in emails and "second@example.com" in emails
     for v in vendors:
         assert "current_lat" in v and "current_lng" in v

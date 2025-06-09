@@ -110,32 +110,21 @@ Base = declarative_base()
 ### 2.3 Arquivo models.py
 
 ```python
-# models.py - define as tabelas no PostgreSQL
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+# models.py - define a tabela de vendedores no PostgreSQL
+from sqlalchemy import Column, Integer, String, Float
 from .database import Base
-from datetime import datetime
-
-class User(Base):
-    __tablename__ = "users"  # tabela de utilizadores
-
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    role = Column(String)  # 'vendor' ou 'customer'
-
-    vendor = relationship("Vendor", back_populates="user", uselist=False)
 
 class Vendor(Base):
-    __tablename__ = "vendors"  # tabela de vendedores
+    __tablename__ = "vendors"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    current_lat = Column(Float)
-    current_lng = Column(Float)
-    last_update = Column(DateTime, default=datetime.utcnow)
-
-    user = relationship("User", back_populates="vendor")
+    name = Column(String)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    product = Column(String)
+    profile_photo = Column(String)
+    current_lat = Column(Float, nullable=True)
+    current_lng = Column(Float, nullable=True)
 ```
 
 ### 2.4 Arquivo schemas.py
@@ -143,32 +132,27 @@ class Vendor(Base):
 ```python
 # schemas.py - define os formatos de dados para entrada e saída
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
+from typing import Optional, Literal
 
-class UserCreate(BaseModel):
-    username: str
+class UserLogin(BaseModel):
+    email: str
     password: str
-    role: str  # 'vendor' ou 'customer'
 
-class UserOut(BaseModel):
-    id: int
-    username: str
-    role: str
-
-    class Config:
-        orm_mode = True
-
-class VendorUpdate(BaseModel):
-    current_lat: float
-    current_lng: float
+class VendorCreate(BaseModel):
+    name: str
+    email: str
+    password: str
+    product: Literal["Bolas de Berlim", "Gelados", "Acessórios"]
+    profile_photo: str
 
 class VendorOut(BaseModel):
     id: int
-    current_lat: float
-    current_lng: float
-    last_update: datetime
-    user: UserOut
+    name: str
+    email: str
+    product: str
+    profile_photo: str
+    current_lat: Optional[float] = None
+    current_lng: Optional[float] = None
 
     class Config:
         orm_mode = True

@@ -42,8 +42,8 @@ export default function DashboardScreen({ navigation }) {
         if (stored) {
           const v = JSON.parse(stored);
           setVendor(v);
-          setName(v.user.name);
-          setEmail(v.user.email);
+          setName(v.name);
+          setEmail(v.email);
           setProduct(v.product);
 
           const share = await isLocationSharing();
@@ -82,8 +82,8 @@ export default function DashboardScreen({ navigation }) {
     if (!vendor) return;
     try {
       const data = new FormData();
-      if (name !== vendor.user.name) data.append('name', name);
-      if (email !== vendor.user.email) data.append('email', email);
+      if (name !== vendor.name) data.append('name', name);
+      if (email !== vendor.email) data.append('email', email);
       if (password) data.append('password', password);
       if (product !== vendor.product) data.append('product', product);
       if (profilePhoto) {
@@ -102,8 +102,8 @@ export default function DashboardScreen({ navigation }) {
 
       await AsyncStorage.setItem('user', JSON.stringify(response.data));
       setVendor(response.data);
-      setName(response.data.user.name);
-      setEmail(response.data.user.email);
+      setName(response.data.name);
+      setEmail(response.data.email);
       setProduct(response.data.product);
       setPassword('');
       setError(null);

@@ -84,6 +84,7 @@ def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
 # --------------------------
 @app.post("/vendors/", response_model=schemas.VendorOut)
 async def create_vendor(
+    name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
     product: str = Form(...),
@@ -97,7 +98,7 @@ async def create_vendor(
     
     # Criar utilizador
     hashed_password = pwd_context.hash(password)
-    new_user = models.User(email=email, hashed_password=hashed_password, role="vendor")
+    new_user = models.User(name=name, email=email, hashed_password=hashed_password, role="vendor")
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -139,6 +140,7 @@ def list_vendors(db: Session = Depends(get_db)):
 @app.put("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
 async def update_vendor_profile(
     vendor_id: int,
+    name: str = Form(None),
     email: str = Form(None),
     password: str = Form(None),
     product: str = Form(None),
@@ -150,6 +152,8 @@ async def update_vendor_profile(
         raise HTTPException(status_code=404, detail="Vendor not found")
 
     user = vendor.user
+    if name:
+        user.name = name
     if email:
         user.email = email
     if password:

@@ -4,6 +4,7 @@ from typing import Optional, Literal
 
 class UserOut(BaseModel):
     id: int
+    name: str
     email: str
 
     class Config:
@@ -14,12 +15,14 @@ class UserLogin(BaseModel):
     password: str
 
 class VendorProfileUpdate(BaseModel):
+    name: Optional[str] = None
     email: Optional[str] = None
     password: Optional[str] = None
     product: Optional[Literal["Bolas de Berlim", "Gelados", "Acess\u00f3rios"]] = None
     profile_photo: Optional[str] = None
 
 class VendorCreate(BaseModel):
+    name: str
     email: str
     password: str
     product: Literal["Bolas de Berlim", "Gelados", "Acess\u00f3rios"]

@@ -281,6 +281,41 @@ expo start
 
 Siga as instruções do terminal para abrir o app em um emulador ou no dispositivo físico.
 
+### 3.4 Configuração da URL do backend
+
+O arquivo `mobile/config.js` exporta a constante `BASE_URL`, utilizada nas requisições ao servidor.
+Por padrão o valor é `http://10.0.2.2:8000`, adequado para o emulador Android (que acessa o `localhost` da máquina).
+
+É possível sobrescrever este endereço definindo a variável de ambiente `EXPO_PUBLIC_BASE_URL` ou
+adicionando `BASE_URL` em `expo.extra` no `app.json` do projeto.
+
+Exemplos:
+
+```bash
+# Emulador Android
+EXPO_PUBLIC_BASE_URL=http://10.0.2.2:8000 npx expo start
+
+# iOS Simulator
+EXPO_PUBLIC_BASE_URL=http://localhost:8000 npx expo start
+
+# Dispositivo físico na mesma rede
+EXPO_PUBLIC_BASE_URL=http://192.168.0.5:8000 npx expo start
+```
+
+Ou defina em `app.json`:
+
+```json
+{
+  "expo": {
+    "extra": {
+      "BASE_URL": "http://192.168.0.5:8000"
+    }
+  }
+}
+```
+
+Escolha a URL apropriada conforme estiver a testar em emuladores ou dispositivos reais.
+
 ## 4. Considerações finais
 
 * Este README fornece um guia inicial. Você pode expandir o backend com autenticação JWT e aprimorar o frontend conforme necessário.

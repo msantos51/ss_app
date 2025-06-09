@@ -1,3 +1,5 @@
+// (em português) Este ecrã mostra o mapa com os vendedores ativos e permite filtrar por tipo de produto
+
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
@@ -63,7 +65,6 @@ export default function MapScreen({ navigation }) {
       loadUser();
     });
 
-    // Também carregar na primeira vez
     fetchVendors();
     loadUser();
 
@@ -79,39 +80,40 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* (em português) Mapa com OpenStreetMap como base e marcadores dos vendedores */}
       <MapView
         ref={mapRef}
         style={styles.map}
         mapType="none"
         initialRegion={{
-          latitude: 38.736946, // Lisboa
+          latitude: 38.736946,
           longitude: -9.142685,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
       >
-        {/* Camadas do OpenStreetMap */}
         <UrlTile
           urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maximumZ={19}
           flipY={false}
         />
-{filteredVendors.map((vendor) =>
-  vendor.current_lat != null && vendor.current_lng != null ? (
-    <Marker
-      key={vendor.id}
-      coordinate={{
-        latitude: vendor.current_lat,
-        longitude: vendor.current_lng,
-      }}
-      title={vendor.user.name}
-      description={vendor.product}
-    />
-  ) : null
-)}
 
+        {filteredVendors.map((vendor) =>
+          vendor.current_lat != null && vendor.current_lng != null ? (
+            <Marker
+              key={vendor.id}
+              coordinate={{
+                latitude: vendor.current_lat,
+                longitude: vendor.current_lng,
+              }}
+              title={vendor.user?.name || 'Vendedor'}
+              description={vendor.product}
+            />
+          ) : null
+        )}
       </MapView>
 
+      {/* (em português) Filtros e lista de vendedores */}
       <View style={styles.filterContainer}>
         <Picker
           selectedValue={selectedProduct}
@@ -142,13 +144,13 @@ export default function MapScreen({ navigation }) {
                 )
               }
             >
-              <Text>{item.user.name}</Text>
+              <Text>{item.user?.name || 'Vendedor'}</Text>
             </TouchableOpacity>
           )}
         />
       </View>
 
-      {/* Botões por cima do mapa */}
+      {/* (em português) Botões Login/Registar ou Perfil */}
       <View style={styles.buttonsContainer}>
         {currentUser ? (
           <TouchableOpacity

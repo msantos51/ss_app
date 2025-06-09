@@ -63,7 +63,6 @@ export default function MapScreen({ navigation }) {
       loadUser();
     });
 
-    // Também carregar na primeira vez
     fetchVendors();
     loadUser();
 
@@ -83,26 +82,25 @@ export default function MapScreen({ navigation }) {
         ref={mapRef}
         style={styles.map}
         initialRegion={{
-          latitude: 38.736946, // Lisboa
+          latitude: 38.736946,
           longitude: -9.142685,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
       >
-{filteredVendors.map((vendor) =>
-  vendor.current_lat != null && vendor.current_lng != null ? (
-    <Marker
-      key={vendor.id}
-      coordinate={{
-        latitude: vendor.current_lat,
-        longitude: vendor.current_lng,
-      }}
-      title={vendor.user.name}
-      description={vendor.product}
-    />
-  ) : null
-)}
-
+        {filteredVendors.map((vendor) =>
+          vendor.current_lat != null && vendor.current_lng != null ? (
+            <Marker
+              key={vendor.id}
+              coordinate={{
+                latitude: vendor.current_lat,
+                longitude: vendor.current_lng,
+              }}
+              title={vendor.user?.name || 'Vendedor'}
+              description={vendor.product}
+            />
+          ) : null
+        )}
       </MapView>
 
       <View style={styles.filterContainer}>
@@ -135,13 +133,12 @@ export default function MapScreen({ navigation }) {
                 )
               }
             >
-              <Text>{item.user.name}</Text>
+              <Text>{item.user?.name || 'Vendedor'}</Text>
             </TouchableOpacity>
           )}
         />
       </View>
 
-      {/* Botões por cima do mapa */}
       <View style={styles.buttonsContainer}>
         {currentUser ? (
           <TouchableOpacity

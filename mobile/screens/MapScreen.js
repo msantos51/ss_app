@@ -1,3 +1,5 @@
+// (em português) Este ecrã mostra o mapa com os vendedores ativos e permite filtrar por tipo de produto
+
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
@@ -8,7 +10,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, UrlTile } from 'react-native-maps';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import {
@@ -78,9 +80,11 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* (em português) Mapa com OpenStreetMap como base e marcadores dos vendedores */}
       <MapView
         ref={mapRef}
         style={styles.map}
+        mapType="none"
         initialRegion={{
           latitude: 38.736946,
           longitude: -9.142685,
@@ -88,6 +92,12 @@ export default function MapScreen({ navigation }) {
           longitudeDelta: 0.05,
         }}
       >
+        <UrlTile
+          urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+        />
+
         {filteredVendors.map((vendor) =>
           vendor.current_lat != null && vendor.current_lng != null ? (
             <Marker
@@ -103,6 +113,7 @@ export default function MapScreen({ navigation }) {
         )}
       </MapView>
 
+      {/* (em português) Filtros e lista de vendedores */}
       <View style={styles.filterContainer}>
         <Picker
           selectedValue={selectedProduct}
@@ -139,6 +150,7 @@ export default function MapScreen({ navigation }) {
         />
       </View>
 
+      {/* (em português) Botões Login/Registar ou Perfil */}
       <View style={styles.buttonsContainer}>
         {currentUser ? (
           <TouchableOpacity

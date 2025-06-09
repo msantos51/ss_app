@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Marker, UrlTile, PROVIDER_DEFAULT } from 'react-native-maps';
+// Substituímos react-native-maps por um componente baseado em WebView com Leaflet
+import LeafletMap from '../LeafletMap';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import {
@@ -84,43 +85,15 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* (em português) Mapa com OpenStreetMap como base e marcadores dos vendedores */}
-      <MapView
-        provider={PROVIDER_DEFAULT}
-        style={styles.map}
-        mapType="none"
-        legalLabelInsets={{ bottom: -100, right: -100 }}
-        initialRegion={{
-          latitude: 38.736946,
-          longitude: -9.142685,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
+      {/* (em português) Mapa usando Leaflet via WebView */}
+      <LeafletMap
         ref={mapRef}
-      >
-        {/* (em português) Camadas do OpenStreetMap */}
-        <UrlTile
-          urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          flipY={false}
-        />
-
-        {/* (em português) Marcadores dos vendedores */}
-        {filteredVendors.map((vendor) => {
-          if (!vendor?.current_lat || !vendor?.current_lng) return null;
-          return (
-            <Marker
-              key={vendor.id}
-              coordinate={{
-                latitude: vendor.current_lat,
-                longitude: vendor.current_lng,
-              }}
-              title={vendor.user?.name || 'Vendedor'}
-              description={vendor.product || ''}
-            />
-          );
-        })}
-      </MapView>
+        markers={filteredVendors.map((v) => ({
+          latitude: v.current_lat,
+          longitude: v.current_lng,
+          title: v.user?.name || 'Vendedor',
+        }))}
+      />
 
       {/* (em português) Filtros e lista de vendedores */}
       <View style={styles.filterContainer}>
@@ -142,14 +115,9 @@ export default function MapScreen({ navigation }) {
             <TouchableOpacity
               style={styles.vendorItem}
               onPress={() =>
-                mapRef.current?.animateToRegion(
-                  {
-                    latitude: item.current_lat,
-                    longitude: item.current_lng,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  },
-                  1000
+                mapRef.current?.setView(
+                  item.current_lat,
+                  item.current_lng
                 )
               }
             >
@@ -192,7 +160,6 @@ export default function MapScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
   filterContainer: {
     position: 'absolute',
     top: 40,

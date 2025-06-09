@@ -85,6 +85,7 @@ export default function MapScreen({ navigation }) {
         ref={mapRef}
         style={styles.map}
         mapType="none"
+        legalLabelInsets={{ bottom: -100, right: -100 }}
         initialRegion={{
           latitude: 38.736946,
           longitude: -9.142685,

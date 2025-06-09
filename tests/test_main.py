@@ -27,8 +27,9 @@ def client(tmp_path):
     if os.path.exists("profile_photos"):
         shutil.rmtree("profile_photos")
 
-def register_vendor(client, email="vendor@example.com", password="secret"):
+def register_vendor(client, email="vendor@example.com", password="secret", name="Vendor"):
     data = {
+        "name": name,
         "email": email,
         "password": password,
         "product": "Bolas de Berlim",
@@ -54,8 +55,8 @@ def test_login(client):
 
 
 def test_vendor_listing(client):
-    register_vendor(client, email="first@example.com")
-    register_vendor(client, email="second@example.com")
+    register_vendor(client, email="first@example.com", name="First")
+    register_vendor(client, email="second@example.com", name="Second")
     resp = client.get("/vendors/")
     assert resp.status_code == 200
     vendors = resp.json()

@@ -97,7 +97,7 @@ export default function MapScreen({ navigation }) {
         latitude: vendor.current_lat,
         longitude: vendor.current_lng,
       }}
-      title={vendor.user.email}
+      title={vendor.user.name}
       description={vendor.product}
     />
   ) : null
@@ -135,7 +135,7 @@ export default function MapScreen({ navigation }) {
                 )
               }
             >
-              <Text>{item.user.email}</Text>
+              <Text>{item.user.name}</Text>
             </TouchableOpacity>
           )}
         />

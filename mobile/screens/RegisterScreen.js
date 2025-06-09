@@ -14,6 +14,7 @@ import axios from 'axios';
 import { BASE_URL } from '../config';
 
 export default function RegisterScreen({ navigation }) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
@@ -34,7 +35,7 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const register = async () => {
-    if (!email || !password || !product) {
+    if (!name || !email || !password || !product) {
       setError('Preencha todos os campos obrigatórios');
       return;
     }
@@ -44,6 +45,7 @@ export default function RegisterScreen({ navigation }) {
 
     try {
       const data = new FormData();
+      data.append('name', name);
       data.append('email', email);
       data.append('password', password);
       data.append('product', product);
@@ -76,6 +78,16 @@ export default function RegisterScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nome"
+        value={name}
+        onChangeText={(text) => {
+          setName(text);
+          setError(null);
+        }}
+      />
 
       <TextInput
         style={styles.input}

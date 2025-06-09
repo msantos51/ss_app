@@ -58,5 +58,8 @@ def test_vendor_listing(client):
     register_vendor(client, email="second@example.com")
     resp = client.get("/vendors/")
     assert resp.status_code == 200
-    emails = [v["user"]["email"] for v in resp.json()]
+    vendors = resp.json()
+    emails = [v["user"]["email"] for v in vendors]
     assert "first@example.com" in emails and "second@example.com" in emails
+    for v in vendors:
+        assert "current_lat" in v and "current_lng" in v

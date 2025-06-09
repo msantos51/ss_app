@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Marker, UrlTile } from 'react-native-maps';
+import MapView, { Marker, UrlTile, PROVIDER_DEFAULT } from 'react-native-maps';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import {
@@ -25,6 +25,7 @@ export default function MapScreen({ navigation }) {
   const [selectedProduct, setSelectedProduct] = useState('Todos');
   const mapRef = useRef(null);
 
+  // (em português) Busca os vendedores ao backend
   const fetchVendors = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/vendors/`);
@@ -34,6 +35,7 @@ export default function MapScreen({ navigation }) {
     }
   };
 
+  // (em português) Carrega o utilizador autenticado (se existir)
   const loadUser = async () => {
     try {
       const stored = await AsyncStorage.getItem('user');
@@ -59,6 +61,7 @@ export default function MapScreen({ navigation }) {
     }
   };
 
+  // (em português) Sempre que o ecrã abrir, atualiza dados
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchVendors();
@@ -72,17 +75,18 @@ export default function MapScreen({ navigation }) {
   }, [navigation]);
 
   const activeVendors = vendors.filter(
-    (v) => v.current_lat != null && v.current_lng != null
+    (v) => v?.current_lat != null && v?.current_lng != null
   );
+
   const filteredVendors = activeVendors.filter(
-    (v) => selectedProduct === 'Todos' || v.product === selectedProduct
+    (v) => selectedProduct === 'Todos' || v?.product === selectedProduct
   );
 
   return (
     <View style={styles.container}>
       {/* (em português) Mapa com OpenStreetMap como base e marcadores dos vendedores */}
       <MapView
-        ref={mapRef}
+        provider={null} // <- força sem Google Maps
         style={styles.map}
         mapType="none"
         legalLabelInsets={{ bottom: -100, right: -100 }}
@@ -92,15 +96,19 @@ export default function MapScreen({ navigation }) {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
+        ref={mapRef}
       >
+        {/* (em português) Camadas do OpenStreetMap */}
         <UrlTile
           urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maximumZ={19}
           flipY={false}
         />
 
-        {filteredVendors.map((vendor) =>
-          vendor.current_lat != null && vendor.current_lng != null ? (
+        {/* (em português) Marcadores dos vendedores */}
+        {filteredVendors.map((vendor) => {
+          if (!vendor?.current_lat || !vendor?.current_lng) return null;
+          return (
             <Marker
               key={vendor.id}
               coordinate={{
@@ -108,10 +116,10 @@ export default function MapScreen({ navigation }) {
                 longitude: vendor.current_lng,
               }}
               title={vendor.user?.name || 'Vendedor'}
-              description={vendor.product}
+              description={vendor.product || ''}
             />
-          ) : null
-        )}
+          );
+        })}
       </MapView>
 
       {/* (em português) Filtros e lista de vendedores */}
@@ -128,7 +136,7 @@ export default function MapScreen({ navigation }) {
         </Picker>
         <FlatList
           data={filteredVendors}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
           style={styles.vendorList}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -151,7 +159,7 @@ export default function MapScreen({ navigation }) {
         />
       </View>
 
-      {/* (em português) Botões Login/Registar ou Perfil */}
+      {/* (em português) Botões Login/Registar ou ir para o Perfil */}
       <View style={styles.buttonsContainer}>
         {currentUser ? (
           <TouchableOpacity

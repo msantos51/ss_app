@@ -11,16 +11,20 @@
   "dependencies": {
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-picker/picker": "2.11.0",
     "axios": "^1.9.0",
     "expo": "53.0.11",
-    "react": "19.0.0",
-    "react-native": "0.79.3",
-    "react-native-maps": "1.20.1",
-    "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "4.11.1",
     "expo-image-picker": "~16.1.4",
     "expo-location": "~18.1.5",
-    "@react-native-async-storage/async-storage": "2.1.2",
-    "@react-native-picker/picker": "2.11.0"
-  }
+    "react": "19.0.0",
+    "react-native": "0.79.3",
+    "react-native-maps": "1.17.1",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.11.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0"
+  },
+  "private": true
 }

@@ -29,6 +29,8 @@ class VendorOut(BaseModel):
     id: int
     product: str
     profile_photo: str
+    current_lat: Optional[float] = None
+    current_lng: Optional[float] = None
     user: UserOut
 
     class Config:

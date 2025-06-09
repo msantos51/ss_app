@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, UrlTile } from 'react-native-maps';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import {
@@ -82,6 +82,7 @@ export default function MapScreen({ navigation }) {
       <MapView
         ref={mapRef}
         style={styles.map}
+        mapType="none"
         initialRegion={{
           latitude: 38.736946, // Lisboa
           longitude: -9.142685,
@@ -89,6 +90,12 @@ export default function MapScreen({ navigation }) {
           longitudeDelta: 0.05,
         }}
       >
+        {/* Camadas do OpenStreetMap */}
+        <UrlTile
+          urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+        />
 {filteredVendors.map((vendor) =>
   vendor.current_lat != null && vendor.current_lng != null ? (
     <Marker

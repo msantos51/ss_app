@@ -86,7 +86,7 @@ export default function MapScreen({ navigation }) {
     <View style={styles.container}>
       {/* (em português) Mapa com OpenStreetMap como base e marcadores dos vendedores */}
       <MapView
-        provider={null} // <- força sem Google Maps
+        provider={PROVIDER_DEFAULT}
         style={styles.map}
         mapType="none"
         legalLabelInsets={{ bottom: -100, right: -100 }}

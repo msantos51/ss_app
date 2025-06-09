@@ -34,6 +34,16 @@ app.mount("/profile_photos", StaticFiles(directory=PROFILE_PHOTO_DIR), name="pro
 # Criar as tabelas na base de dados
 models.Base.metadata.create_all(bind=engine)
 
+# Garantir que a coluna "name" existe para compatibilidade com bases de dados antigas
+from sqlalchemy import inspect, text
+inspector = inspect(engine)
+if "users" in inspector.get_table_names():
+    cols = [c["name"] for c in inspector.get_columns("users")]
+    if "name" not in cols:
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN name VARCHAR"))
+            conn.commit()
+
 # Contexto para hash de password
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

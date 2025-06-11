@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LeafletMap from '../LeafletMap';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { subscribe as subscribeLocations } from '../socketService';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -76,6 +77,18 @@ export default function MapScreen({ navigation }) {
 
     return unsubscribe;
   }, [navigation]);
+
+  // Subscrição ao WebSocket para atualizações de localização
+  useEffect(() => {
+    const unsubscribe = subscribeLocations(({ vendor_id, lat, lng }) => {
+      setVendors((prev) =>
+        prev.map((v) =>
+          v.id === vendor_id ? { ...v, current_lat: lat, current_lng: lng } : v
+        )
+      );
+    });
+    return unsubscribe;
+  }, []);
 
   const activeVendors = vendors.filter(
     (v) => v?.current_lat != null && v?.current_lng != null

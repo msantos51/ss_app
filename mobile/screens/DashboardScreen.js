@@ -105,7 +105,10 @@ export default function DashboardScreen({ navigation }) {
         return;
       }
 
-      const response = await axios.patch(`${BASE_URL}/vendors/${vendor.id}/profile`, data, {
+      const response = await axios({
+        method: 'PATCH',
+        url: `${BASE_URL}/vendors/${vendor.id}/profile`,
+        data,
         headers: {
           Accept: 'application/json',
           'Content-Type': 'multipart/form-data',

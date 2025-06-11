@@ -12,11 +12,15 @@ export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#FF6600',
-    accent: '#FFC300',
-    background: '#F9F9F9',
-    surface: '#FFFFFF',
-    text: '#333333',
+    primary: '#705D00',  // primary
+    accent: '#705D00',   // secondary
+    background: '#FFF8EF', // background
+    surface: '#FFF8EF',    // surface
+    text: '#1F1B10',       // onBackground
+    error: '#BA1A1A',
+    onPrimary: '#FFFFFF',
+    onSecondary: '#FFFFFF',
+    onSurface: '#1F1B10',
   },
   fonts: configureFonts(fontConfig),
 };

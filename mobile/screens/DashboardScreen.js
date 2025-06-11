@@ -86,10 +86,12 @@ export default function DashboardScreen({ navigation }) {
     if (!vendor) return;
     try {
       const data = new FormData();
+
       if (name !== vendor.name) data.append('name', name);
       if (email !== vendor.email) data.append('email', email);
       if (password) data.append('password', password);
       if (product !== vendor.product) data.append('product', product);
+
       if (profilePhoto) {
         data.append('profile_photo', {
           uri: profilePhoto.uri,
@@ -98,11 +100,12 @@ export default function DashboardScreen({ navigation }) {
         });
       }
 
-      // Agora usamos PATCH, para compatibilizar com o backend
-      const response = await axios({
-        method: 'patch',
-        url: `${BASE_URL}/vendors/${vendor.id}/profile`,
-        data: data,
+      if (data._parts.length === 0) {
+        setError("Nenhuma alteração efetuada.");
+        return;
+      }
+
+      const response = await axios.patch(`${BASE_URL}/vendors/${vendor.id}/profile`, data, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'multipart/form-data',
@@ -120,11 +123,7 @@ export default function DashboardScreen({ navigation }) {
       setEditing(false);
     } catch (err) {
       console.error('Erro ao atualizar:', err);
-      if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
-      } else {
-        setError('Falha ao atualizar');
-      }
+      setError(err.response?.data?.detail || err.message || 'Falha ao atualizar');
     }
   };
 

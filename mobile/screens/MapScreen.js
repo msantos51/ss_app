@@ -25,6 +25,7 @@ export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState('Todos');
+  const [showList, setShowList] = useState(false);
   const mapRef = useRef(null);
 
   // (em português) Busca os vendedores ao backend
@@ -97,7 +98,11 @@ export default function MapScreen({ navigation }) {
       />
 
       {/* (em português) Filtros e lista de vendedores */}
-      <View style={styles.filterContainer}>
+      <TouchableOpacity
+        style={styles.filterContainer}
+        activeOpacity={1}
+        onPress={() => setShowList((v) => !v)}
+      >
         <Picker
           selectedValue={selectedProduct}
           onValueChange={(itemValue) => setSelectedProduct(itemValue)}
@@ -108,33 +113,35 @@ export default function MapScreen({ navigation }) {
           <Picker.Item label="Acessórios" value="Acessórios" />
           <Picker.Item label="Gelados" value="Gelados" />
         </Picker>
-        <FlatList
-          data={filteredVendors}
-          keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
-          style={styles.vendorList}
-          renderItem={({ item }) => {
-            const photoUri = item.profile_photo
-              ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-              : null;
-            return (
-              <TouchableOpacity
-                style={styles.vendorItem}
-                onPress={() =>
-                  mapRef.current?.setView(
-                    item.current_lat,
-                    item.current_lng
-                  )
-                }
-              >
-                {photoUri && (
-                  <Image source={{ uri: photoUri }} style={styles.vendorImage} />
-                )}
-                <Text>{item.name || 'Vendedor'}</Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
+        {showList && (
+          <FlatList
+            data={filteredVendors}
+            keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
+            style={styles.vendorList}
+            renderItem={({ item }) => {
+              const photoUri = item.profile_photo
+                ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+                : null;
+              return (
+                <TouchableOpacity
+                  style={styles.vendorItem}
+                  onPress={() =>
+                    mapRef.current?.setView(
+                      item.current_lat,
+                      item.current_lng
+                    )
+                  }
+                >
+                  {photoUri && (
+                    <Image source={{ uri: photoUri }} style={styles.vendorImage} />
+                  )}
+                  <Text>{item.name || 'Vendedor'}</Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        )}
+      </TouchableOpacity>
 
       {/* (em português) Botões Login/Registar ou ir para o Perfil */}
       <View style={styles.buttonsContainer}>
@@ -181,7 +188,8 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   picker: { backgroundColor: '#eee', marginBottom: 4 },
-  vendorList: { maxHeight: 80 },
+  // Aumentamos a altura máxima para mostrar mais vendedores sem precisar rolar
+  vendorList: { maxHeight: 200 },
   vendorItem: {
     paddingVertical: 4,
     borderBottomWidth: 1,

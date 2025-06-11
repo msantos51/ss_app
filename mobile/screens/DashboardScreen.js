@@ -35,6 +35,7 @@ export default function DashboardScreen({ navigation }) {
   const logout = async () => {
     await stopLocationSharing();
     await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('token');
     navigation.replace('Login');
   };
 
@@ -111,10 +112,12 @@ export default function DashboardScreen({ navigation }) {
         return;
       }
 
+      const token = await AsyncStorage.getItem('token');
       const response = await axios.patch(`${BASE_URL}/vendors/${vendor.id}/profile`, data, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'multipart/form-data',
+          Authorization: token ? `Bearer ${token}` : undefined,
         },
       });
 

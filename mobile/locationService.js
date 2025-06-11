@@ -20,12 +20,20 @@ export const startLocationSharing = async (vendorId) => {
       distanceInterval: 10,
     },
     ({ coords }) => {
-      axios
-        .put(`${BASE_URL}/vendors/${vendorId}/location`, {
-          lat: coords.latitude,
-          lng: coords.longitude,
-        })
-        .catch((err) => console.log('Erro ao enviar localização:', err));
+      AsyncStorage.getItem('token').then((token) => {
+        axios
+          .put(
+            `${BASE_URL}/vendors/${vendorId}/location`,
+            {
+              lat: coords.latitude,
+              lng: coords.longitude,
+            },
+            {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            }
+          )
+          .catch((err) => console.log('Erro ao enviar localização:', err));
+      });
     }
   );
   await AsyncStorage.setItem('sharingLocation', 'true');

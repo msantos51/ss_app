@@ -94,16 +94,12 @@ export default function DashboardScreen({ navigation }) {
 
       if (profilePhoto) {
         const fileUri = profilePhoto.uri;
-
-        // Lemos o ficheiro com FileSystem para evitar o Network Error
         const fileInfo = await FileSystem.getInfoAsync(fileUri);
-
         const file = {
           uri: fileUri,
           name: 'profile.jpg',
           type: 'image/jpeg',
         };
-
         data.append('profile_photo', file);
       }
 

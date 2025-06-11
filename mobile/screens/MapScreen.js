@@ -21,6 +21,7 @@ import {
   stopLocationSharing,
   isLocationSharing,
 } from '../locationService';
+import useProximityNotifications from '../useProximityNotifications';
 
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
@@ -98,6 +99,8 @@ export default function MapScreen({ navigation }) {
     (v) => selectedProduct === 'Todos' || v?.product === selectedProduct
   );
 
+  useProximityNotifications(filteredVendors);
+
   return (
     <View style={styles.container}>
       {/* (em português) Mapa usando Leaflet via WebView */}
@@ -138,11 +141,11 @@ export default function MapScreen({ navigation }) {
               return (
                 <TouchableOpacity
                   style={styles.vendorItem}
-                  onPress={() =>
-                    mapRef.current?.setView(
-                      item.current_lat,
-                      item.current_lng
-                    )
+                  onPress={() => {
+                    mapRef.current?.setView(item.current_lat, item.current_lng);
+                  }}
+                  onLongPress={() =>
+                    navigation.navigate('VendorDetail', { vendor: item })
                   }
                 >
                   {photoUri && (

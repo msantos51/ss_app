@@ -193,8 +193,8 @@ def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
 def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
     ...
 
-# Rota para atualizar dados do vendedor
-@app.put("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
+# Rota para atualizar dados do vendedor (uso do PATCH)
+@app.patch("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
 def update_vendor_profile(vendor_id: int, update: schemas.VendorProfileUpdate, db: Session = Depends(get_db)):
     ...
 ```

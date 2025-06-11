@@ -96,3 +96,39 @@ def test_protected_routes(client):
     )
     assert resp.status_code == 200
 
+
+def test_location_update_fields(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+    token = get_token(client)
+
+    resp = client.put(
+        f"/vendors/{vendor_id}/location",
+        json={"lat": 10.5, "lng": -20.3},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+
+    resp = client.get("/vendors/")
+    assert resp.status_code == 200
+    vendors = resp.json()
+    vendor = next(v for v in vendors if v["id"] == vendor_id)
+    assert vendor["current_lat"] == 10.5
+    assert vendor["current_lng"] == -20.3
+
+
+def test_websocket_location_broadcast(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+    token = get_token(client)
+
+    with client.websocket_connect("/ws/locations") as websocket:
+        resp = client.put(
+            f"/vendors/{vendor_id}/location",
+            json={"lat": 5.5, "lng": -7.1},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 200
+        data = websocket.receive_json()
+        assert data == {"vendor_id": vendor_id, "lat": 5.5, "lng": -7.1}
+

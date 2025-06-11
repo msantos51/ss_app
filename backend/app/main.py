@@ -16,6 +16,7 @@ import json
 import base64
 import hmac
 import hashlib
+from app.database import get_db
 
 # Diretório para guardar fotos de perfil
 PROFILE_PHOTO_DIR = "profile_photos"

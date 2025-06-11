@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  Image,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -111,19 +112,27 @@ export default function MapScreen({ navigation }) {
           data={filteredVendors}
           keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
           style={styles.vendorList}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.vendorItem}
-              onPress={() =>
-                mapRef.current?.setView(
-                  item.current_lat,
-                  item.current_lng
-                )
-              }
-            >
-              <Text>{item.name || 'Vendedor'}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => {
+            const photoUri = item.profile_photo
+              ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+              : null;
+            return (
+              <TouchableOpacity
+                style={styles.vendorItem}
+                onPress={() =>
+                  mapRef.current?.setView(
+                    item.current_lat,
+                    item.current_lng
+                  )
+                }
+              >
+                {photoUri && (
+                  <Image source={{ uri: photoUri }} style={styles.vendorImage} />
+                )}
+                <Text>{item.name || 'Vendedor'}</Text>
+              </TouchableOpacity>
+            );
+          }}
         />
       </View>
 
@@ -177,6 +186,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  vendorImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
   },
   buttonsContainer: {
     position: 'absolute',

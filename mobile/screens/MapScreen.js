@@ -181,7 +181,8 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   picker: { backgroundColor: '#eee', marginBottom: 4 },
-  vendorList: { maxHeight: 80 },
+  // Aumentamos a altura máxima para mostrar mais vendedores sem precisar rolar
+  vendorList: { maxHeight: 200 },
   vendorItem: {
     paddingVertical: 4,
     borderBottomWidth: 1,

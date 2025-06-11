@@ -164,15 +164,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     // Colocamos a barra de filtros mais abaixo para nao sobrepor os botoes de
     // zoom do Leaflet
-    top: 100,
-    left: 10,
-    right: 10,
+    top: 10,
+    left: 70,
+    right: 70,
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 8,
   },
   picker: { backgroundColor: '#eee', marginBottom: 8 },
-  vendorList: { maxHeight: 150 },
+  vendorList: { maxHeight: 120 },
   vendorItem: {
     paddingVertical: 8,
     borderBottomWidth: 1,

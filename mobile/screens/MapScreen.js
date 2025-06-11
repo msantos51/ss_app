@@ -134,19 +134,28 @@ export default function MapScreen({ navigation }) {
             data={filteredVendors}
             keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
             style={styles.vendorList}
-            renderItem={({ item }) => {
-              const photoUri = item.profile_photo
-                ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-                : null;
-              return (
-                <TouchableOpacity
-                  style={styles.vendorItem}
-                  onPress={() => {
-                    mapRef.current?.setView(item.current_lat, item.current_lng);
-                  }}
-                  onLongPress={() =>
-                    navigation.navigate('VendorDetail', { vendor: item })
-                  }
+renderItem={({ item }) => {
+  const photoUri = item.profile_photo
+    ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+    : null;
+  return (
+    <TouchableOpacity
+      style={styles.vendorItem}
+      onPress={() => {
+        mapRef.current?.setView(item.current_lat, item.current_lng);
+      }}
+      onLongPress={() =>
+        navigation.navigate('VendorDetail', { vendor: item })
+      }
+    >
+      {photoUri && (
+        <Image source={{ uri: photoUri }} style={styles.vendorImage} />
+      )}
+      <Text>{item.name || 'Vendedor'}</Text>
+    </TouchableOpacity>
+  );
+}}
+
                 >
                   {photoUri && (
                     <Image source={{ uri: photoUri }} style={styles.vendorImage} />

@@ -308,9 +308,14 @@ Ou defina em `app.json`:
 
 Escolha a URL apropriada conforme estiver a testar em emuladores ou dispositivos reais.
 
+
+
 ### 3.5 Funcionalidades adicionais
 
 O aplicativo móvel inclui agora uma tela de detalhes para cada vendedor. Nela é possível ver foto, produto e avaliações feitas por clientes. Também é possível enviar novos comentários e uma classificação de 1 a 5 estrelas. Para abrir esta tela pressione longamente sobre o nome do vendedor na lista de filtros; um toque normal apenas faz o mapa aproximar-se do vendedor.
+
+Adicionalmente, quando um vendedor ativo estiver num raio de aproximadamente 500 metros do utilizador, o app envia uma notificação local (usa `expo-notifications`). Certifique-se de executar `npm install` para instalar esta dependência antes de iniciar o Expo.
+
 
 Adicionalmente, quando um vendedor ativo estiver num raio de aproximadamente 500 metros do utilizador, o app envia uma notificação local (usa `expo-notifications`). Certifique-se de executar `npm install` para instalar esta dependência antes de iniciar o Expo.
 

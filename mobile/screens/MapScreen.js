@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// Substituímos react-native-maps por um componente baseado em WebView com Leaflet
 import LeafletMap from '../LeafletMap';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -30,7 +29,6 @@ export default function MapScreen({ navigation }) {
   const [showList, setShowList] = useState(false);
   const mapRef = useRef(null);
 
-  // (em português) Busca os vendedores ao backend
   const fetchVendors = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/vendors/`);
@@ -40,14 +38,12 @@ export default function MapScreen({ navigation }) {
     }
   };
 
-  // (em português) Carrega o utilizador autenticado (se existir)
   const loadUser = async () => {
     try {
       const stored = await AsyncStorage.getItem('user');
       if (stored) {
         const v = JSON.parse(stored);
         setCurrentUser(v);
-
         const share = await isLocationSharing();
         if (share) {
           try {
@@ -66,20 +62,16 @@ export default function MapScreen({ navigation }) {
     }
   };
 
-  // (em português) Sempre que o ecrã abrir, atualiza dados
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchVendors();
       loadUser();
     });
-
     fetchVendors();
     loadUser();
-
     return unsubscribe;
   }, [navigation]);
 
-  // Subscrição ao WebSocket para atualizações de localização
   useEffect(() => {
     const unsubscribe = subscribeLocations(({ vendor_id, lat, lng }) => {
       setVendors((prev) =>
@@ -103,7 +95,6 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* (em português) Mapa usando Leaflet via WebView */}
       <LeafletMap
         ref={mapRef}
         markers={filteredVendors.map((v) => ({
@@ -113,7 +104,6 @@ export default function MapScreen({ navigation }) {
         }))}
       />
 
-      {/* (em português) Filtros e lista de vendedores */}
       <TouchableOpacity
         style={styles.filterContainer}
         activeOpacity={1}
@@ -129,33 +119,25 @@ export default function MapScreen({ navigation }) {
           <Picker.Item label="Acessórios" value="Acessórios" />
           <Picker.Item label="Gelados" value="Gelados" />
         </Picker>
+
         {showList && (
           <FlatList
             data={filteredVendors}
             keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
             style={styles.vendorList}
-renderItem={({ item }) => {
-  const photoUri = item.profile_photo
-    ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-    : null;
-  return (
-    <TouchableOpacity
-      style={styles.vendorItem}
-      onPress={() => {
-        mapRef.current?.setView(item.current_lat, item.current_lng);
-      }}
-      onLongPress={() =>
-        navigation.navigate('VendorDetail', { vendor: item })
-      }
-    >
-      {photoUri && (
-        <Image source={{ uri: photoUri }} style={styles.vendorImage} />
-      )}
-      <Text>{item.name || 'Vendedor'}</Text>
-    </TouchableOpacity>
-  );
-}}
-
+            renderItem={({ item }) => {
+              const photoUri = item.profile_photo
+                ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+                : null;
+              return (
+                <TouchableOpacity
+                  style={styles.vendorItem}
+                  onPress={() => {
+                    mapRef.current?.setView(item.current_lat, item.current_lng);
+                  }}
+                  onLongPress={() =>
+                    navigation.navigate('VendorDetail', { vendor: item })
+                  }
                 >
                   {photoUri && (
                     <Image source={{ uri: photoUri }} style={styles.vendorImage} />
@@ -168,7 +150,6 @@ renderItem={({ item }) => {
         )}
       </TouchableOpacity>
 
-      {/* (em português) Botões Login/Registar ou ir para o Perfil */}
       <View style={styles.buttonsContainer}>
         {currentUser ? (
           <TouchableOpacity
@@ -203,8 +184,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   filterContainer: {
     position: 'absolute',
-    // Colocamos a barra de filtros mais abaixo para nao sobrepor os botoes de
-    // zoom do Leaflet
     top: 10,
     left: 70,
     right: 70,
@@ -213,7 +192,6 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   picker: { backgroundColor: '#eee', marginBottom: 4 },
-  // Aumentamos a altura máxima para mostrar mais vendedores sem precisar rolar
   vendorList: { maxHeight: 200 },
   vendorItem: {
     paddingVertical: 4,

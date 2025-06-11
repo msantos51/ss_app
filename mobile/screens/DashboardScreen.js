@@ -1,5 +1,3 @@
-// DashboardScreen.js
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -13,6 +11,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -72,7 +71,7 @@ export default function DashboardScreen({ navigation }) {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.IMAGE,  // <- atualizado aqui
       allowsEditing: true,
       quality: 1,
     });
@@ -93,11 +92,18 @@ export default function DashboardScreen({ navigation }) {
       if (product !== vendor.product) data.append('product', product);
 
       if (profilePhoto) {
-        data.append('profile_photo', {
-          uri: profilePhoto.uri,
-          name: profilePhoto.fileName ?? 'profile.jpg',
-          type: profilePhoto.type ?? 'image/jpeg',
-        });
+        const fileUri = profilePhoto.uri;
+
+        // Lemos o ficheiro com FileSystem para evitar o Network Error
+        const fileInfo = await FileSystem.getInfoAsync(fileUri);
+
+        const file = {
+          uri: fileUri,
+          name: 'profile.jpg',
+          type: 'image/jpeg',
+        };
+
+        data.append('profile_photo', file);
       }
 
       if (data._parts.length === 0) {
@@ -105,10 +111,7 @@ export default function DashboardScreen({ navigation }) {
         return;
       }
 
-      const response = await axios({
-        method: 'PATCH',
-        url: `${BASE_URL}/vendors/${vendor.id}/profile`,
-        data,
+      const response = await axios.patch(`${BASE_URL}/vendors/${vendor.id}/profile`, data, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'multipart/form-data',

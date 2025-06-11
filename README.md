@@ -229,6 +229,7 @@ Dentro da pasta `sunny_sales_app`, instale a biblioteca `axios`:
 ```bash
 cd sunny_sales_app
 npm install axios
+npm install expo-notifications
 ```
 
 ### 3.2 Exemplo simples de uso no `App.js`
@@ -306,6 +307,12 @@ Ou defina em `app.json`:
 ```
 
 Escolha a URL apropriada conforme estiver a testar em emuladores ou dispositivos reais.
+
+### 3.5 Funcionalidades adicionais
+
+O aplicativo móvel inclui agora uma tela de detalhes para cada vendedor. Nela é possível ver foto, produto e avaliações feitas por clientes. Também é possível enviar novos comentários e uma classificação de 1 a 5 estrelas.
+
+Adicionalmente, quando um vendedor ativo estiver num raio de aproximadamente 500 metros do utilizador, o app envia uma notificação local (usa `expo-notifications`). Certifique-se de executar `npm install` para instalar esta dependência antes de iniciar o Expo.
 
 ## 4. Considerações finais
 

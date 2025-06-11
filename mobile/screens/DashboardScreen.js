@@ -28,6 +28,7 @@ export default function DashboardScreen({ navigation }) {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const logout = async () => {
     await stopLocationSharing();
@@ -107,6 +108,8 @@ export default function DashboardScreen({ navigation }) {
       setProduct(response.data.product);
       setPassword('');
       setError(null);
+      setProfilePhoto(null);
+      setEditing(false);
     } catch (err) {
       console.error(err);
       if (err.response?.data?.detail) {
@@ -158,13 +161,18 @@ export default function DashboardScreen({ navigation }) {
         <Image source={{ uri: profileUri }} style={styles.imagePreview} />
       )}
 
-      <Button title="Escolher Foto de Perfil" onPress={pickImage} />
+      <Button
+        title="Escolher Foto de Perfil"
+        onPress={pickImage}
+        disabled={!editing}
+      />
 
       <TextInput
         style={styles.input}
         placeholder="Nome"
         value={name}
         onChangeText={setName}
+        editable={editing}
       />
 
       <TextInput
@@ -173,6 +181,7 @@ export default function DashboardScreen({ navigation }) {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
+        editable={editing}
       />
 
       <TextInput
@@ -181,19 +190,38 @@ export default function DashboardScreen({ navigation }) {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        editable={editing}
       />
 
       <Picker
         selectedValue={product}
         onValueChange={(itemValue) => setProduct(itemValue)}
         style={styles.input}
+        enabled={editing}
       >
         <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
         <Picker.Item label="Gelados" value="Gelados" />
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      <Button title="Atualizar" onPress={updateProfile} />
+      {editing ? (
+        <>
+          <Button title="Guardar" onPress={updateProfile} />
+          <Button
+            title="Cancelar"
+            onPress={() => {
+              setName(vendor.name);
+              setEmail(vendor.email);
+              setProduct(vendor.product);
+              setProfilePhoto(null);
+              setPassword('');
+              setEditing(false);
+            }}
+          />
+        </>
+      ) : (
+        <Button title="Atualizar dados" onPress={() => setEditing(true)} />
+      )}
 
       <Button
         title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}

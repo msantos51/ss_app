@@ -3,6 +3,7 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Body, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from . import models, schemas
@@ -10,6 +11,11 @@ from .database import SessionLocal, engine
 import os
 import shutil
 from uuid import uuid4
+import time
+import json
+import base64
+import hmac
+import hashlib
 
 # Diretório para guardar fotos de perfil
 PROFILE_PHOTO_DIR = "profile_photos"
@@ -57,6 +63,55 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 # --------------------------
+# Autenticação JWT simples
+# --------------------------
+SECRET_KEY = os.getenv("SECRET_KEY", "secret")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def _b64(data: dict | bytes) -> str:
+    if isinstance(data, dict):
+        data = json.dumps(data, separators=(",", ":"), sort_keys=True).encode()
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
+
+def _b64decode(segment: str) -> bytes:
+    padded = segment + "=" * (-len(segment) % 4)
+    return base64.urlsafe_b64decode(padded)
+
+def create_access_token(payload: dict, expires_sec: int = 3600) -> str:
+    data = payload.copy()
+    data["exp"] = int(time.time()) + expires_sec
+    header = {"alg": "HS256", "typ": "JWT"}
+    segments = [_b64(header), _b64(data)]
+    signing_input = ".".join(segments)
+    sig = hmac.new(SECRET_KEY.encode(), signing_input.encode(), hashlib.sha256).digest()
+    segments.append(_b64(sig))
+    return ".".join(segments)
+
+def decode_token(token: str) -> dict:
+    try:
+        header_b64, payload_b64, sig_b64 = token.split(".")
+        signing_input = f"{header_b64}.{payload_b64}"
+        expected = hmac.new(SECRET_KEY.encode(), signing_input.encode(), hashlib.sha256).digest()
+        if not hmac.compare_digest(expected, _b64decode(sig_b64)):
+            raise HTTPException(status_code=401, detail="Invalid token signature")
+        payload = json.loads(_b64decode(payload_b64))
+        if payload.get("exp", 0) < int(time.time()):
+            raise HTTPException(status_code=401, detail="Token expired")
+        return payload
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+def get_current_vendor(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = decode_token(token)
+    vendor_id = payload.get("sub")
+    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=401, detail="Vendor not found")
+    return vendor
+
+# --------------------------
 # Sessão de base de dados
 # --------------------------
 def get_db():
@@ -75,6 +130,17 @@ def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
     if not vendor or not pwd_context.verify(credentials.password, vendor.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     return vendor
+
+# --------------------------
+# Endpoint para obter JWT
+# --------------------------
+@app.post("/token")
+def generate_token(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
+    vendor = db.query(models.Vendor).filter(models.Vendor.email == credentials.email).first()
+    if not vendor or not pwd_context.verify(credentials.password, vendor.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    token = create_access_token({"sub": vendor.id})
+    return {"access_token": token, "token_type": "bearer"}
 
 # --------------------------
 # Registo de vendedor
@@ -134,10 +200,13 @@ async def update_vendor_profile(
     product: str = Form(None),
     profile_photo: UploadFile = File(None),
     db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
 ):
     vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found")
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
 
     if name:
         vendor.name = name
@@ -168,10 +237,13 @@ async def update_vendor_location(
     lat: float = Body(...),
     lng: float = Body(...),
     db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
 ):
     vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found")
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
 
     vendor.current_lat = lat
     vendor.current_lng = lng

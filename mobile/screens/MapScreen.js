@@ -142,7 +142,12 @@ export default function MapScreen({ navigation }) {
                   {photoUri && (
                     <Image source={{ uri: photoUri }} style={styles.vendorImage} />
                   )}
-                  <Text>{item.name || 'Vendedor'}</Text>
+                  <Text>
+                    {item.name || 'Vendedor'}
+                    {item.rating_average != null
+                      ? ` \u2013 ${item.rating_average.toFixed(1)}\u2605`
+                      : ''}
+                  </Text>
                 </TouchableOpacity>
               );
             }}

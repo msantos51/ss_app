@@ -162,7 +162,9 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   filterContainer: {
     position: 'absolute',
-    top: 40,
+    // Colocamos a barra de filtros mais abaixo para nao sobrepor os botoes de
+    // zoom do Leaflet
+    top: 100,
     left: 10,
     right: 10,
     backgroundColor: '#fff',

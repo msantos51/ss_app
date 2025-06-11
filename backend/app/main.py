@@ -1,4 +1,4 @@
-# main.py - aplicação FastAPI com rotas principais
+# main.py - aplicação FastAPI com rotas principais e PATCH otimizado
 
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Body, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
@@ -13,7 +13,7 @@ from uuid import uuid4
 
 # Diretório para guardar fotos de perfil
 PROFILE_PHOTO_DIR = "profile_photos"
-os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)  # ← Garantir que existe antes do mount
+os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)
 
 # Inicializar app
 app = FastAPI()
@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Montar rota para servir fotos (ex: http://localhost:8000/profile_photos/foto.jpg)
+# Montar rota para servir fotos publicamente
 app.mount("/profile_photos", StaticFiles(directory=PROFILE_PHOTO_DIR), name="profile_photos")
 
 # Criar as tabelas na base de dados
@@ -88,14 +88,12 @@ async def create_vendor(
     profile_photo: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
-    # Verificar se email já está registado
     db_vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
     if db_vendor:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed_password = pwd_context.hash(password)
 
-    # Guardar imagem em disco
     ext = os.path.splitext(profile_photo.filename)[1]
     file_name = f"{uuid4().hex}{ext}"
     file_path = os.path.join(PROFILE_PHOTO_DIR, file_name)
@@ -104,7 +102,6 @@ async def create_vendor(
 
     public_path = f"profile_photos/{file_name}"
 
-    # Criar vendedor
     new_vendor = models.Vendor(
         name=name,
         email=email,
@@ -126,9 +123,9 @@ def list_vendors(db: Session = Depends(get_db)):
     return vendors
 
 # --------------------------
-# Atualizar perfil do vendedor
+# Atualizar perfil do vendedor (agora com PATCH)
 # --------------------------
-@app.put("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
+@app.patch("/vendors/{vendor_id}/profile", response_model=schemas.VendorOut)
 async def update_vendor_profile(
     vendor_id: int,
     name: str = Form(None),
@@ -191,6 +188,6 @@ async def websocket_locations(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            await websocket.receive_text()  # Apenas para manter conexão ativa
+            await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket)

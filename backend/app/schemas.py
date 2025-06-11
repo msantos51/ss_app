@@ -31,3 +31,18 @@ class VendorOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ReviewCreate(BaseModel):
+    rating: int
+    comment: Optional[str] = None
+
+
+class ReviewOut(BaseModel):
+    id: int
+    vendor_id: int
+    rating: int
+    comment: Optional[str] = None
+
+    class Config:
+        orm_mode = True

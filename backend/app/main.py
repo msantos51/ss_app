@@ -263,3 +263,30 @@ async def websocket_locations(websocket: WebSocket):
             await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+
+# --------------------------
+# Reviews dos vendedores
+# --------------------------
+@app.post("/vendors/{vendor_id}/reviews", response_model=schemas.ReviewOut)
+def create_review(
+    vendor_id: int, review: schemas.ReviewCreate, db: Session = Depends(get_db)
+):
+    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    new_rev = models.Review(
+        vendor_id=vendor_id, rating=review.rating, comment=review.comment
+    )
+    db.add(new_rev)
+    db.commit()
+    db.refresh(new_rev)
+    return new_rev
+
+
+@app.get("/vendors/{vendor_id}/reviews", response_model=list[schemas.ReviewOut])
+def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
+    return (
+        db.query(models.Review)
+        .filter(models.Review.vendor_id == vendor_id)
+        .all()
+    )

@@ -132,3 +132,23 @@ def test_websocket_location_broadcast(client):
         data = websocket.receive_json()
         assert data == {"vendor_id": vendor_id, "lat": 5.5, "lng": -7.1}
 
+
+def test_reviews_endpoints(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+
+    # add review
+    resp = client.post(
+        f"/vendors/{vendor_id}/reviews",
+        json={"rating": 4, "comment": "Bom"},
+    )
+    assert resp.status_code == 200
+    review = resp.json()
+    assert review["rating"] == 4
+
+    # list reviews
+    resp = client.get(f"/vendors/{vendor_id}/reviews")
+    assert resp.status_code == 200
+    reviews = resp.json()
+    assert len(reviews) == 1 and reviews[0]["comment"] == "Bom"
+

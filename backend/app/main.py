@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from . import models, schemas
-from .database import SessionLocal, engine
+from app import models, schemas
+from app.database import SessionLocal, engine, get_db
 import os
 import shutil
 from uuid import uuid4
@@ -112,9 +112,9 @@ def get_current_vendor(token: str = Depends(oauth2_scheme), db: Session = Depend
     return vendor
 
 # --------------------------
-# Sessão de base de dados
+# Sessão de base de dados (mantemos o get_db antigo, mas agora já está importado corretamente também)
 # --------------------------
-def get_db():
+def get_db_local():
     db = SessionLocal()
     try:
         yield db

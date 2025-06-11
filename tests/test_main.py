@@ -152,3 +152,16 @@ def test_reviews_endpoints(client):
     reviews = resp.json()
     assert len(reviews) == 1 and reviews[0]["comment"] == "Bom"
 
+
+def test_vendor_average_rating(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+
+    client.post(f"/vendors/{vendor_id}/reviews", json={"rating": 5})
+    client.post(f"/vendors/{vendor_id}/reviews", json={"rating": 3})
+
+    resp = client.get("/vendors/")
+    assert resp.status_code == 200
+    vendor = next(v for v in resp.json() if v["id"] == vendor_id)
+    assert pytest.approx(vendor["rating_average"], 0.01) == 4.0
+

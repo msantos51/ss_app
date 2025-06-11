@@ -186,6 +186,11 @@ async def create_vendor(
 @app.get("/vendors/", response_model=list[schemas.VendorOut])
 def list_vendors(db: Session = Depends(get_db)):
     vendors = db.query(models.Vendor).all()
+    for v in vendors:
+        if v.reviews:
+            v.rating_average = sum(r.rating for r in v.reviews) / len(v.reviews)
+        else:
+            v.rating_average = None
     return vendors
 
 # --------------------------

@@ -28,6 +28,7 @@ class VendorOut(BaseModel):
     profile_photo: str
     current_lat: Optional[float] = None
     current_lng: Optional[float] = None
+    rating_average: Optional[float] = None
 
     class Config:
         orm_mode = True

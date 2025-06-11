@@ -45,10 +45,17 @@ pip install -r backend/requirements.txt
 
 1. Instale o PostgreSQL.
 2. Crie uma base de dados chamada `beach_vendors` e um utilizador com permissões.
-3. Defina as variáveis de ambiente com as credenciais da base de dados:
+3. Copie o arquivo `.env.example` para `.env` e defina `DATABASE_URL` com as suas credenciais. Opcionalmente ajuste `EXPO_PUBLIC_BASE_URL`.
 
 ```bash
-export DATABASE_URL=postgresql://<user>:<password>@localhost/beach_vendors
+cp .env.example .env
+```
+
+Edite o arquivo `.env` resultante, por exemplo:
+
+```env
+DATABASE_URL=postgresql://<user>:<password>@localhost/beach_vendors
+# EXPO_PUBLIC_BASE_URL=http://10.0.2.2:8000
 ```
 
 ### 1.3 Node.js e React Native

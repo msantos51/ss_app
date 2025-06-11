@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   Image,
+  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -158,17 +159,13 @@ export default function DashboardScreen({ navigation }) {
       <Text style={styles.title}>Perfil do Vendedor</Text>
 
       {profileUri && (
-        <Image source={{ uri: profileUri }} style={styles.imagePreview} />
+        <TouchableOpacity onPress={editing ? pickImage : undefined}>
+          <Image source={{ uri: profileUri }} style={styles.imagePreview} />
+        </TouchableOpacity>
       )}
 
-      <Button
-        title="Escolher Foto de Perfil"
-        onPress={pickImage}
-        disabled={!editing}
-      />
-
       <TextInput
-        style={styles.input}
+        style={[styles.input, !editing && styles.inputDisabled]}
         placeholder="Nome"
         value={name}
         onChangeText={setName}
@@ -176,7 +173,7 @@ export default function DashboardScreen({ navigation }) {
       />
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, !editing && styles.inputDisabled]}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
@@ -185,7 +182,7 @@ export default function DashboardScreen({ navigation }) {
       />
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, !editing && styles.inputDisabled]}
         placeholder="Password"
         secureTextEntry
         value={password}
@@ -265,6 +262,10 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     width: '100%',
+  },
+  inputDisabled: {
+    backgroundColor: '#eee',
+    color: '#666',
   },
   error: {
     color: 'red',

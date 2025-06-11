@@ -58,9 +58,7 @@ export default function RegisterScreen({ navigation }) {
         });
       }
 
-      await axios.post(`${BASE_URL}/vendors/`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await axios.post(`${BASE_URL}/vendors/`, data);
 
       navigation.navigate('Login');
     } catch (err) {

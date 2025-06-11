@@ -46,12 +46,16 @@ def test_vendor_registration(client):
     assert payload["product"] == "Bolas de Berlim"
 
 
-def test_login(client):
-    register_vendor(client)
-    resp = client.post("/login", json={"email": "vendor@example.com", "password": "secret"})
+def get_token(client, email="vendor@example.com", password="secret"):
+    resp = client.post("/token", json={"email": email, "password": password})
     assert resp.status_code == 200
-    payload = resp.json()
-    assert payload["email"] == "vendor@example.com"
+    return resp.json()["access_token"]
+
+
+def test_token_generation(client):
+    register_vendor(client)
+    token = get_token(client)
+    assert token
 
 
 def test_vendor_listing(client):
@@ -64,3 +68,31 @@ def test_vendor_listing(client):
     assert "first@example.com" in emails and "second@example.com" in emails
     for v in vendors:
         assert "current_lat" in v and "current_lng" in v
+
+
+def test_protected_routes(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+    token = get_token(client)
+
+    # update profile with auth
+    resp = client.patch(
+        f"/vendors/{vendor_id}/profile",
+        data={"name": "New"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["name"] == "New"
+
+    # update profile without auth
+    resp = client.patch(f"/vendors/{vendor_id}/profile", data={"name": "Fail"})
+    assert resp.status_code == 401
+
+    # update location with auth
+    resp = client.put(
+        f"/vendors/{vendor_id}/location",
+        json={"lat": 1.0, "lng": 2.0},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+

@@ -22,12 +22,18 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${BASE_URL}/login`, {
+      const tokenRes = await axios.post(`${BASE_URL}/token`, {
+        email,
+        password,
+      });
+      await AsyncStorage.setItem('token', tokenRes.data.access_token);
+
+      const userRes = await axios.post(`${BASE_URL}/login`, {
         email,
         password,
       });
 
-      await AsyncStorage.setItem('user', JSON.stringify(response.data));
+      await AsyncStorage.setItem('user', JSON.stringify(userRes.data));
       navigation.navigate('Dashboard');
     } catch (err) {
       console.error(err);

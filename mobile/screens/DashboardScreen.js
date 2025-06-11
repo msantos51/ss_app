@@ -104,7 +104,8 @@ export default function DashboardScreen({ navigation }) {
         url: `${BASE_URL}/vendors/${vendor.id}/profile`,
         data: data,
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
       });
 

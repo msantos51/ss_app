@@ -8,6 +8,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import MapScreen from './screens/MapScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import VendorDetailScreen from './screens/VendorDetailScreen';
+import TermsScreen from './screens/TermsScreen';
 import { theme } from './theme';
 
 const Stack = createNativeStackNavigator();
@@ -30,6 +31,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="Terms" component={TermsScreen} options={{ title: 'Termos' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

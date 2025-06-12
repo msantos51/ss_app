@@ -2,7 +2,9 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-const LeafletMap = forwardRef(({ markers = [] }, ref) => {
+const LeafletMap = forwardRef(
+  ({ markers = [], initialPosition = { latitude: 38.736946, longitude: -9.142685 } }, ref)
+ => {
   const webviewRef = useRef(null);
   const html = `
     <!DOCTYPE html>
@@ -21,7 +23,10 @@ const LeafletMap = forwardRef(({ markers = [] }, ref) => {
         <div id="map"></div>
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script>
-          var map = L.map('map').setView([38.736946, -9.142685], 13);
+          var map = L.map('map').setView([
+            ${initialPosition.latitude},
+            ${initialPosition.longitude}
+          ], 13);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
           var markers = ${JSON.stringify(markers)};
           markers.forEach(function(m) {

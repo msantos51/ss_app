@@ -8,6 +8,7 @@ import {
   Text,
   FlatList,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +21,7 @@ import {
   stopLocationSharing,
   isLocationSharing,
 } from '../locationService';
+import * as Location from 'expo-location';
 import useProximityNotifications from '../useProximityNotifications';
 
 export default function MapScreen({ navigation }) {
@@ -27,6 +29,8 @@ export default function MapScreen({ navigation }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState('Todos');
   const [showList, setShowList] = useState(false);
+  const [initialPosition, setInitialPosition] = useState(null);
+  const [loadingLocation, setLoadingLocation] = useState(true);
   const mapRef = useRef(null);
 
   const fetchVendors = async () => {
@@ -83,6 +87,33 @@ export default function MapScreen({ navigation }) {
     return unsubscribe;
   }, []);
 
+  const locateUser = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const loc = await Location.getCurrentPositionAsync({});
+        setInitialPosition({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
+        mapRef.current?.setView(
+          loc.coords.latitude,
+          loc.coords.longitude
+        );
+      }
+    } catch (err) {
+      console.log('Erro ao obter localização:', err);
+    }
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      await locateUser();
+      setLoadingLocation(false);
+    };
+    init();
+  }, []);
+
   const activeVendors = vendors.filter(
     (v) => v?.current_lat != null && v?.current_lng != null
   );
@@ -95,14 +126,28 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <LeafletMap
-        ref={mapRef}
-        markers={filteredVendors.map((v) => ({
-          latitude: v.current_lat,
-          longitude: v.current_lng,
-          title: v.name || 'Vendedor',
-        }))}
-      />
+      {loadingLocation ? (
+        <ActivityIndicator size="large" style={StyleSheet.absoluteFill} />
+      ) : (
+        <LeafletMap
+          ref={mapRef}
+          initialPosition={initialPosition}
+          markers={filteredVendors.map((v) => ({
+            latitude: v.current_lat,
+            longitude: v.current_lng,
+            title: v.name || 'Vendedor',
+          }))}
+        />
+      )}
+
+      {!loadingLocation && (
+        <TouchableOpacity
+          style={styles.locateButton}
+          onPress={locateUser}
+        >
+          <Text style={styles.locateIcon}>📍</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity
         style={styles.filterContainer}
@@ -228,5 +273,18 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  locateButton: {
+    position: 'absolute',
+    bottom: 120,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  locateIcon: {
+    fontSize: 24,
   },
 });

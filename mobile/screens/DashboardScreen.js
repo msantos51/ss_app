@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Linking,
+  ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -187,7 +188,7 @@ export default function DashboardScreen({ navigation }) {
     : null;
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
 
       <Text style={styles.title}>Perfil do Vendedor</Text>
@@ -236,28 +237,36 @@ export default function DashboardScreen({ navigation }) {
       </Picker>
 
       {editing ? (
-        <>
-          <Button title="Guardar" onPress={updateProfile} />
-          <Button
-            title="Cancelar"
-            onPress={() => {
-              setName(vendor.name);
-              setEmail(vendor.email);
-              setProduct(vendor.product);
-              setProfilePhoto(null);
-              setPassword('');
-              setEditing(false);
-            }}
-          />
-        </>
+        <View style={styles.row}>
+          <View style={styles.halfButton}>
+            <Button title="Guardar" onPress={updateProfile} />
+          </View>
+          <View style={[styles.halfButton, styles.leftSpacing]}>
+            <Button
+              title="Cancelar"
+              onPress={() => {
+                setName(vendor.name);
+                setEmail(vendor.email);
+                setProduct(vendor.product);
+                setProfilePhoto(null);
+                setPassword('');
+                setEditing(false);
+              }}
+            />
+          </View>
+        </View>
       ) : (
-        <Button title="Atualizar dados" onPress={() => setEditing(true)} />
+        <View style={styles.fullButton}>
+          <Button title="Atualizar dados" onPress={() => setEditing(true)} />
+        </View>
       )}
 
-      <Button
-        title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
-        onPress={toggleLocation}
-      />
+      <View style={styles.fullButton}>
+        <Button
+          title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
+          onPress={toggleLocation}
+        />
+      </View>
 
       <Text
         style={{
@@ -272,10 +281,12 @@ export default function DashboardScreen({ navigation }) {
       </Text>
 
       {!vendor.subscription_active ? (
-        <Button title="Pagar Semanalidade" onPress={paySubscription} />
+        <View style={styles.fullButton}>
+          <Button title="Pagar Semanalidade" onPress={paySubscription} />
+        </View>
       ) : (
         vendor.subscription_valid_until && (
-          <Text style={{ marginVertical: 8 }}>
+          <Text style={{ marginVertical: 8, textAlign: 'center' }}>
             {`Subscrição válida até ${new Date(
               vendor.subscription_valid_until
             ).toLocaleDateString()}`}
@@ -283,8 +294,10 @@ export default function DashboardScreen({ navigation }) {
         )
       )}
 
-      <Button title="Logout" onPress={logout} />
-    </View>
+      <View style={styles.fullButton}>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -323,5 +336,21 @@ const styles = StyleSheet.create({
     height: 120,
     marginVertical: 12,
     borderRadius: 60,
+  },
+  row: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  halfButton: {
+    flex: 1,
+  },
+  leftSpacing: {
+    marginLeft: 12,
+  },
+  fullButton: {
+    width: '100%',
+    marginBottom: 12,
   },
 });

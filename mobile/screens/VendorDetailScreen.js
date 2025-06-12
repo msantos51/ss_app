@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TextInput, Button } from 'react-native';
+import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
 export default function VendorDetailScreen({ route }) {
   const { vendor } = route.params;
   const [reviews, setReviews] = useState([]);
-  const [rating, setRating] = useState('');
+  const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
 
   const loadReviews = async () => {
@@ -25,10 +26,10 @@ export default function VendorDetailScreen({ route }) {
   const submitReview = async () => {
     try {
       await axios.post(`${BASE_URL}/vendors/${vendor.id}/reviews`, {
-        rating: parseInt(rating) || 0,
+        rating: rating,
         comment,
       });
-      setRating('');
+      setRating(0);
       setComment('');
       loadReviews();
     } catch (e) {
@@ -58,13 +59,7 @@ export default function VendorDetailScreen({ route }) {
         )}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Avaliação 1-5"
-        value={rating}
-        onChangeText={setRating}
-        keyboardType="numeric"
-      />
+      <StarRatingInput rating={rating} onChange={setRating} />
       <TextInput
         style={styles.input}
         placeholder="Comentário"

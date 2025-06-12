@@ -22,12 +22,15 @@ import {
   isLocationSharing,
 } from '../locationService';
 
+const AVAILABLE_ICONS = ['📍', '🍦', '🍩', '🌭', '🏖️'];
+
 export default function DashboardScreen({ navigation }) {
   const [vendor, setVendor] = useState(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
+  const [icon, setIcon] = useState('📍');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
@@ -47,6 +50,7 @@ export default function DashboardScreen({ navigation }) {
         setName(updated.name);
         setEmail(updated.email);
         setProduct(updated.product);
+        setIcon(updated.icon || '📍');
       }
     } catch (err) {
       console.log('Erro ao atualizar vendedor:', err);
@@ -70,6 +74,7 @@ export default function DashboardScreen({ navigation }) {
           setName(v.name);
           setEmail(v.email);
           setProduct(v.product);
+          setIcon(v.icon || '📍');
           fetchVendorFromServer(v.id);
 
           const share = await isLocationSharing();
@@ -117,6 +122,7 @@ export default function DashboardScreen({ navigation }) {
       if (email !== vendor.email) data.append('email', email);
       if (password) data.append('password', password);
       if (product !== vendor.product) data.append('product', product);
+      if (icon !== (vendor.icon || '📍')) data.append('icon', icon);
 
       if (profilePhoto) {
         const fileUri = profilePhoto.uri;
@@ -147,6 +153,7 @@ export default function DashboardScreen({ navigation }) {
       setName(response.data.name);
       setEmail(response.data.email);
       setProduct(response.data.product);
+      setIcon(response.data.icon || '📍');
       setPassword('');
       setError(null);
       setProfilePhoto(null);
@@ -293,6 +300,17 @@ export default function DashboardScreen({ navigation }) {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
+      <Picker
+        selectedValue={icon}
+        onValueChange={(val) => setIcon(val)}
+        style={styles.input}
+        enabled={editing}
+      >
+        {AVAILABLE_ICONS.map((ic) => (
+          <Picker.Item key={ic} label={ic} value={ic} />
+        ))}
+      </Picker>
+
       {editing && (
         <View style={styles.row}>
           <View style={styles.halfButton}>
@@ -305,6 +323,7 @@ export default function DashboardScreen({ navigation }) {
                 setName(vendor.name);
                 setEmail(vendor.email);
                 setProduct(vendor.product);
+                setIcon(vendor.icon || '📍');
                 setProfilePhoto(null);
                 setPassword('');
                 setEditing(false);

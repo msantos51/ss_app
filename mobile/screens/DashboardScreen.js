@@ -32,6 +32,7 @@ export default function DashboardScreen({ navigation }) {
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const fetchVendorFromServer = async (vendorId) => {
     try {
@@ -210,8 +211,35 @@ export default function DashboardScreen({ navigation }) {
     : null;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {error && <Text style={styles.error}>{error}</Text>}
+    <View style={{ flex: 1 }}>
+      {menuOpen && (
+        <View style={styles.menu}>
+          <Button
+            title="Atualizar Dados"
+            onPress={() => {
+              setMenuOpen(false);
+              setEditing(true);
+            }}
+          />
+          <Button
+            title="Pagar Semanalidade"
+            onPress={() => {
+              setMenuOpen(false);
+              paySubscription();
+            }}
+          />
+        </View>
+      )}
+
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => setMenuOpen(!menuOpen)}
+      >
+        <Text style={styles.menuIcon}>☰</Text>
+      </TouchableOpacity>
+
+      <ScrollView contentContainerStyle={styles.container}>
+        {error && <Text style={styles.error}>{error}</Text>}
 
       <TouchableOpacity
         style={styles.mapButton}
@@ -265,7 +293,7 @@ export default function DashboardScreen({ navigation }) {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      {editing ? (
+      {editing && (
         <View style={styles.row}>
           <View style={styles.halfButton}>
             <Button title="Guardar" onPress={updateProfile} />
@@ -283,10 +311,6 @@ export default function DashboardScreen({ navigation }) {
               }}
             />
           </View>
-        </View>
-      ) : (
-        <View style={styles.fullButton}>
-          <Button title="Atualizar dados" onPress={() => setEditing(true)} />
         </View>
       )}
 
@@ -333,27 +357,23 @@ export default function DashboardScreen({ navigation }) {
           );
         }
         return (
-          <>
-            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-              Subscrição inativa
-            </Text>
-            <View style={styles.fullButton}>
-              <Button title="Pagar Semanalidade" onPress={paySubscription} />
-            </View>
-          </>
+          <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+            Subscrição inativa
+          </Text>
         );
       })()}
 
-      <View style={styles.fullButton}>
+      <View style={[styles.fullButton, styles.logoutButton]}>
         <Button title="Logout" onPress={logout} />
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 16,
@@ -403,6 +423,9 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 12,
   },
+  logoutButton: {
+    marginTop: 'auto',
+  },
   mapButton: {
     position: 'absolute',
     top: 16,
@@ -410,5 +433,23 @@ const styles = StyleSheet.create({
   },
   mapIcon: {
     fontSize: 50,
+  },
+  menuButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+  },
+  menuIcon: {
+    fontSize: 40,
+  },
+  menu: {
+    position: 'absolute',
+    top: 70,
+    left: 16,
+    backgroundColor: '#fff',
+    padding: 8,
+    borderRadius: 8,
+    elevation: 4,
+    zIndex: 1,
   },
 });

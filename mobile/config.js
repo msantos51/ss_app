@@ -6,5 +6,5 @@ const envUrl =
   process.env.EXPO_PUBLIC_BASE_URL ||
   Constants.expoConfig?.extra?.BASE_URL;
 
-// Default to Android emulator loopback
-export const BASE_URL = "https://ss-app-jptj.onrender.com"
+// Default to Android emulator loopback if no env variable is provided
+export const BASE_URL = envUrl || 'http://10.0.2.2:8000';

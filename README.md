@@ -308,6 +308,19 @@ Ou defina em `app.json`:
 
 Escolha a URL apropriada conforme estiver a testar em emuladores ou dispositivos reais.
 
+### 3.4.1 Build do APK para dispositivo
+
+Ao gerar o APK com `eas build` o endereço do backend também precisa estar definido.
+Use a mesma variável `EXPO_PUBLIC_BASE_URL` (ou a chave `expo.extra.BASE_URL` no
+`app.json`) apontando para o servidor acessível pelo aparelho:
+
+```bash
+EXPO_PUBLIC_BASE_URL=https://ss-app-jptj.onrender.com \
+  eas build -p android --profile production
+```
+
+Assim o aplicativo instalado num dispositivo físico comunica-se com o backend correto.
+
 
 
 ### 3.5 Funcionalidades adicionais

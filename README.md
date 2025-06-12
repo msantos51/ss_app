@@ -76,6 +76,20 @@ expo init sunny_sales_app
 
 Escolha o template "blank" para simplicidade.
 
+### 1.4 Stripe
+
+Para habilitar os pagamentos semanais configure as seguintes variáveis no arquivo `.env`:
+
+```env
+STRIPE_API_KEY=<sua_chave_secreta>
+STRIPE_PRICE_ID=<preco_semanal_id>
+STRIPE_WEBHOOK_SECRET=<segredo_do_webhook>
+SUCCESS_URL=https://example.com/sucesso
+CANCEL_URL=https://example.com/cancelado
+```
+
+Estas definições permitem que o backend crie sessões de pagamento e processe os webhooks da Stripe.
+
 ## 2. Backend (Python)
 
 ### 2.1 requirements.txt

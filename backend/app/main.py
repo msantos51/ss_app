@@ -1,12 +1,14 @@
 # main.py - aplicação FastAPI com rotas principais e PATCH otimizado
 
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Body, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Body, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from app import models, schemas
+import stripe
+from datetime import datetime, timedelta
 from app.database import SessionLocal, engine, get_db
 import os
 import shutil
@@ -42,6 +44,13 @@ models.Base.metadata.create_all(bind=engine)
 
 # Contexto para hash de password
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Configuração do Stripe
+stripe.api_key = os.getenv("STRIPE_API_KEY", "")
+STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+SUCCESS_URL = os.getenv("SUCCESS_URL", "https://example.com/success")
+CANCEL_URL = os.getenv("CANCEL_URL", "https://example.com/cancel")
 
 # Gerenciador de WebSockets
 class ConnectionManager:
@@ -258,6 +267,34 @@ async def update_vendor_location(
     return {"message": "Localização atualizada com sucesso"}
 
 # --------------------------
+# Criar sessão de pagamento no Stripe
+# --------------------------
+@app.post("/vendors/{vendor_id}/create-checkout-session")
+def create_checkout_session(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    if not STRIPE_PRICE_ID:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": STRIPE_PRICE_ID, "quantity": 1}],
+            success_url=SUCCESS_URL,
+            cancel_url=CANCEL_URL,
+            metadata={"vendor_id": vendor_id},
+        )
+        return {"checkout_url": session.url}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+# --------------------------
 # WebSocket para localização em tempo real
 # --------------------------
 @app.websocket("/ws/locations")
@@ -295,3 +332,25 @@ def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
         .filter(models.Review.vendor_id == vendor_id)
         .all()
     )
+
+# --------------------------
+# Webhook do Stripe
+# --------------------------
+@app.post("/stripe/webhook")
+async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
+    payload = await request.body()
+    sig = request.headers.get("stripe-signature")
+    try:
+        event = stripe.Webhook.construct_event(payload, sig, STRIPE_WEBHOOK_SECRET)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid webhook")
+
+    if event.get("type") == "checkout.session.completed":
+        session = event["data"]["object"]
+        vendor_id = int(session.get("metadata", {}).get("vendor_id", 0))
+        vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+        if vendor:
+            vendor.subscription_active = True
+            vendor.subscription_valid_until = datetime.utcnow() + timedelta(days=7)
+            db.commit()
+    return {"status": "success"}

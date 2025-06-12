@@ -36,6 +36,7 @@ export default function DashboardScreen({ navigation }) {
   const [sharingLocation, setSharingLocation] = useState(false);
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [reviews, setReviews] = useState([]);
 
   const fetchVendorFromServer = async (vendorId) => {
     try {
@@ -51,9 +52,19 @@ export default function DashboardScreen({ navigation }) {
         setEmail(updated.email);
         setProduct(updated.product);
         setIcon(updated.icon || '📍');
+        fetchReviews(vendorId);
       }
     } catch (err) {
       console.log('Erro ao atualizar vendedor:', err);
+    }
+  };
+
+  const fetchReviews = async (vendorId) => {
+    try {
+      const resp = await axios.get(`${BASE_URL}/vendors/${vendorId}/reviews`);
+      setReviews(resp.data);
+    } catch (e) {
+      console.log('Erro ao carregar reviews:', e);
     }
   };
 
@@ -76,6 +87,7 @@ export default function DashboardScreen({ navigation }) {
           setProduct(v.product);
           setIcon(v.icon || '📍');
           fetchVendorFromServer(v.id);
+          fetchReviews(v.id);
 
           const share = await isLocationSharing();
           setSharingLocation(share);
@@ -96,7 +108,10 @@ export default function DashboardScreen({ navigation }) {
     };
     loadVendor();
     const unsubscribe = navigation.addListener('focus', () => {
-      if (vendor?.id) fetchVendorFromServer(vendor.id);
+      if (vendor?.id) {
+        fetchVendorFromServer(vendor.id);
+        fetchReviews(vendor.id);
+      }
     });
     return unsubscribe;
   }, [navigation, vendor?.id]);
@@ -322,6 +337,27 @@ export default function DashboardScreen({ navigation }) {
           return <Text style={{ marginVertical: 8, textAlign: 'center' }}>Subscrição inativa</Text>;
         })()}
 
+        <View style={styles.reviewSection}>
+          <Text style={styles.sectionTitle}>Minhas Avaliações</Text>
+          {reviews.length > 0 ? (
+            <>
+              <Text style={styles.averageText}>
+                {vendor.rating_average != null
+                  ? `Média: ${vendor.rating_average.toFixed(1)}\u2605`
+                  : 'Ainda sem avaliações'}
+              </Text>
+              {reviews.map((r) => (
+                <View key={r.id} style={styles.reviewItem}>
+                  <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
+                  {r.comment ? <Text>{r.comment}</Text> : null}
+                </View>
+              ))}
+            </>
+          ) : (
+            <Text style={styles.averageText}>Ainda sem avaliações</Text>
+          )}
+        </View>
+
         <View style={[styles.fullButton, styles.logoutButton]}>
           <Button title="Logout" onPress={logout} />
         </View>
@@ -377,4 +413,13 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 100,
   },
+  reviewSection: { width: '100%', marginTop: 16 },
+  sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
+  averageText: { marginBottom: 8 },
+  reviewItem: {
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  reviewRating: { fontWeight: 'bold' },
 });

@@ -280,19 +280,40 @@ export default function DashboardScreen({ navigation }) {
           : 'Localização não partilhada'}
       </Text>
 
-      {!vendor.subscription_active ? (
-        <View style={styles.fullButton}>
-          <Button title="Pagar Semanalidade" onPress={paySubscription} />
-        </View>
-      ) : (
-        vendor.subscription_valid_until && (
-          <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-            {`Subscrição válida até ${new Date(
-              vendor.subscription_valid_until
-            ).toLocaleDateString()}`}
-          </Text>
-        )
-      )}
+      {(() => {
+        if (vendor.subscription_active) {
+          if (vendor.subscription_valid_until) {
+            const diffMs =
+              new Date(vendor.subscription_valid_until).getTime() - Date.now();
+            const daysLeft = Math.max(
+              0,
+              Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+            );
+            return (
+              <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+                {`Subscrição ativa \u2013 termina em ${daysLeft} dia${
+                  daysLeft !== 1 ? 's' : ''
+                }`}
+              </Text>
+            );
+          }
+          return (
+            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+              Subscrição ativa
+            </Text>
+          );
+        }
+        return (
+          <>
+            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+              Subscrição inativa
+            </Text>
+            <View style={styles.fullButton}>
+              <Button title="Pagar Semanalidade" onPress={paySubscription} />
+            </View>
+          </>
+        );
+      })()}
 
       <View style={styles.fullButton}>
         <Button title="Logout" onPress={logout} />

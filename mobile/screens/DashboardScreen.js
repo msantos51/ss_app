@@ -22,12 +22,15 @@ import {
   isLocationSharing,
 } from '../locationService';
 
+const AVAILABLE_ICONS = ['📍', '🍦', '🍩', '🌭', '🏖️'];
+
 export default function DashboardScreen({ navigation }) {
   const [vendor, setVendor] = useState(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
+  const [icon, setIcon] = useState('📍');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
@@ -47,6 +50,7 @@ export default function DashboardScreen({ navigation }) {
         setName(updated.name);
         setEmail(updated.email);
         setProduct(updated.product);
+        setIcon(updated.icon || '📍');
       }
     } catch (err) {
       console.log('Erro ao atualizar vendedor:', err);
@@ -70,6 +74,7 @@ export default function DashboardScreen({ navigation }) {
           setName(v.name);
           setEmail(v.email);
           setProduct(v.product);
+          setIcon(v.icon || '📍');
           fetchVendorFromServer(v.id);
 
           const share = await isLocationSharing();
@@ -117,6 +122,7 @@ export default function DashboardScreen({ navigation }) {
       if (email !== vendor.email) data.append('email', email);
       if (password) data.append('password', password);
       if (product !== vendor.product) data.append('product', product);
+      if (icon !== (vendor.icon || '📍')) data.append('icon', icon);
 
       if (profilePhoto) {
         const fileUri = profilePhoto.uri;
@@ -126,11 +132,6 @@ export default function DashboardScreen({ navigation }) {
           type: 'image/jpeg',
         };
         data.append('profile_photo', file);
-      }
-
-      if (data._parts.length === 0) {
-        setError("Nenhuma alteração efetuada.");
-        return;
       }
 
       const token = await AsyncStorage.getItem('token');
@@ -147,6 +148,7 @@ export default function DashboardScreen({ navigation }) {
       setName(response.data.name);
       setEmail(response.data.email);
       setProduct(response.data.product);
+      setIcon(response.data.icon || '📍');
       setPassword('');
       setError(null);
       setProfilePhoto(null);
@@ -188,9 +190,7 @@ export default function DashboardScreen({ navigation }) {
       }
     } catch (err) {
       console.error('Erro no pagamento:', err);
-      setError(
-        err.response?.data?.detail || err.message || 'Falha ao iniciar pagamento'
-      );
+      setError(err.response?.data?.detail || err.message || 'Falha ao iniciar pagamento');
     }
   };
 
@@ -215,17 +215,11 @@ export default function DashboardScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <TouchableOpacity
-          style={styles.mapButton}
-          onPress={() => navigation.navigate('Map')}
-        >
+        <TouchableOpacity style={styles.mapButton} onPress={() => navigation.navigate('Map')}>
           <Text style={styles.mapIcon}>🗺️</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => setMenuOpen(!menuOpen)}
-        >
+        <TouchableOpacity style={styles.menuButton} onPress={() => setMenuOpen(!menuOpen)}>
           <Text style={styles.menuIcon}>☰</Text>
         </TouchableOpacity>
 
@@ -263,15 +257,16 @@ export default function DashboardScreen({ navigation }) {
           editable={editing}
         />
 
-        <Picker
-          selectedValue={product}
-          onValueChange={(itemValue) => setProduct(itemValue)}
-          style={styles.input}
-          enabled={editing}
-        >
+        <Picker selectedValue={product} onValueChange={(itemValue) => setProduct(itemValue)} style={styles.input} enabled={editing}>
           <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
           <Picker.Item label="Gelados" value="Gelados" />
           <Picker.Item label="Acessórios" value="Acessórios" />
+        </Picker>
+
+        <Picker selectedValue={icon} onValueChange={(val) => setIcon(val)} style={styles.input} enabled={editing}>
+          {AVAILABLE_ICONS.map((ic) => (
+            <Picker.Item key={ic} label={ic} value={ic} />
+          ))}
         </Picker>
 
         {editing && (
@@ -286,6 +281,7 @@ export default function DashboardScreen({ navigation }) {
                   setName(vendor.name);
                   setEmail(vendor.email);
                   setProduct(vendor.product);
+                  setIcon(vendor.icon || '📍');
                   setProfilePhoto(null);
                   setPassword('');
                   setEditing(false);
@@ -296,50 +292,27 @@ export default function DashboardScreen({ navigation }) {
         )}
 
         <View style={styles.fullButton}>
-          <Button
-            title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
-            onPress={toggleLocation}
-          />
+          <Button title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'} onPress={toggleLocation} />
         </View>
 
-        <Text
-          style={{
-            color: sharingLocation ? 'green' : 'gray',
-            marginVertical: 8,
-            textAlign: 'center',
-          }}
-        >
-          {sharingLocation
-            ? 'Partilha de localização ativa'
-            : 'Localização não partilhada'}
+        <Text style={{ color: sharingLocation ? 'green' : 'gray', marginVertical: 8, textAlign: 'center' }}>
+          {sharingLocation ? 'Partilha de localização ativa' : 'Localização não partilhada'}
         </Text>
 
         {(() => {
           if (vendor.subscription_active) {
             if (vendor.subscription_valid_until) {
-              const diffMs =
-                new Date(vendor.subscription_valid_until).getTime() - Date.now();
-              const daysLeft = Math.max(
-                0,
-                Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-              );
+              const diffMs = new Date(vendor.subscription_valid_until).getTime() - Date.now();
+              const daysLeft = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
               return (
                 <Text style={{ marginVertical: 8, textAlign: 'center' }}>
                   {`Subscrição ativa – termina em ${daysLeft} dia${daysLeft !== 1 ? 's' : ''}`}
                 </Text>
               );
             }
-            return (
-              <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-                Subscrição ativa
-              </Text>
-            );
+            return <Text style={{ marginVertical: 8, textAlign: 'center' }}>Subscrição ativa</Text>;
           }
-          return (
-            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-              Subscrição inativa
-            </Text>
-          );
+          return <Text style={{ marginVertical: 8, textAlign: 'center' }}>Subscrição inativa</Text>;
         })()}
 
         <View style={[styles.fullButton, styles.logoutButton]}>
@@ -349,20 +322,8 @@ export default function DashboardScreen({ navigation }) {
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Button
-            title="Atualizar Dados"
-            onPress={() => {
-              setMenuOpen(false);
-              setEditing(true);
-            }}
-          />
-          <Button
-            title="Pagar Semanalidade"
-            onPress={() => {
-              setMenuOpen(false);
-              paySubscription();
-            }}
-          />
+          <Button title="Atualizar Dados" onPress={() => { setMenuOpen(false); setEditing(true); }} />
+          <Button title="Pagar Semanalidade" onPress={() => { setMenuOpen(false); paySubscription(); }} />
         </View>
       )}
     </View>

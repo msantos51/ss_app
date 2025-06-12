@@ -17,6 +17,7 @@ const LeafletMap = forwardRef((props, ref) => {
         />
         <style>
           html, body, #map { height: 100%; margin: 0; padding: 0; }
+          .custom-icon { font-size: 24px; }
         </style>
       </head>
       <body>
@@ -30,7 +31,11 @@ const LeafletMap = forwardRef((props, ref) => {
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
           var markers = ${JSON.stringify(markers)};
           markers.forEach(function(m) {
-            L.marker([m.latitude, m.longitude]).addTo(map).bindPopup(m.title || '');
+            var opts = {};
+            if (m.icon) {
+              opts.icon = L.divIcon({ className: 'custom-icon', html: m.icon });
+            }
+            L.marker([m.latitude, m.longitude], opts).addTo(map).bindPopup(m.title || '');
           });
           window.setView = function(lat, lng) { map.setView([lat, lng], 15); };
         </script>

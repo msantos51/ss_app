@@ -87,28 +87,31 @@ export default function MapScreen({ navigation }) {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    const getLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({});
-          setInitialPosition({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-          });
-          mapRef.current?.setView(
-            loc.coords.latitude,
-            loc.coords.longitude
-          );
-        }
-      } catch (err) {
-        console.log('Erro ao obter localização:', err);
-      } finally {
-        setLoadingLocation(false);
+  const locateUser = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const loc = await Location.getCurrentPositionAsync({});
+        setInitialPosition({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
+        mapRef.current?.setView(
+          loc.coords.latitude,
+          loc.coords.longitude
+        );
       }
+    } catch (err) {
+      console.log('Erro ao obter localização:', err);
+    }
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      await locateUser();
+      setLoadingLocation(false);
     };
-    getLocation();
+    init();
   }, []);
 
   const activeVendors = vendors.filter(
@@ -135,6 +138,15 @@ export default function MapScreen({ navigation }) {
             title: v.name || 'Vendedor',
           }))}
         />
+      )}
+
+      {!loadingLocation && (
+        <TouchableOpacity
+          style={styles.locateButton}
+          onPress={locateUser}
+        >
+          <Text style={styles.locateIcon}>📍</Text>
+        </TouchableOpacity>
       )}
 
       <TouchableOpacity
@@ -261,5 +273,18 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  locateButton: {
+    position: 'absolute',
+    bottom: 120,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  locateIcon: {
+    fontSize: 24,
   },
 });

@@ -277,6 +277,7 @@ export default function DashboardScreen({ navigation }) {
               <Picker.Item label="Acessórios" value="Acessórios" />
             </Picker>
 
+            <Text style={styles.iconLabel}>Escolha o ícone que será exibido no mapa</Text>
             <Picker selectedValue={icon} onValueChange={(val) => setIcon(val)} style={styles.input}>
               {AVAILABLE_ICONS.map((ic) => (
                 <Picker.Item key={ic} label={ic} value={ic} />
@@ -422,4 +423,5 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   reviewRating: { fontWeight: 'bold' },
+  iconLabel: { alignSelf: 'flex-start', marginBottom: 4 },
 });

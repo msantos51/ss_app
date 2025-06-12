@@ -136,6 +136,7 @@ export default function MapScreen({ navigation }) {
             latitude: v.current_lat,
             longitude: v.current_lng,
             title: v.name || 'Vendedor',
+            icon: v.icon,
           }))}
         />
       )}

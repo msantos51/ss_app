@@ -13,11 +13,14 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
+const AVAILABLE_ICONS = ['📍', '🍦', '🍩', '🌭', '🏖️'];
+
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
+  const [icon, setIcon] = useState('📍');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -49,6 +52,7 @@ export default function RegisterScreen({ navigation }) {
       data.append('email', email);
       data.append('password', password);
       data.append('product', product);
+      data.append('icon', icon);
 
       if (profilePhoto) {
         data.append('profile_photo', {
@@ -121,6 +125,16 @@ export default function RegisterScreen({ navigation }) {
         <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
         <Picker.Item label="Gelados" value="Gelados" />
         <Picker.Item label="Acessórios" value="Acessórios" />
+      </Picker>
+
+      <Picker
+        selectedValue={icon}
+        onValueChange={(val) => setIcon(val)}
+        style={styles.input}
+      >
+        {AVAILABLE_ICONS.map((ic) => (
+          <Picker.Item key={ic} label={ic} value={ic} />
+        ))}
       </Picker>
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />

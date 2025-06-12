@@ -9,6 +9,7 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,6 +30,7 @@ export default function MapScreen({ navigation }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState('Todos');
   const [showList, setShowList] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [initialPosition, setInitialPosition] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
   const mapRef = useRef(null);
@@ -119,7 +121,9 @@ export default function MapScreen({ navigation }) {
   );
 
   const filteredVendors = activeVendors.filter(
-    (v) => selectedProduct === 'Todos' || v?.product === selectedProduct
+    (v) =>
+      (selectedProduct === 'Todos' || v?.product === selectedProduct) &&
+      (searchQuery === '' || v?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   useProximityNotifications(filteredVendors);
@@ -150,11 +154,7 @@ export default function MapScreen({ navigation }) {
         </TouchableOpacity>
       )}
 
-      <TouchableOpacity
-        style={styles.filterContainer}
-        activeOpacity={1}
-        onPress={() => setShowList((v) => !v)}
-      >
+      <View style={styles.filterContainer}>
         <Picker
           selectedValue={selectedProduct}
           onValueChange={(itemValue) => setSelectedProduct(itemValue)}
@@ -165,41 +165,55 @@ export default function MapScreen({ navigation }) {
           <Picker.Item label="Acessórios" value="Acessórios" />
           <Picker.Item label="Gelados" value="Gelados" />
         </Picker>
+        <TouchableOpacity
+          style={styles.listToggle}
+          onPress={() => setShowList((v) => !v)}
+        >
+          <Text style={styles.listToggleText}>{showList ? 'Fechar Lista' : 'Mostrar Lista'}</Text>
+        </TouchableOpacity>
 
         {showList && (
-          <FlatList
-            data={filteredVendors}
-            keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
-            style={styles.vendorList}
-            renderItem={({ item }) => {
-              const photoUri = item.profile_photo
-                ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-                : null;
-              return (
-                <TouchableOpacity
-                  style={styles.vendorItem}
-                  onPress={() => {
-                    mapRef.current?.setView(item.current_lat, item.current_lng);
-                  }}
-                  onLongPress={() =>
-                    navigation.navigate('VendorDetail', { vendor: item })
-                  }
-                >
-                  {photoUri && (
-                    <Image source={{ uri: photoUri }} style={styles.vendorImage} />
-                  )}
-                  <Text>
-                    {item.name || 'Vendedor'}
-                    {item.rating_average != null
-                      ? ` \u2013 ${item.rating_average.toFixed(1)}\u2605`
-                      : ''}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
+          <>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Procurar..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <FlatList
+              data={filteredVendors}
+              keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
+              style={styles.vendorList}
+              renderItem={({ item }) => {
+                const photoUri = item.profile_photo
+                  ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+                  : null;
+                return (
+                  <TouchableOpacity
+                    style={styles.vendorItem}
+                    onPress={() => {
+                      mapRef.current?.setView(item.current_lat, item.current_lng);
+                    }}
+                    onLongPress={() =>
+                      navigation.navigate('VendorDetail', { vendor: item })
+                    }
+                  >
+                    {photoUri && (
+                      <Image source={{ uri: photoUri }} style={styles.vendorImage} />
+                    )}
+                    <Text>
+                      {item.name || 'Vendedor'}
+                      {item.rating_average != null
+                        ? ` \u2013 ${item.rating_average.toFixed(1)}\u2605`
+                        : ''}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </>
         )}
-      </TouchableOpacity>
+      </View>
 
       <View style={styles.buttonsContainer}>
         {currentUser ? (
@@ -251,6 +265,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 4,
+    marginBottom: 4,
+  },
+  listToggle: { backgroundColor: '#2196F3', padding: 6, borderRadius: 8, marginBottom: 4 },
+  listToggleText: { color: '#fff', textAlign: 'center' },
   vendorImage: {
     width: 32,
     height: 32,

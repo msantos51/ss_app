@@ -11,8 +11,15 @@ load_dotenv()  # Isto carrega o .env
 # Obter a URL da base de dados das variáveis de ambiente
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Se a variável não estiver definida, usa uma base SQLite local para facilitar
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///./app.db"
+    connect_args = {"check_same_thread": False}
+else:
+    connect_args = {}
+
 # Criar o motor de conexão
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, **connect_args)
 
 # Criar sessão de acesso ao banco
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

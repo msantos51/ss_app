@@ -45,7 +45,7 @@ pip install -r backend/requirements.txt
 
 1. Instale o PostgreSQL.
 2. Crie uma base de dados chamada `beach_vendors` e um utilizador com permissões.
-3. Copie o arquivo `.env.example` para `.env` e defina `DATABASE_URL` com as suas credenciais. Opcionalmente ajuste `EXPO_PUBLIC_BASE_URL`.
+3. Copie o arquivo `.env.example` para `.env` e defina `DATABASE_URL` com as suas credenciais. Caso a variável não seja definida o backend usa uma base SQLite local. Opcionalmente ajuste `EXPO_PUBLIC_BASE_URL`.
 
 ```bash
 cp .env.example .env

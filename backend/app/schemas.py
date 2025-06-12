@@ -29,6 +29,8 @@ class VendorOut(BaseModel):
     current_lat: Optional[float] = None
     current_lng: Optional[float] = None
     rating_average: Optional[float] = None
+    subscription_active: Optional[bool] = None
+    subscription_valid_until: Optional[str] = None
 
     class Config:
         orm_mode = True

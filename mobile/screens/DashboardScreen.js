@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -147,6 +148,28 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
+  const paySubscription = async () => {
+    if (!vendor) return;
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const res = await axios.post(
+        `${BASE_URL}/vendors/${vendor.id}/create-checkout-session`,
+        null,
+        {
+          headers: { Authorization: token ? `Bearer ${token}` : undefined },
+        }
+      );
+      if (res.data.checkout_url) {
+        Linking.openURL(res.data.checkout_url);
+      }
+    } catch (err) {
+      console.error('Erro no pagamento:', err);
+      setError(
+        err.response?.data?.detail || err.message || 'Falha ao iniciar pagamento'
+      );
+    }
+  };
+
   if (!vendor) {
     return (
       <View style={styles.container}>
@@ -247,6 +270,18 @@ export default function DashboardScreen({ navigation }) {
           ? 'Partilha de localização ativa'
           : 'Localização não partilhada'}
       </Text>
+
+      {!vendor.subscription_active ? (
+        <Button title="Pagar Semanalidade" onPress={paySubscription} />
+      ) : (
+        vendor.subscription_valid_until && (
+          <Text style={{ marginVertical: 8 }}>
+            {`Subscrição válida até ${new Date(
+              vendor.subscription_valid_until
+            ).toLocaleDateString()}`}
+          </Text>
+        )
+      )}
 
       <Button title="Logout" onPress={logout} />
     </View>

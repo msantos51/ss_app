@@ -1,6 +1,7 @@
 # models.py - define as tabelas no PostgreSQL
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 from .database import Base
 
 class Vendor(Base):
@@ -16,6 +17,8 @@ class Vendor(Base):
     profile_photo = Column(String)
     current_lat = Column(Float, nullable=True)
     current_lng = Column(Float, nullable=True)
+    subscription_active = Column(Boolean, default=False)
+    subscription_valid_until = Column(DateTime, nullable=True)
 
     reviews = relationship("Review", back_populates="vendor")
 

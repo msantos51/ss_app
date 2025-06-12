@@ -212,6 +212,141 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {error && <Text style={styles.error}>{error}</Text>}
+
+        <TouchableOpacity
+          style={styles.mapButton}
+          onPress={() => navigation.navigate('Map')}
+        >
+          <Text style={styles.mapIcon}>🗺️</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => setMenuOpen(!menuOpen)}
+        >
+          <Text style={styles.menuIcon}>☰</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.title}>Meu Perfil</Text>
+
+        {profileUri && (
+          <TouchableOpacity onPress={editing ? pickImage : undefined}>
+            <Image source={{ uri: profileUri }} style={styles.imagePreview} />
+          </TouchableOpacity>
+        )}
+
+        <TextInput
+          style={[styles.input, !editing && styles.inputDisabled]}
+          placeholder="Nome"
+          value={name}
+          onChangeText={setName}
+          editable={editing}
+        />
+
+        <TextInput
+          style={[styles.input, !editing && styles.inputDisabled]}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          editable={editing}
+        />
+
+        <TextInput
+          style={[styles.input, !editing && styles.inputDisabled]}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          editable={editing}
+        />
+
+        <Picker
+          selectedValue={product}
+          onValueChange={(itemValue) => setProduct(itemValue)}
+          style={styles.input}
+          enabled={editing}
+        >
+          <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
+          <Picker.Item label="Gelados" value="Gelados" />
+          <Picker.Item label="Acessórios" value="Acessórios" />
+        </Picker>
+
+        {editing && (
+          <View style={styles.row}>
+            <View style={styles.halfButton}>
+              <Button title="Guardar" onPress={updateProfile} />
+            </View>
+            <View style={[styles.halfButton, styles.leftSpacing]}>
+              <Button
+                title="Cancelar"
+                onPress={() => {
+                  setName(vendor.name);
+                  setEmail(vendor.email);
+                  setProduct(vendor.product);
+                  setProfilePhoto(null);
+                  setPassword('');
+                  setEditing(false);
+                }}
+              />
+            </View>
+          </View>
+        )}
+
+        <View style={styles.fullButton}>
+          <Button
+            title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
+            onPress={toggleLocation}
+          />
+        </View>
+
+        <Text
+          style={{
+            color: sharingLocation ? 'green' : 'gray',
+            marginVertical: 8,
+            textAlign: 'center',
+          }}
+        >
+          {sharingLocation
+            ? 'Partilha de localização ativa'
+            : 'Localização não partilhada'}
+        </Text>
+
+        {(() => {
+          if (vendor.subscription_active) {
+            if (vendor.subscription_valid_until) {
+              const diffMs =
+                new Date(vendor.subscription_valid_until).getTime() - Date.now();
+              const daysLeft = Math.max(
+                0,
+                Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+              );
+              return (
+                <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+                  {`Subscrição ativa – termina em ${daysLeft} dia${daysLeft !== 1 ? 's' : ''}`}
+                </Text>
+              );
+            }
+            return (
+              <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+                Subscrição ativa
+              </Text>
+            );
+          }
+          return (
+            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+              Subscrição inativa
+            </Text>
+          );
+        })()}
+
+        <View style={[styles.fullButton, styles.logoutButton]}>
+          <Button title="Logout" onPress={logout} />
+        </View>
+      </ScrollView>
+
       {menuOpen && (
         <View style={styles.menu}>
           <Button
@@ -230,143 +365,6 @@ export default function DashboardScreen({ navigation }) {
           />
         </View>
       )}
-
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={() => setMenuOpen(!menuOpen)}
-      >
-        <Text style={styles.menuIcon}>☰</Text>
-      </TouchableOpacity>
-
-      <ScrollView contentContainerStyle={styles.container}>
-        {error && <Text style={styles.error}>{error}</Text>}
-
-      <TouchableOpacity
-        style={styles.mapButton}
-        onPress={() => navigation.navigate('Map')}
-      >
-        <Text style={styles.mapIcon}>🗺️</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.title}>Meu Perfil</Text>
-
-      {profileUri && (
-        <TouchableOpacity onPress={editing ? pickImage : undefined}>
-          <Image source={{ uri: profileUri }} style={styles.imagePreview} />
-        </TouchableOpacity>
-      )}
-
-      <TextInput
-        style={[styles.input, !editing && styles.inputDisabled]}
-        placeholder="Nome"
-        value={name}
-        onChangeText={setName}
-        editable={editing}
-      />
-
-      <TextInput
-        style={[styles.input, !editing && styles.inputDisabled]}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        editable={editing}
-      />
-
-      <TextInput
-        style={[styles.input, !editing && styles.inputDisabled]}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        editable={editing}
-      />
-
-      <Picker
-        selectedValue={product}
-        onValueChange={(itemValue) => setProduct(itemValue)}
-        style={styles.input}
-        enabled={editing}
-      >
-        <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
-        <Picker.Item label="Gelados" value="Gelados" />
-        <Picker.Item label="Acessórios" value="Acessórios" />
-      </Picker>
-
-      {editing && (
-        <View style={styles.row}>
-          <View style={styles.halfButton}>
-            <Button title="Guardar" onPress={updateProfile} />
-          </View>
-          <View style={[styles.halfButton, styles.leftSpacing]}>
-            <Button
-              title="Cancelar"
-              onPress={() => {
-                setName(vendor.name);
-                setEmail(vendor.email);
-                setProduct(vendor.product);
-                setProfilePhoto(null);
-                setPassword('');
-                setEditing(false);
-              }}
-            />
-          </View>
-        </View>
-      )}
-
-      <View style={styles.fullButton}>
-        <Button
-          title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
-          onPress={toggleLocation}
-        />
-      </View>
-
-      <Text
-        style={{
-          color: sharingLocation ? 'green' : 'gray',
-          marginVertical: 8,
-          textAlign: 'center',
-        }}
-      >
-        {sharingLocation
-          ? 'Partilha de localização ativa'
-          : 'Localização não partilhada'}
-      </Text>
-
-      {(() => {
-        if (vendor.subscription_active) {
-          if (vendor.subscription_valid_until) {
-            const diffMs =
-              new Date(vendor.subscription_valid_until).getTime() - Date.now();
-            const daysLeft = Math.max(
-              0,
-              Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-            );
-            return (
-              <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-                {`Subscrição ativa \u2013 termina em ${daysLeft} dia${
-                  daysLeft !== 1 ? 's' : ''
-                }`}
-              </Text>
-            );
-          }
-          return (
-            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-              Subscrição ativa
-            </Text>
-          );
-        }
-        return (
-          <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-            Subscrição inativa
-          </Text>
-        );
-      })()}
-
-      <View style={[styles.fullButton, styles.logoutButton]}>
-        <Button title="Logout" onPress={logout} />
-      </View>
-      </ScrollView>
     </View>
   );
 }
@@ -379,11 +377,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -392,56 +386,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '100%',
   },
-  inputDisabled: {
-    backgroundColor: '#eee',
-    color: '#666',
-  },
-  error: {
-    color: 'red',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  imagePreview: {
-    width: 120,
-    height: 120,
-    marginVertical: 12,
-    borderRadius: 60,
-  },
-  row: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  halfButton: {
-    flex: 1,
-  },
-  leftSpacing: {
-    marginLeft: 12,
-  },
-  fullButton: {
-    width: '100%',
-    marginBottom: 12,
-  },
-  logoutButton: {
-    marginTop: 'auto',
-  },
-  mapButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-  },
-  mapIcon: {
-    fontSize: 50,
-  },
-  menuButton: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-  },
-  menuIcon: {
-    fontSize: 40,
-  },
+  inputDisabled: { backgroundColor: '#eee', color: '#666' },
+  error: { color: 'red', marginBottom: 12, textAlign: 'center' },
+  imagePreview: { width: 120, height: 120, marginVertical: 12, borderRadius: 60 },
+  row: { flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginBottom: 12 },
+  halfButton: { flex: 1 },
+  leftSpacing: { marginLeft: 12 },
+  fullButton: { width: '100%', marginBottom: 12 },
+  logoutButton: { marginTop: 'auto' },
+  mapButton: { position: 'absolute', top: 16, right: 16 },
+  mapIcon: { fontSize: 50 },
+  menuButton: { position: 'absolute', top: 16, left: 16 },
+  menuIcon: { fontSize: 40 },
   menu: {
     position: 'absolute',
     top: 70,
@@ -449,7 +405,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 8,
     borderRadius: 8,
-    elevation: 4,
-    zIndex: 1,
+    elevation: 10,
+    zIndex: 100,
   },
 });

@@ -28,7 +28,7 @@ import useProximityNotifications from '../useProximityNotifications';
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState('Todos');
+  const [selectedProduct, setSelectedProduct] = useState('Todos os vendedores');
   const [showList, setShowList] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [initialPosition, setInitialPosition] = useState(null);
@@ -122,7 +122,7 @@ export default function MapScreen({ navigation }) {
 
   const filteredVendors = activeVendors.filter(
     (v) =>
-      (selectedProduct === 'Todos' || v?.product === selectedProduct) &&
+      (selectedProduct === 'Todos os vendedores' || v?.product === selectedProduct) &&
       (searchQuery === '' || v?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
@@ -160,7 +160,7 @@ export default function MapScreen({ navigation }) {
           onValueChange={(itemValue) => setSelectedProduct(itemValue)}
           style={styles.picker}
         >
-          <Picker.Item label="Todos" value="Todos" />
+          <Picker.Item label="Todos os vendedores" value="Todos os vendedores" />
           <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
           <Picker.Item label="Acessórios" value="Acessórios" />
           <Picker.Item label="Gelados" value="Gelados" />
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   locateButton: {
     position: 'absolute',
-    bottom: 120,
+    bottom: 40,
     right: 20,
     backgroundColor: '#fff',
     borderRadius: 20,

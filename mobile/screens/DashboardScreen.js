@@ -307,10 +307,18 @@ export default function DashboardScreen({ navigation }) {
         ) : (
           <>
             {profileUri && <Image source={{ uri: profileUri }} style={styles.imagePreview} />}
-            <Text style={styles.infoText}>Nome: {vendor.name}</Text>
-            <Text style={styles.infoText}>Email: {vendor.email}</Text>
-            <Text style={styles.infoText}>Produto: {vendor.product}</Text>
-            <Text style={styles.infoText}>Ícone: {vendor.icon || '📍'}</Text>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Nome:</Text> {vendor.name}
+            </Text>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Email:</Text> {vendor.email}
+            </Text>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Produto:</Text> {vendor.product}
+            </Text>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Ícone:</Text> {vendor.icon || '📍'}
+            </Text>
           </>
         )}
 
@@ -394,6 +402,7 @@ const styles = StyleSheet.create({
   },
   inputDisabled: { backgroundColor: '#eee', color: '#666' },
   infoText: { marginBottom: 8, width: '100%' },
+  label: { fontWeight: 'bold' },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
   imagePreview: { width: 120, height: 120, marginVertical: 12, borderRadius: 60 },
   row: { flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginBottom: 12 },

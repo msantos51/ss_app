@@ -17,7 +17,11 @@ export default function App() {
     <PaperProvider theme={theme}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Map">
-          <Stack.Screen name="Map" component={MapScreen} />
+          <Stack.Screen
+            name="Map"
+            component={MapScreen}
+            options={{ title: 'Sunny Sales', headerTitleAlign: 'center' }}
+          />
           <Stack.Screen
             name="VendorDetail"
             component={VendorDetailScreen}

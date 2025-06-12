@@ -213,7 +213,14 @@ export default function DashboardScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <Text style={styles.title}>Perfil do Vendedor</Text>
+      <TouchableOpacity
+        style={styles.mapButton}
+        onPress={() => navigation.navigate('Map')}
+      >
+        <Text style={styles.mapIcon}>🗺️</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Meu Perfil</Text>
 
       {profileUri && (
         <TouchableOpacity onPress={editing ? pickImage : undefined}>
@@ -395,5 +402,13 @@ const styles = StyleSheet.create({
   fullButton: {
     width: '100%',
     marginBottom: 12,
+  },
+  mapButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  mapIcon: {
+    fontSize: 24,
   },
 });

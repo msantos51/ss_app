@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -34,6 +33,25 @@ export default function DashboardScreen({ navigation }) {
   const [sharingLocation, setSharingLocation] = useState(false);
   const [editing, setEditing] = useState(false);
 
+  const fetchVendorFromServer = async (vendorId) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const res = await axios.get(`${BASE_URL}/vendors/`, {
+        headers: { Authorization: token ? `Bearer ${token}` : undefined },
+      });
+      const updated = res.data.find((v) => v.id === vendorId);
+      if (updated) {
+        await AsyncStorage.setItem('user', JSON.stringify(updated));
+        setVendor(updated);
+        setName(updated.name);
+        setEmail(updated.email);
+        setProduct(updated.product);
+      }
+    } catch (err) {
+      console.log('Erro ao atualizar vendedor:', err);
+    }
+  };
+
   const logout = async () => {
     await stopLocationSharing();
     await AsyncStorage.removeItem('user');
@@ -51,6 +69,7 @@ export default function DashboardScreen({ navigation }) {
           setName(v.name);
           setEmail(v.email);
           setProduct(v.product);
+          fetchVendorFromServer(v.id);
 
           const share = await isLocationSharing();
           setSharingLocation(share);
@@ -70,7 +89,11 @@ export default function DashboardScreen({ navigation }) {
       }
     };
     loadVendor();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (vendor?.id) fetchVendorFromServer(vendor.id);
+    });
+    return unsubscribe;
+  }, [navigation, vendor?.id]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -96,7 +119,6 @@ export default function DashboardScreen({ navigation }) {
 
       if (profilePhoto) {
         const fileUri = profilePhoto.uri;
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
         const file = {
           uri: fileUri,
           name: 'profile.jpg',
@@ -280,19 +302,40 @@ export default function DashboardScreen({ navigation }) {
           : 'Localização não partilhada'}
       </Text>
 
-      {!vendor.subscription_active ? (
-        <View style={styles.fullButton}>
-          <Button title="Pagar Semanalidade" onPress={paySubscription} />
-        </View>
-      ) : (
-        vendor.subscription_valid_until && (
-          <Text style={{ marginVertical: 8, textAlign: 'center' }}>
-            {`Subscrição válida até ${new Date(
-              vendor.subscription_valid_until
-            ).toLocaleDateString()}`}
-          </Text>
-        )
-      )}
+      {(() => {
+        if (vendor.subscription_active) {
+          if (vendor.subscription_valid_until) {
+            const diffMs =
+              new Date(vendor.subscription_valid_until).getTime() - Date.now();
+            const daysLeft = Math.max(
+              0,
+              Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+            );
+            return (
+              <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+                {`Subscrição ativa \u2013 termina em ${daysLeft} dia${
+                  daysLeft !== 1 ? 's' : ''
+                }`}
+              </Text>
+            );
+          }
+          return (
+            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+              Subscrição ativa
+            </Text>
+          );
+        }
+        return (
+          <>
+            <Text style={{ marginVertical: 8, textAlign: 'center' }}>
+              Subscrição inativa
+            </Text>
+            <View style={styles.fullButton}>
+              <Button title="Pagar Semanalidade" onPress={paySubscription} />
+            </View>
+          </>
+        );
+      })()}
 
       <View style={styles.fullButton}>
         <Button title="Logout" onPress={logout} />

@@ -409,6 +409,6 @@ const styles = StyleSheet.create({
     right: 16,
   },
   mapIcon: {
-    fontSize: 24,
+    fontSize: 50,
   },
 });

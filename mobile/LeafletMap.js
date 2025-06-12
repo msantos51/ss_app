@@ -2,10 +2,10 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-const LeafletMap = forwardRef(
-  ({ markers = [], initialPosition = { latitude: 38.736946, longitude: -9.142685 } }, ref)
- => {
+const LeafletMap = forwardRef((props, ref) => {
+  const { markers = [], initialPosition = { latitude: 38.736946, longitude: -9.142685 } } = props;
   const webviewRef = useRef(null);
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -35,7 +35,8 @@ const LeafletMap = forwardRef(
           window.setView = function(lat, lng) { map.setView([lat, lng], 15); };
         </script>
       </body>
-    </html>`;
+    </html>
+  `;
 
   useImperativeHandle(ref, () => ({
     setView: (lat, lng) => {

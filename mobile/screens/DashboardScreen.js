@@ -225,70 +225,77 @@ export default function DashboardScreen({ navigation }) {
 
         <Text style={styles.title}>Meu Perfil</Text>
 
-        {profileUri && (
-          <TouchableOpacity onPress={editing ? pickImage : undefined}>
-            <Image source={{ uri: profileUri }} style={styles.imagePreview} />
-          </TouchableOpacity>
-        )}
+        {editing ? (
+          <>
+            {profileUri && (
+              <TouchableOpacity onPress={pickImage}>
+                <Image source={{ uri: profileUri }} style={styles.imagePreview} />
+              </TouchableOpacity>
+            )}
 
-        <TextInput
-          style={[styles.input, !editing && styles.inputDisabled]}
-          placeholder="Nome"
-          value={name}
-          onChangeText={setName}
-          editable={editing}
-        />
+            <TextInput
+              style={styles.input}
+              placeholder="Nome"
+              value={name}
+              onChangeText={setName}
+            />
 
-        <TextInput
-          style={[styles.input, !editing && styles.inputDisabled]}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          editable={editing}
-        />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
 
-        <TextInput
-          style={[styles.input, !editing && styles.inputDisabled]}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          editable={editing}
-        />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
 
-        <Picker selectedValue={product} onValueChange={(itemValue) => setProduct(itemValue)} style={styles.input} enabled={editing}>
-          <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
-          <Picker.Item label="Gelados" value="Gelados" />
-          <Picker.Item label="Acessórios" value="Acessórios" />
-        </Picker>
+            <Picker selectedValue={product} onValueChange={(itemValue) => setProduct(itemValue)} style={styles.input}>
+              <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
+              <Picker.Item label="Gelados" value="Gelados" />
+              <Picker.Item label="Acessórios" value="Acessórios" />
+            </Picker>
 
-        <Picker selectedValue={icon} onValueChange={(val) => setIcon(val)} style={styles.input} enabled={editing}>
-          {AVAILABLE_ICONS.map((ic) => (
-            <Picker.Item key={ic} label={ic} value={ic} />
-          ))}
-        </Picker>
+            <Picker selectedValue={icon} onValueChange={(val) => setIcon(val)} style={styles.input}>
+              {AVAILABLE_ICONS.map((ic) => (
+                <Picker.Item key={ic} label={ic} value={ic} />
+              ))}
+            </Picker>
 
-        {editing && (
-          <View style={styles.row}>
-            <View style={styles.halfButton}>
-              <Button title="Guardar" onPress={updateProfile} />
+            <View style={styles.row}>
+              <View style={styles.halfButton}>
+                <Button title="Guardar" onPress={updateProfile} />
+              </View>
+              <View style={[styles.halfButton, styles.leftSpacing]}>
+                <Button
+                  title="Cancelar"
+                  onPress={() => {
+                    setName(vendor.name);
+                    setEmail(vendor.email);
+                    setProduct(vendor.product);
+                    setIcon(vendor.icon || '📍');
+                    setProfilePhoto(null);
+                    setPassword('');
+                    setEditing(false);
+                  }}
+                />
+              </View>
             </View>
-            <View style={[styles.halfButton, styles.leftSpacing]}>
-              <Button
-                title="Cancelar"
-                onPress={() => {
-                  setName(vendor.name);
-                  setEmail(vendor.email);
-                  setProduct(vendor.product);
-                  setIcon(vendor.icon || '📍');
-                  setProfilePhoto(null);
-                  setPassword('');
-                  setEditing(false);
-                }}
-              />
-            </View>
-          </View>
+          </>
+        ) : (
+          <>
+            {profileUri && <Image source={{ uri: profileUri }} style={styles.imagePreview} />}
+            <Text style={styles.infoText}>Nome: {vendor.name}</Text>
+            <Text style={styles.infoText}>Email: {vendor.email}</Text>
+            <Text style={styles.infoText}>Produto: {vendor.product}</Text>
+            <Text style={styles.infoText}>Ícone: {vendor.icon || '📍'}</Text>
+          </>
         )}
 
         <View style={styles.fullButton}>
@@ -348,6 +355,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   inputDisabled: { backgroundColor: '#eee', color: '#666' },
+  infoText: { marginBottom: 8, width: '100%' },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
   imagePreview: { width: 120, height: 120, marginVertical: 12, borderRadius: 60 },
   row: { flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginBottom: 12 },

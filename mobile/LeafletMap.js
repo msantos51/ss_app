@@ -19,12 +19,13 @@ const LeafletMap = forwardRef((props, ref) => {
           html, body, #map { height: 100%; margin: 0; padding: 0; }
           .custom-icon .gm-pin {
             position: relative;
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border-radius: 50% 50% 50% 0;
             transform: rotate(-45deg);
             overflow: hidden;
             background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
           }
           .custom-icon .gm-pin img {
             position: absolute;

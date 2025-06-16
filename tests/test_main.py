@@ -41,7 +41,6 @@ def register_vendor(client, email="vendor@example.com", password="secret", name=
         "email": email,
         "password": password,
         "product": "Bolas de Berlim",
-        "pin_color": "#FF0000",
     }
     files = {"profile_photo": ("test.png", b"fakeimage", "image/png")}
     return client.post("/vendors/", data=data, files=files)

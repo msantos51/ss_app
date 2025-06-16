@@ -20,7 +20,6 @@ class VendorCreate(BaseModel):
     password: str
     product: Literal["Bolas de Berlim", "Gelados", "Acess\u00f3rios"]
     profile_photo: str
-    pin_color: Optional[str] = "#FF0000"
 
 class VendorOut(BaseModel):
     id: int

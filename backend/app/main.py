@@ -190,7 +190,6 @@ async def create_vendor(
     password: str = Form(...),
     product: str = Form(...),
     profile_photo: UploadFile = File(...),
-    pin_color: str = Form("#FF0000"),
     db: Session = Depends(get_db),
 ):
     db_vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
@@ -213,7 +212,7 @@ async def create_vendor(
         hashed_password=hashed_password,
         product=product,
         profile_photo=public_path,
-        pin_color=pin_color,
+        pin_color="#FF0000",
         confirmation_token=token_urlsafe(32),
     )
     db.add(new_vendor)

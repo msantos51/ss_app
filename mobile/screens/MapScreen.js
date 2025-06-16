@@ -150,7 +150,7 @@ export default function MapScreen({ navigation }) {
               longitude: v.current_lng,
               title: v.name || 'Vendedor',
               iconHtml: photo
-                ? `<div class="gm-pin" style="border: 2px solid ${v.pin_color || '#FF0000'};"><img src="${photo}" /></div>`
+                ? `<div class="gm-pin" style="border: 2px solid ${v.pin_color || '#FFB6C1'};"><img src="${photo}" /></div>`
                 : null,
               selected: v.id === selectedVendorId,
             };

@@ -145,7 +145,7 @@ export default function MapScreen({ navigation }) {
               longitude: v.current_lng,
               title: v.name || 'Vendedor',
               iconHtml: photo
-                ? `<div class="gm-pin" style="border: 4px solid ${v.pin_color || '#FF0000'};"><img src="${photo}" /></div>`
+                ? `<div class="gm-pin" style="border: 2px solid ${v.pin_color || '#FF0000'};"><img src="${photo}" /></div>`
                 : null,
             };
           })}
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   },
   locateButton: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 110,
     right: 20,
     backgroundColor: '#fff',
     borderRadius: 20,

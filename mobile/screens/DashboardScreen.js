@@ -336,9 +336,15 @@ export default function DashboardScreen({ navigation }) {
             <Text style={styles.infoText}>
               <Text style={styles.label}>Produto:</Text> {vendor.product}
             </Text>
-            <Text style={styles.infoText}>
-              <Text style={styles.label}>Cor do Pin:</Text> {vendor.pin_color || '#FF0000'}
-            </Text>
+            <View style={[styles.infoText, styles.colorRow]}>
+              <Text style={styles.label}>Cor do Pin:</Text>
+              <View
+                style={[
+                  styles.colorPreview,
+                  { backgroundColor: vendor.pin_color || '#FF0000' },
+                ]}
+              />
+            </View>
           </>
         )}
 
@@ -465,4 +471,16 @@ const styles = StyleSheet.create({
     borderColor: '#000',
   },
   colorOptionSelected: { borderWidth: 3 },
+  colorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  colorPreview: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
 });

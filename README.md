@@ -356,10 +356,21 @@ O aplicativo móvel inclui agora uma tela de detalhes para cada vendedor. Nela �
 
 Adicionalmente, quando um vendedor ativo estiver num raio de aproximadamente 500 metros do utilizador, o app envia uma notificação local (usa `expo-notifications`). Certifique-se de executar `npm install` para instalar esta dependência antes de iniciar o Expo.
 
+## 4. Simulação automática de movimento
 
-Adicionalmente, quando um vendedor ativo estiver num raio de aproximadamente 500 metros do utilizador, o app envia uma notificação local (usa `expo-notifications`). Certifique-se de executar `npm install` para instalar esta dependência antes de iniciar o Expo.
+Para testar o backend é possível simular o deslocamento de um vendedor existente.
+O script `scripts/simulate_movement.py` envia atualizações de localização para o
+servidor. Defina as credenciais do vendedor através das variáveis de ambiente
+`VENDOR_EMAIL` e `VENDOR_PASSWORD` e execute:
 
-## 4. Considerações finais
+```bash
+python scripts/simulate_movement.py
+```
+
+Por padrão o script usa `BASE_URL=http://localhost:8000` e `VENDOR_ID=1`, mas
+estes valores podem ser sobrepostos via variáveis de ambiente.
+
+## 5. Considerações finais
 
 * Este README fornece um guia inicial. Você pode expandir o backend com autenticação JWT e aprimorar o frontend conforme necessário.
 * Use o Visual Studio Code para editar os arquivos e acompanhar o desenvolvimento.

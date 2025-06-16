@@ -17,6 +17,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
 import {
@@ -255,7 +256,7 @@ export default function DashboardScreen({ navigation }) {
         {error && <Text style={styles.error}>{error}</Text>}
 
         <TouchableOpacity style={styles.mapButton} onPress={() => navigation.navigate('Map')}>
-          <Text style={styles.mapIcon}>🗺️</Text>
+          <MaterialCommunityIcons name="map-outline" size={50} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuButton} onPress={() => setMenuOpen(!menuOpen)}>

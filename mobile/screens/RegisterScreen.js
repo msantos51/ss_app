@@ -40,6 +40,10 @@ export default function RegisterScreen({ navigation }) {
       setError('Preencha todos os campos obrigatórios');
       return;
     }
+    if (password.length < 8 || password.toLowerCase() === password) {
+      setError('Password deve ter 8 caracteres e uma letra maiúscula');
+      return;
+    }
 
     setLoading(true);
     setError(null);

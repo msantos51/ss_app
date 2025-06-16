@@ -29,6 +29,8 @@ export default function DashboardScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
   const [product, setProduct] = useState('');
   const [pinColor, setPinColor] = useState('#FF0000');
   const colorOptions = [
@@ -142,12 +144,19 @@ export default function DashboardScreen({ navigation }) {
 
   const updateProfile = async () => {
     if (!vendor) return;
+    if (changingPassword && (!password || !oldPassword)) {
+      setError('Preencha as passwords');
+      return;
+    }
     try {
       const data = new FormData();
 
       if (name !== vendor.name) data.append('name', name);
       if (email !== vendor.email) data.append('email', email);
-      if (password) data.append('password', password);
+      if (changingPassword && password) {
+        data.append('new_password', password);
+        data.append('old_password', oldPassword);
+      }
       if (product !== vendor.product) data.append('product', product);
       if (pinColor !== (vendor.pin_color || '#FF0000')) data.append('pin_color', pinColor);
 
@@ -177,6 +186,8 @@ export default function DashboardScreen({ navigation }) {
       setProduct(response.data.product);
       setPinColor(response.data.pin_color || '#FF0000');
       setPassword('');
+      setOldPassword('');
+      setChangingPassword(false);
       setError(null);
       setProfilePhoto(null);
       setEditing(false);
@@ -275,13 +286,34 @@ export default function DashboardScreen({ navigation }) {
               autoCapitalize="none"
             />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
+            {changingPassword ? (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password atual"
+                  secureTextEntry
+                  value={oldPassword}
+                  onChangeText={setOldPassword}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nova password"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </>
+            ) : (
+              <>
+                <TextInput
+                  style={[styles.input, styles.inputDisabled]}
+                  placeholder="Password"
+                  value="********"
+                  editable={false}
+                />
+                <Button title="Alterar password" onPress={() => setChangingPassword(true)} />
+              </>
+            )}
 
             <Picker selectedValue={product} onValueChange={(itemValue) => setProduct(itemValue)} style={styles.input}>
               <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
@@ -318,6 +350,8 @@ export default function DashboardScreen({ navigation }) {
                     setPinColor(vendor.pin_color || '#FF0000');
                     setProfilePhoto(null);
                     setPassword('');
+                    setOldPassword('');
+                    setChangingPassword(false);
                     setEditing(false);
                   }}
                 />

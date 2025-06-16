@@ -11,6 +11,7 @@ import VendorDetailScreen from './screens/VendorDetailScreen';
 import RoutesScreen from './screens/RoutesScreen';
 import RouteDetailScreen from './screens/RouteDetailScreen';
 import TermsScreen from './screens/TermsScreen';
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import { theme } from './theme';
 
 const Stack = createNativeStackNavigator();
@@ -32,6 +33,7 @@ export default function App() {
           />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Recuperar Password' }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
           <Stack.Screen name="Routes" component={RoutesScreen} options={{ title: 'Trajetos' }} />
           <Stack.Screen name="RouteDetail" component={RouteDetailScreen} options={{ title: 'Trajeto' }} />

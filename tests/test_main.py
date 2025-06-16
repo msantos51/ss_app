@@ -35,7 +35,7 @@ def client(tmp_path):
     if os.path.exists("profile_photos"):
         shutil.rmtree("profile_photos")
 
-def register_vendor(client, email="vendor@example.com", password="secret", name="Vendor"):
+def register_vendor(client, email="vendor@example.com", password="Secret123", name="Vendor"):
     data = {
         "name": name,
         "email": email,
@@ -60,7 +60,7 @@ def test_vendor_registration(client):
     assert payload["product"] == "Bolas de Berlim"
 
 
-def get_token(client, email="vendor@example.com", password="secret"):
+def get_token(client, email="vendor@example.com", password="Secret123"):
     resp = client.post("/token", json={"email": email, "password": password})
     assert resp.status_code == 200
     return resp.json()["access_token"]
@@ -75,12 +75,12 @@ def test_token_generation(client):
 
 def test_login_requires_confirmation(client):
     register_vendor(client, email="new@example.com")
-    resp = client.post("/login", json={"email": "new@example.com", "password": "secret"})
+    resp = client.post("/login", json={"email": "new@example.com", "password": "Secret123"})
     assert resp.status_code == 400
     assert "Email not confirmed" in resp.json()["detail"]
 
     confirm_latest_email(client)
-    resp = client.post("/login", json={"email": "new@example.com", "password": "secret"})
+    resp = client.post("/login", json={"email": "new@example.com", "password": "Secret123"})
     assert resp.status_code == 200
 
 
@@ -90,9 +90,9 @@ def test_password_reset_flow(client):
     client.post("/password-reset-request", data={"email": "vendor@example.com"})
     body = client.sent_emails[-1]["body"]
     token = body.split("/password-reset/")[1]
-    resp = client.post(f"/password-reset/{token}", data={"new_password": "newpass"})
+    resp = client.post(f"/password-reset/{token}", data={"new_password": "Newpass1"})
     assert resp.status_code == 200
-    resp = client.post("/token", json={"email": "vendor@example.com", "password": "newpass"})
+    resp = client.post("/token", json={"email": "vendor@example.com", "password": "Newpass1"})
     assert resp.status_code == 200
 
 

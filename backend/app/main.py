@@ -57,6 +57,14 @@ SUCCESS_URL = os.getenv("SUCCESS_URL", "https://example.com/success")
 CANCEL_URL = os.getenv("CANCEL_URL", "https://example.com/cancel")
 
 
+def validate_password(password: str):
+    if len(password) < 8 or password.lower() == password:
+        raise HTTPException(
+            status_code=400,
+            detail="Password deve ter pelo menos 8 caracteres e uma letra maiúscula",
+        )
+
+
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371000
     phi1 = radians(lat1)
@@ -207,7 +215,7 @@ async def create_vendor(
     db_vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
     if db_vendor:
         raise HTTPException(status_code=400, detail="Email already registered")
-
+    validate_password(password)
     hashed_password = pwd_context.hash(password)
 
     ext = os.path.splitext(profile_photo.filename)[1]
@@ -273,6 +281,7 @@ def password_reset(token: str, new_password: str = Form(...), db: Session = Depe
     vendor = db.query(models.Vendor).filter(models.Vendor.password_reset_token == token).first()
     if not vendor or not vendor.password_reset_expires or vendor.password_reset_expires < datetime.utcnow():
         raise HTTPException(status_code=400, detail="Invalid or expired token")
+    validate_password(new_password)
     vendor.hashed_password = pwd_context.hash(new_password)
     vendor.password_reset_token = None
     vendor.password_reset_expires = None
@@ -301,6 +310,8 @@ async def update_vendor_profile(
     name: str = Form(None),
     email: str = Form(None),
     password: str = Form(None),
+    old_password: str = Form(None),
+    new_password: str = Form(None),
     product: str = Form(None),
     profile_photo: UploadFile = File(None),
     pin_color: str = Form(None),
@@ -317,8 +328,15 @@ async def update_vendor_profile(
         vendor.name = name
     if email:
         vendor.email = email
-    if password:
-        vendor.hashed_password = pwd_context.hash(password)
+    # manter compatibilidade com parametro antigo 'password'
+    if new_password or password:
+        new_pass = new_password if new_password is not None else password
+        if not old_password:
+            raise HTTPException(status_code=400, detail="Old password required")
+        if not pwd_context.verify(old_password, vendor.hashed_password):
+            raise HTTPException(status_code=400, detail="Old password incorrect")
+        validate_password(new_pass)
+        vendor.hashed_password = pwd_context.hash(new_pass)
     if product:
         vendor.product = product
     if profile_photo:

@@ -10,6 +10,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { theme } from '../theme';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -161,7 +162,7 @@ export default function RegisterScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 16 },
+  container: { flex: 1, justifyContent: 'center', padding: 16, backgroundColor: theme.colors.background },
   input: { marginBottom: 12 },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
   imagePreview: {

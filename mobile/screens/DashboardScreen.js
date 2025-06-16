@@ -18,6 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { theme } from '../theme';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -474,7 +475,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
   input: { marginBottom: 12, width: '100%' },
@@ -496,7 +497,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 70,
     left: 16,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     padding: 8,
     borderRadius: 8,
     elevation: 10,

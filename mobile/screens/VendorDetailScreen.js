@@ -4,6 +4,7 @@ import { Text, TextInput, Button } from 'react-native-paper';
 import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { theme } from '../theme';
 
 export default function VendorDetailScreen({ route }) {
   const { vendor } = route.params;
@@ -76,7 +77,7 @@ export default function VendorDetailScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 16, backgroundColor: theme.colors.background },
   photo: { width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginBottom: 16 },
   name: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
   product: { textAlign: 'center', marginBottom: 16 },

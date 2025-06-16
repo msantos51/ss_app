@@ -2,9 +2,9 @@ import { DefaultTheme, configureFonts } from 'react-native-paper';
 
 const fontConfig = {
   default: {
-    regular: { fontFamily: 'Roboto-Regular', fontWeight: 'normal' },
-    medium: { fontFamily: 'Roboto-Medium', fontWeight: 'normal' },
-    light: { fontFamily: 'Roboto-Light', fontWeight: 'normal' },
+    regular: { fontFamily: 'System', fontWeight: '400' },
+    medium: { fontFamily: 'System', fontWeight: '600' },
+    light: { fontFamily: 'System', fontWeight: '300' },
   },
 };
 
@@ -12,11 +12,11 @@ export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#705D00',  // primary
-    accent: '#705D00',   // secondary
-    background: '#FFF8EF', // background
-    surface: '#FFF8EF',    // surface
-    text: '#1F1B10',       // onBackground
+    primary: '#1E88E5',
+    accent: '#1E88E5',
+    background: '#F2F2F2',
+    surface: '#FFFFFF',
+    text: '#1F1B10',
     error: '#BA1A1A',
     onPrimary: '#FFFFFF',
     onSecondary: '#FFFFFF',

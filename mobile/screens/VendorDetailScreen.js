@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TextInput, Button } from 'react-native';
+import { View, Image, StyleSheet, FlatList } from 'react-native';
+import { Text, TextInput, Button } from 'react-native-paper';
 import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -61,12 +62,15 @@ export default function VendorDetailScreen({ route }) {
 
       <StarRatingInput rating={rating} onChange={setRating} />
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Comentário"
+        label="Comentário"
         value={comment}
         onChangeText={setComment}
       />
-      <Button title="Enviar" onPress={submitReview} />
+      <Button mode="contained" onPress={submitReview}>
+        Enviar
+      </Button>
     </View>
   );
 }
@@ -79,5 +83,5 @@ const styles = StyleSheet.create({
   reviewList: { marginVertical: 8 },
   reviewItem: { paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
   reviewRating: { fontWeight: 'bold' },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 8, marginBottom: 8 },
+  input: { marginBottom: 8 },
 });

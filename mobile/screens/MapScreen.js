@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
+import { Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LeafletMap from '../LeafletMap';
@@ -182,8 +183,9 @@ export default function MapScreen({ navigation }) {
         {showList && (
           <>
             <TextInput
+              mode="outlined"
               style={styles.searchInput}
-              placeholder="Procurar..."
+              label="Procurar..."
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -224,27 +226,30 @@ export default function MapScreen({ navigation }) {
 
       <View style={styles.buttonsContainer}>
         {currentUser ? (
-          <TouchableOpacity
+          <Button
+            mode="contained"
             style={styles.button}
             onPress={() => navigation.navigate('Dashboard')}
           >
-            <Text style={styles.buttonText}>Perfil</Text>
-          </TouchableOpacity>
+            Perfil
+          </Button>
         ) : (
           <>
-            <TouchableOpacity
+            <Button
+              mode="contained"
               style={styles.button}
               onPress={() => navigation.navigate('Login')}
             >
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
+              Login
+            </Button>
 
-            <TouchableOpacity
+            <Button
+              mode="outlined"
               style={styles.button}
               onPress={() => navigation.navigate('Register')}
             >
-              <Text style={styles.buttonText}>Registar</Text>
-            </TouchableOpacity>
+              Registar
+            </Button>
           </>
         )}
       </View>
@@ -272,13 +277,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 4,
-    marginBottom: 4,
-  },
+  searchInput: { marginBottom: 4 },
   listToggle: { backgroundColor: '#2196F3', padding: 6, borderRadius: 8, marginBottom: 4 },
   listToggleText: { color: '#fff', textAlign: 'center' },
   vendorImage: {
@@ -295,16 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  button: {
-    backgroundColor: '#2196F3',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  button: { flex: 1, marginHorizontal: 4 },
   locateButton: {
     position: 'absolute',
     bottom: 110,

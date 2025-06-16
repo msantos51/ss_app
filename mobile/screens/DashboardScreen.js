@@ -31,6 +31,18 @@ export default function DashboardScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
   const [pinColor, setPinColor] = useState('#FF0000');
+  const colorOptions = [
+    '#FF0000',
+    '#FFA500',
+    '#FFFF00',
+    '#008000',
+    '#00FFFF',
+    '#0000FF',
+    '#800080',
+    '#FFC0CB',
+    '#808080',
+    '#000000',
+  ];
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
@@ -277,13 +289,20 @@ export default function DashboardScreen({ navigation }) {
               <Picker.Item label="Acessórios" value="Acessórios" />
             </Picker>
 
-            <Text style={styles.pinColorLabel}>Cor do contorno do pin (hex)</Text>
-            <TextInput
-              style={styles.input}
-              value={pinColor}
-              onChangeText={setPinColor}
-              placeholder="#FF0000"
-            />
+            <Text style={styles.pinColorLabel}>Cor do contorno do pin</Text>
+            <View style={styles.colorOptions}>
+              {colorOptions.map((c) => (
+                <TouchableOpacity
+                  key={c}
+                  onPress={() => setPinColor(c)}
+                  style={[
+                    styles.colorOption,
+                    { backgroundColor: c },
+                    pinColor === c && styles.colorOptionSelected,
+                  ]}
+                />
+              ))}
+            </View>
 
             <View style={styles.row}>
               <View style={styles.halfButton}>
@@ -435,4 +454,15 @@ const styles = StyleSheet.create({
   },
   reviewRating: { fontWeight: 'bold' },
   pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
+  colorOptions: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },
+  colorOption: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+  colorOptionSelected: { borderWidth: 3 },
 });

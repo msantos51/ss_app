@@ -234,6 +234,19 @@ O backend ficará disponível em `http://localhost:8000`.
 
 O arquivo `backend/app/main.py` agora configura o middleware `CORSMiddleware` para permitir que o aplicativo móvel aceda ao backend durante o desenvolvimento. Foi também criado um endpoint WebSocket (`/ws/locations`) que emite atualizações de localização dos vendedores em tempo real para todos os clientes conectados.
 
+### 2.8 Envio de e-mails
+
+Para confirmar contas e redefinir senhas a aplicação envia e-mails via SMTP. Defina as variáveis abaixo (pode usar uma conta Gmail com palavra‑passe de aplicativo):
+
+```env
+SMTP_USER=sunnysales.geral@gmail.com
+SMTP_PASSWORD=<sua_app_password>
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+```
+
+Se não definir `SMTP_USER` e `SMTP_PASSWORD` o backend apenas ignora o envio dos e-mails.
+
 ## 3. Frontend (React Native)
 
 ### 3.1 Instalação de dependências

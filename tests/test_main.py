@@ -17,10 +17,18 @@ def client(tmp_path):
     importlib.reload(models)
     importlib.reload(main)
 
+    sent_emails = []
+
+    def fake_send_email(to, subject, body):
+        sent_emails.append({"to": to, "subject": subject, "body": body})
+
+    main.send_email = fake_send_email
+
     # create tables
     models.Base.metadata.create_all(bind=database.engine)
 
     with TestClient(main.app) as c:
+        c.sent_emails = sent_emails
         yield c
 
     # cleanup created profile photos directory if it exists
@@ -39,6 +47,12 @@ def register_vendor(client, email="vendor@example.com", password="secret", name=
     return client.post("/vendors/", data=data, files=files)
 
 
+def confirm_latest_email(client):
+    body = client.sent_emails[-1]["body"]
+    token = body.split("/confirm-email/")[1]
+    return client.get(f"/confirm-email/{token}")
+
+
 def test_vendor_registration(client):
     resp = register_vendor(client)
     assert resp.status_code == 200
@@ -55,13 +69,39 @@ def get_token(client, email="vendor@example.com", password="secret"):
 
 def test_token_generation(client):
     register_vendor(client)
+    confirm_latest_email(client)
     token = get_token(client)
     assert token
 
 
+def test_login_requires_confirmation(client):
+    register_vendor(client, email="new@example.com")
+    resp = client.post("/login", json={"email": "new@example.com", "password": "secret"})
+    assert resp.status_code == 400
+    assert "Email not confirmed" in resp.json()["detail"]
+
+    confirm_latest_email(client)
+    resp = client.post("/login", json={"email": "new@example.com", "password": "secret"})
+    assert resp.status_code == 200
+
+
+def test_password_reset_flow(client):
+    register_vendor(client)
+    confirm_latest_email(client)
+    client.post("/password-reset-request", data={"email": "vendor@example.com"})
+    body = client.sent_emails[-1]["body"]
+    token = body.split("/password-reset/")[1]
+    resp = client.post(f"/password-reset/{token}", data={"new_password": "newpass"})
+    assert resp.status_code == 200
+    resp = client.post("/token", json={"email": "vendor@example.com", "password": "newpass"})
+    assert resp.status_code == 200
+
+
 def test_vendor_listing(client):
     register_vendor(client, email="first@example.com", name="First")
+    confirm_latest_email(client)
     register_vendor(client, email="second@example.com", name="Second")
+    confirm_latest_email(client)
     resp = client.get("/vendors/")
     assert resp.status_code == 200
     vendors = resp.json()
@@ -74,6 +114,7 @@ def test_vendor_listing(client):
 def test_protected_routes(client):
     resp = register_vendor(client)
     vendor_id = resp.json()["id"]
+    confirm_latest_email(client)
     token = get_token(client)
 
     # update profile with auth
@@ -101,6 +142,7 @@ def test_protected_routes(client):
 def test_location_update_fields(client):
     resp = register_vendor(client)
     vendor_id = resp.json()["id"]
+    confirm_latest_email(client)
     token = get_token(client)
 
     resp = client.put(
@@ -121,6 +163,7 @@ def test_location_update_fields(client):
 def test_websocket_location_broadcast(client):
     resp = register_vendor(client)
     vendor_id = resp.json()["id"]
+    confirm_latest_email(client)
     token = get_token(client)
 
     with client.websocket_connect("/ws/locations") as websocket:

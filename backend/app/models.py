@@ -20,6 +20,10 @@ class Vendor(Base):
     current_lng = Column(Float, nullable=True)
     subscription_active = Column(Boolean, default=False)
     subscription_valid_until = Column(DateTime, nullable=True)
+    email_confirmed = Column(Boolean, default=False)
+    confirmation_token = Column(String, nullable=True, index=True)
+    password_reset_token = Column(String, nullable=True, index=True)
+    password_reset_expires = Column(DateTime, nullable=True)
 
     reviews = relationship("Review", back_populates="vendor")
 

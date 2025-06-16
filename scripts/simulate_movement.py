@@ -4,8 +4,8 @@ import httpx
 
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 VENDOR_ID = int(os.environ.get("VENDOR_ID", "1"))
-EMAIL = os.environ.get("test@gmail.com")
-PASSWORD = os.environ.get("12345")
+EMAIL = os.environ.get("VENDOR_EMAIL")
+PASSWORD = os.environ.get("VENDOR_PASSWORD")
 
 if not EMAIL or not PASSWORD:
     raise SystemExit("Please set VENDOR_EMAIL and VENDOR_PASSWORD environment variables")

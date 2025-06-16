@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
+import { View, StyleSheet, Image, Alert } from 'react-native';
 import {
-  View,
   TextInput,
   Button,
-  StyleSheet,
   Text,
-  Image,
   ActivityIndicator,
-  Alert,
-} from 'react-native';
+} from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
@@ -94,8 +91,9 @@ export default function RegisterScreen({ navigation }) {
       {error && <Text style={styles.error}>{error}</Text>}
 
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Nome"
+        label="Nome"
         value={name}
         onChangeText={(text) => {
           setName(text);
@@ -104,8 +102,9 @@ export default function RegisterScreen({ navigation }) {
       />
 
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Email"
+        label="Email"
         value={email}
         onChangeText={(text) => {
           setEmail(text);
@@ -115,8 +114,9 @@ export default function RegisterScreen({ navigation }) {
       />
 
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Password"
+        label="Password"
         secureTextEntry
         value={password}
         onChangeText={(text) => {
@@ -140,7 +140,7 @@ export default function RegisterScreen({ navigation }) {
       </Picker>
 
 
-      <Button title="Escolher Foto de Perfil" onPress={pickImage} />
+      <Button mode="outlined" onPress={pickImage}>Escolher Foto de Perfil</Button>
 
       {profilePhoto && (
         <Image
@@ -152,9 +152,9 @@ export default function RegisterScreen({ navigation }) {
       <View style={{ marginTop: 12 }} />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator animating size="large" />
       ) : (
-        <Button title="Registar" onPress={register} />
+        <Button mode="contained" onPress={register}>Registar</Button>
       )}
     </View>
   );
@@ -162,13 +162,7 @@ export default function RegisterScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 12,
-    padding: 8,
-    borderRadius: 8,
-  },
+  input: { marginBottom: 12 },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
   imagePreview: {
     width: 100,

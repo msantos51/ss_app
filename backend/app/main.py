@@ -232,7 +232,7 @@ async def create_vendor(
         hashed_password=hashed_password,
         product=product,
         profile_photo=public_path,
-        pin_color="#FF0000",
+        pin_color="#FFB6C1",
         confirmation_token=token_urlsafe(32),
     )
     db.add(new_vendor)

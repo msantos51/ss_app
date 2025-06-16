@@ -35,18 +35,16 @@ export default function DashboardScreen({ navigation }) {
   const [oldPassword, setOldPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [product, setProduct] = useState('');
-  const [pinColor, setPinColor] = useState('#FF0000');
+  const [pinColor, setPinColor] = useState('#FFB6C1');
   const colorOptions = [
-    '#FF0000',
-    '#FFA500',
-    '#FFFF00',
-    '#008000',
-    '#00FFFF',
-    '#0000FF',
-    '#800080',
-    '#FFC0CB',
-    '#808080',
-    '#000000',
+    '#FFB6C1', // Rosa Pastel
+    '#ADD8E6', // Azul Pastel
+    '#90EE90', // Verde Pastel
+    '#FFFF99', // Amarelo Pastel
+    '#C8A2C8', // Lilás Pastel
+    '#98E8D5', // Menta Pastel
+    '#FFCC99', // Pêssego Pastel
+    '#E6E6FA', // Lavanda Pastel
   ];
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
@@ -68,7 +66,7 @@ export default function DashboardScreen({ navigation }) {
         setName(updated.name);
         setEmail(updated.email);
         setProduct(updated.product);
-        setPinColor(updated.pin_color || '#FF0000');
+        setPinColor(updated.pin_color || '#FFB6C1');
         fetchReviews(vendorId);
       }
     } catch (err) {
@@ -102,7 +100,7 @@ export default function DashboardScreen({ navigation }) {
           setName(v.name);
           setEmail(v.email);
           setProduct(v.product);
-          setPinColor(v.pin_color || '#FF0000');
+          setPinColor(v.pin_color || '#FFB6C1');
           fetchVendorFromServer(v.id);
           fetchReviews(v.id);
 
@@ -161,7 +159,7 @@ export default function DashboardScreen({ navigation }) {
         data.append('old_password', oldPassword);
       }
       if (product !== vendor.product) data.append('product', product);
-      if (pinColor !== (vendor.pin_color || '#FF0000')) data.append('pin_color', pinColor);
+      if (pinColor !== (vendor.pin_color || '#FFB6C1')) data.append('pin_color', pinColor);
 
       if (profilePhoto) {
         const fileUri = profilePhoto.uri;
@@ -187,7 +185,7 @@ export default function DashboardScreen({ navigation }) {
       setName(response.data.name);
       setEmail(response.data.email);
       setProduct(response.data.product);
-      setPinColor(response.data.pin_color || '#FF0000');
+      setPinColor(response.data.pin_color || '#FFB6C1');
       setPassword('');
       setOldPassword('');
       setChangingPassword(false);
@@ -357,7 +355,7 @@ export default function DashboardScreen({ navigation }) {
                     setName(vendor.name);
                     setEmail(vendor.email);
                     setProduct(vendor.product);
-                    setPinColor(vendor.pin_color || '#FF0000');
+                    setPinColor(vendor.pin_color || '#FFB6C1');
                     setProfilePhoto(null);
                     setPassword('');
                     setOldPassword('');
@@ -387,7 +385,7 @@ export default function DashboardScreen({ navigation }) {
               <View
                 style={[
                   styles.colorPreview,
-                  { backgroundColor: vendor.pin_color || '#FF0000' },
+                  { backgroundColor: vendor.pin_color || '#FFB6C1' },
                 ]}
               />
             </View>

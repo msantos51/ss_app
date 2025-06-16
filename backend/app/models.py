@@ -15,7 +15,7 @@ class Vendor(Base):
     hashed_password = Column(String)
     product = Column(String)
     profile_photo = Column(String)
-    pin_color = Column(String, default="#FF0000")
+    pin_color = Column(String, default="#FFB6C1")
     current_lat = Column(Float, nullable=True)
     current_lng = Column(Float, nullable=True)
     subscription_active = Column(Boolean, default=False)

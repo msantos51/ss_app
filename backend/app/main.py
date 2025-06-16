@@ -13,6 +13,9 @@ from app.database import SessionLocal, engine, get_db
 import os
 import shutil
 from uuid import uuid4
+from secrets import token_urlsafe
+from email.message import EmailMessage
+import smtplib
 import time
 import json
 import base64
@@ -51,6 +54,28 @@ STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 SUCCESS_URL = os.getenv("SUCCESS_URL", "https://example.com/success")
 CANCEL_URL = os.getenv("CANCEL_URL", "https://example.com/cancel")
+
+# Configuração de e-mail (Gmail por padrão)
+SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+
+
+def send_email(to: str, subject: str, body: str):
+    if not SMTP_USER or not SMTP_PASSWORD:
+        # Silenciosamente ignore se as credenciais nao foram definidas
+        return
+    msg = EmailMessage()
+    msg["From"] = SMTP_USER
+    msg["To"] = to
+    msg["Subject"] = subject
+    msg.set_content(body)
+
+    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+        server.starttls()
+        server.login(SMTP_USER, SMTP_PASSWORD)
+        server.send_message(msg)
 
 # Gerenciador de WebSockets
 class ConnectionManager:
@@ -138,6 +163,8 @@ def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
     vendor = db.query(models.Vendor).filter(models.Vendor.email == credentials.email).first()
     if not vendor or not pwd_context.verify(credentials.password, vendor.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
+    if not vendor.email_confirmed:
+        raise HTTPException(status_code=400, detail="Email not confirmed")
     return vendor
 
 # --------------------------
@@ -148,6 +175,8 @@ def generate_token(credentials: schemas.UserLogin, db: Session = Depends(get_db)
     vendor = db.query(models.Vendor).filter(models.Vendor.email == credentials.email).first()
     if not vendor or not pwd_context.verify(credentials.password, vendor.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
+    if not vendor.email_confirmed:
+        raise HTTPException(status_code=400, detail="Email not confirmed")
     token = create_access_token({"sub": vendor.id})
     return {"access_token": token, "token_type": "bearer"}
 
@@ -185,11 +214,59 @@ async def create_vendor(
         product=product,
         profile_photo=public_path,
         pin_color=pin_color,
+        confirmation_token=token_urlsafe(32),
     )
     db.add(new_vendor)
     db.commit()
     db.refresh(new_vendor)
+
+    confirm_link = f"{os.getenv('BASE_URL', 'http://localhost:8000')}/confirm-email/{new_vendor.confirmation_token}"
+    send_email(
+        new_vendor.email,
+        "Confirme o seu registro",
+        f"Clique no link para confirmar sua conta: {confirm_link}",
+    )
     return new_vendor
+
+
+@app.get("/confirm-email/{token}")
+def confirm_email(token: str, db: Session = Depends(get_db)):
+    vendor = db.query(models.Vendor).filter(models.Vendor.confirmation_token == token).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Invalid token")
+    vendor.email_confirmed = True
+    vendor.confirmation_token = None
+    db.commit()
+    return {"message": "Email confirmado"}
+
+
+@app.post("/password-reset-request")
+def password_reset_request(email: str = Form(...), db: Session = Depends(get_db)):
+    vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    vendor.password_reset_token = token_urlsafe(32)
+    vendor.password_reset_expires = datetime.utcnow() + timedelta(hours=1)
+    db.commit()
+    reset_link = f"{os.getenv('BASE_URL', 'http://localhost:8000')}/password-reset/{vendor.password_reset_token}"
+    send_email(
+        vendor.email,
+        "Redefinição de senha",
+        f"Clique no link para alterar sua senha: {reset_link}",
+    )
+    return {"message": "E-mail de recuperação enviado"}
+
+
+@app.post("/password-reset/{token}")
+def password_reset(token: str, new_password: str = Form(...), db: Session = Depends(get_db)):
+    vendor = db.query(models.Vendor).filter(models.Vendor.password_reset_token == token).first()
+    if not vendor or not vendor.password_reset_expires or vendor.password_reset_expires < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+    vendor.hashed_password = pwd_context.hash(new_password)
+    vendor.password_reset_token = None
+    vendor.password_reset_expires = None
+    db.commit()
+    return {"message": "Senha alterada"}
 
 # --------------------------
 # Listar vendedores

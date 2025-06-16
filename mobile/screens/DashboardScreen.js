@@ -22,7 +22,7 @@ import {
   isLocationSharing,
 } from '../locationService';
 
-const AVAILABLE_ICONS = ['📍', '🍦', '🍩', '🌭', '🏖️'];
+
 
 export default function DashboardScreen({ navigation }) {
   const [vendor, setVendor] = useState(null);
@@ -30,7 +30,7 @@ export default function DashboardScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
-  const [icon, setIcon] = useState('📍');
+  const [pinColor, setPinColor] = useState('#FF0000');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [sharingLocation, setSharingLocation] = useState(false);
@@ -51,7 +51,7 @@ export default function DashboardScreen({ navigation }) {
         setName(updated.name);
         setEmail(updated.email);
         setProduct(updated.product);
-        setIcon(updated.icon || '📍');
+        setPinColor(updated.pin_color || '#FF0000');
         fetchReviews(vendorId);
       }
     } catch (err) {
@@ -85,7 +85,7 @@ export default function DashboardScreen({ navigation }) {
           setName(v.name);
           setEmail(v.email);
           setProduct(v.product);
-          setIcon(v.icon || '📍');
+          setPinColor(v.pin_color || '#FF0000');
           fetchVendorFromServer(v.id);
           fetchReviews(v.id);
 
@@ -137,7 +137,7 @@ export default function DashboardScreen({ navigation }) {
       if (email !== vendor.email) data.append('email', email);
       if (password) data.append('password', password);
       if (product !== vendor.product) data.append('product', product);
-      if (icon !== (vendor.icon || '📍')) data.append('icon', icon);
+      if (pinColor !== (vendor.pin_color || '#FF0000')) data.append('pin_color', pinColor);
 
       if (profilePhoto) {
         const fileUri = profilePhoto.uri;
@@ -163,7 +163,7 @@ export default function DashboardScreen({ navigation }) {
       setName(response.data.name);
       setEmail(response.data.email);
       setProduct(response.data.product);
-      setIcon(response.data.icon || '📍');
+      setPinColor(response.data.pin_color || '#FF0000');
       setPassword('');
       setError(null);
       setProfilePhoto(null);
@@ -277,12 +277,13 @@ export default function DashboardScreen({ navigation }) {
               <Picker.Item label="Acessórios" value="Acessórios" />
             </Picker>
 
-            <Text style={styles.iconLabel}>Escolha o ícone que será exibido no mapa</Text>
-            <Picker selectedValue={icon} onValueChange={(val) => setIcon(val)} style={styles.input}>
-              {AVAILABLE_ICONS.map((ic) => (
-                <Picker.Item key={ic} label={ic} value={ic} />
-              ))}
-            </Picker>
+            <Text style={styles.pinColorLabel}>Cor do contorno do pin (hex)</Text>
+            <TextInput
+              style={styles.input}
+              value={pinColor}
+              onChangeText={setPinColor}
+              placeholder="#FF0000"
+            />
 
             <View style={styles.row}>
               <View style={styles.halfButton}>
@@ -295,7 +296,7 @@ export default function DashboardScreen({ navigation }) {
                     setName(vendor.name);
                     setEmail(vendor.email);
                     setProduct(vendor.product);
-                    setIcon(vendor.icon || '📍');
+                    setPinColor(vendor.pin_color || '#FF0000');
                     setProfilePhoto(null);
                     setPassword('');
                     setEditing(false);
@@ -317,7 +318,7 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.label}>Produto:</Text> {vendor.product}
             </Text>
             <Text style={styles.infoText}>
-              <Text style={styles.label}>Ícone:</Text> {vendor.icon || '📍'}
+              <Text style={styles.label}>Cor do Pin:</Text> {vendor.pin_color || '#FF0000'}
             </Text>
           </>
         )}
@@ -433,5 +434,5 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   reviewRating: { fontWeight: 'bold' },
-  iconLabel: { alignSelf: 'flex-start', marginBottom: 4 },
+  pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
 });

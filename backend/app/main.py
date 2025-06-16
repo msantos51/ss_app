@@ -161,7 +161,7 @@ async def create_vendor(
     password: str = Form(...),
     product: str = Form(...),
     profile_photo: UploadFile = File(...),
-    icon: str = Form("📍"),
+    pin_color: str = Form("#FF0000"),
     db: Session = Depends(get_db),
 ):
     db_vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
@@ -184,7 +184,7 @@ async def create_vendor(
         hashed_password=hashed_password,
         product=product,
         profile_photo=public_path,
-        icon=icon,
+        pin_color=pin_color,
     )
     db.add(new_vendor)
     db.commit()
@@ -215,7 +215,7 @@ async def update_vendor_profile(
     password: str = Form(None),
     product: str = Form(None),
     profile_photo: UploadFile = File(None),
-    icon: str = Form(None),
+    pin_color: str = Form(None),
     db: Session = Depends(get_db),
     current_vendor: models.Vendor = Depends(get_current_vendor),
 ):
@@ -240,8 +240,8 @@ async def update_vendor_profile(
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(profile_photo.file, buffer)
         vendor.profile_photo = f"profile_photos/{file_name}"
-    if icon:
-        vendor.icon = icon
+    if pin_color:
+        vendor.pin_color = pin_color
 
     db.commit()
     db.refresh(vendor)

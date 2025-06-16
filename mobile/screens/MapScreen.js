@@ -36,6 +36,7 @@ export default function MapScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [initialPosition, setInitialPosition] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
+  const [selectedVendorId, setSelectedVendorId] = useState(null);
   const mapRef = useRef(null);
 
   const fetchVendors = async () => {
@@ -150,6 +151,7 @@ export default function MapScreen({ navigation }) {
               iconHtml: photo
                 ? `<div class="gm-pin" style="border: 2px solid ${v.pin_color || '#FF0000'};"><img src="${photo}" /></div>`
                 : null,
+              selected: v.id === selectedVendorId,
             };
           })}
         />
@@ -203,11 +205,13 @@ export default function MapScreen({ navigation }) {
                   <TouchableOpacity
                     style={styles.vendorItem}
                     onPress={() => {
+                      setSelectedVendorId(item.id);
                       mapRef.current?.setView(item.current_lat, item.current_lng);
                     }}
-                    onLongPress={() =>
-                      navigation.navigate('VendorDetail', { vendor: item })
-                    }
+                    onLongPress={() => {
+                      setSelectedVendorId(item.id);
+                      navigation.navigate('VendorDetail', { vendor: item });
+                    }}
                   >
                     {photoUri && (
                       <Image source={{ uri: photoUri }} style={styles.vendorImage} />

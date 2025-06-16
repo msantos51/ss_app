@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, ActivityIndicator, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
+import { TextInput, Button, Text, ActivityIndicator } from 'react-native-paper';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
@@ -28,16 +29,19 @@ export default function ForgotPasswordScreen({ navigation }) {
     <View style={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Email"
+        label="Email"
         value={email}
         onChangeText={(t) => setEmail(t)}
         autoCapitalize="none"
       />
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator animating size="large" />
       ) : (
-        <Button title="Enviar" onPress={requestReset} disabled={!email} />
+        <Button mode="contained" onPress={requestReset} disabled={!email}>
+          Enviar
+        </Button>
       )}
     </View>
   );
@@ -45,12 +49,6 @@ export default function ForgotPasswordScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 12,
-    padding: 8,
-    borderRadius: 8,
-  },
+  input: { marginBottom: 12 },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
 });

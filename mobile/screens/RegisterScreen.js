@@ -7,7 +7,7 @@ import {
   Text,
   Image,
   ActivityIndicator,
-  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,11 +19,6 @@ export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
-  const [pinColor, setPinColor] = useState('#FF0000');
-  const colorOptions = [
-    '#FF0000', '#FFA500', '#FFFF00', '#008000', '#00FFFF',
-    '#0000FF', '#800080', '#FFC0CB', '#808080', '#000000',
-  ];
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +50,6 @@ export default function RegisterScreen({ navigation }) {
       data.append('email', email);
       data.append('password', password);
       data.append('product', product);
-      data.append('pin_color', pinColor);
 
       if (profilePhoto) {
         data.append('profile_photo', {
@@ -71,6 +65,10 @@ export default function RegisterScreen({ navigation }) {
         },
       });
 
+      Alert.alert(
+        'Registo efetuado',
+        'Verifique o seu e-mail para confirmar a conta.'
+      );
       navigation.navigate('Login');
     } catch (err) {
       console.error("Erro no registo:", err);
@@ -137,20 +135,6 @@ export default function RegisterScreen({ navigation }) {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      <Text style={styles.pinColorLabel}>Cor do contorno do pin</Text>
-      <View style={styles.colorOptions}>
-        {colorOptions.map((c) => (
-          <TouchableOpacity
-            key={c}
-            onPress={() => setPinColor(c)}
-            style={[
-              styles.colorOption,
-              { backgroundColor: c },
-              pinColor === c && styles.colorOptionSelected,
-            ]}
-          />
-        ))}
-      </View>
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />
 
@@ -189,16 +173,5 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignSelf: 'center',
   },
-  pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
-  colorOptions: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },
-  colorOption: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  colorOptionSelected: { borderWidth: 3 },
+  // estilos removidos de seleção de cor do pin
 });

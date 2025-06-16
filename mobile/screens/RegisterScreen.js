@@ -14,8 +14,6 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
-
-
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -76,14 +74,20 @@ export default function RegisterScreen({ navigation }) {
       }
 
       await axios.post(`${BASE_URL}/vendors/`, data);
-
       navigation.navigate('Login');
     } catch (err) {
-      console.error(err.response?.data);
-      if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
+      console.error("Erro no registo:", err);
+
+      if (err.response && err.response.data) {
+        if (err.response.data.detail) {
+          setError(err.response.data.detail);
+        } else if (typeof err.response.data === 'string') {
+          setError(err.response.data);
+        } else {
+          setError('Erro inesperado no servidor.');
+        }
       } else {
-        setError('Falha no registo');
+        setError('Não foi possível contactar o servidor.');
       }
     } finally {
       setLoading(false);

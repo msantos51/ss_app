@@ -58,6 +58,9 @@ const LeafletMap = forwardRef((props, ref) => {
             if (m.iconHtml) {
               opts.icon = L.divIcon({ className: 'custom-icon', html: m.iconHtml });
             }
+            if (m.selected) {
+              opts.zIndexOffset = 1000;
+            }
             L.marker([m.latitude, m.longitude], opts).addTo(map).bindPopup(m.title || '');
           });
           if (line.length > 0) {

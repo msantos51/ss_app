@@ -136,12 +136,19 @@ export default function MapScreen({ navigation }) {
         <LeafletMap
           ref={mapRef}
           initialPosition={initialPosition}
-          markers={filteredVendors.map((v) => ({
-            latitude: v.current_lat,
-            longitude: v.current_lng,
-            title: v.name || 'Vendedor',
-            icon: v.icon,
-          }))}
+          markers={filteredVendors.map((v) => {
+            const photo = v.profile_photo
+              ? `${BASE_URL.replace(/\/$/, '')}/${v.profile_photo}`
+              : null;
+            return {
+              latitude: v.current_lat,
+              longitude: v.current_lng,
+              title: v.name || 'Vendedor',
+              iconHtml: photo
+                ? `<img src="${photo}" style="border: 2px solid ${v.pin_color || '#FF0000'};" />`
+                : null,
+            };
+          })}
         />
       )}
 

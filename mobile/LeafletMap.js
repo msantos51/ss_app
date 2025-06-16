@@ -17,7 +17,11 @@ const LeafletMap = forwardRef((props, ref) => {
         />
         <style>
           html, body, #map { height: 100%; margin: 0; padding: 0; }
-          .custom-icon { font-size: 24px; }
+          .custom-icon img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+          }
         </style>
       </head>
       <body>
@@ -32,8 +36,8 @@ const LeafletMap = forwardRef((props, ref) => {
           var markers = ${JSON.stringify(markers)};
           markers.forEach(function(m) {
             var opts = {};
-            if (m.icon) {
-              opts.icon = L.divIcon({ className: 'custom-icon', html: m.icon });
+            if (m.iconHtml) {
+              opts.icon = L.divIcon({ className: 'custom-icon', html: m.iconHtml });
             }
             L.marker([m.latitude, m.longitude], opts).addTo(map).bindPopup(m.title || '');
           });

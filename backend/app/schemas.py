@@ -12,7 +12,7 @@ class VendorProfileUpdate(BaseModel):
     password: Optional[str] = None
     product: Optional[Literal["Bolas de Berlim", "Gelados", "Acess\u00f3rios"]] = None
     profile_photo: Optional[str] = None
-    icon: Optional[str] = None
+    pin_color: Optional[str] = None
 
 class VendorCreate(BaseModel):
     name: str
@@ -20,7 +20,7 @@ class VendorCreate(BaseModel):
     password: str
     product: Literal["Bolas de Berlim", "Gelados", "Acess\u00f3rios"]
     profile_photo: str
-    icon: Optional[str] = "📍"
+    pin_color: Optional[str] = "#FF0000"
 
 class VendorOut(BaseModel):
     id: int
@@ -28,7 +28,7 @@ class VendorOut(BaseModel):
     email: str
     product: str
     profile_photo: str
-    icon: Optional[str] = None
+    pin_color: Optional[str] = None
     current_lat: Optional[float] = None
     current_lng: Optional[float] = None
     rating_average: Optional[float] = None

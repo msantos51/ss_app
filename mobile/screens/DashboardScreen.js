@@ -402,6 +402,7 @@ export default function DashboardScreen({ navigation }) {
         <View style={styles.menu}>
           <Button title="Atualizar Dados" onPress={() => { setMenuOpen(false); setEditing(true); }} />
           <Button title="Pagar Semanalidade" onPress={() => { setMenuOpen(false); paySubscription(); }} />
+          <Button title="Trajetos" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }} />
           <Button title="Termos e Condi\u00e7\u00f5es" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }} />
         </View>
       )}

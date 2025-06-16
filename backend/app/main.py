@@ -21,6 +21,7 @@ import json
 import base64
 import hmac
 import hashlib
+from math import radians, sin, cos, sqrt, atan2
 
 # Diretório para guardar fotos de perfil
 PROFILE_PHOTO_DIR = "profile_photos"
@@ -54,6 +55,17 @@ STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 SUCCESS_URL = os.getenv("SUCCESS_URL", "https://example.com/success")
 CANCEL_URL = os.getenv("CANCEL_URL", "https://example.com/cancel")
+
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371000
+    phi1 = radians(lat1)
+    phi2 = radians(lat2)
+    dphi = radians(lat2 - lat1)
+    dlambda = radians(lon2 - lon1)
+    a = sin(dphi / 2) ** 2 + cos(phi1) * cos(phi2) * sin(dlambda / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c
 
 # Configuração de e-mail (Gmail por padrão)
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
@@ -344,8 +356,104 @@ async def update_vendor_location(
     vendor.current_lng = lng
     db.commit()
 
+    route = (
+        db.query(models.Route)
+        .filter(models.Route.vendor_id == vendor_id, models.Route.end_time == None)
+        .order_by(models.Route.start_time.desc())
+        .first()
+    )
+    if route:
+        points = json.loads(route.points or "[]")
+        points.append({"lat": lat, "lng": lng, "t": datetime.utcnow().isoformat()})
+        route.points = json.dumps(points)
+        db.commit()
+
     await manager.broadcast({"vendor_id": vendor_id, "lat": lat, "lng": lng})
     return {"message": "Localização atualizada com sucesso"}
+
+# --------------------------
+# Iniciar e terminar trajetos
+# --------------------------
+@app.post("/vendors/{vendor_id}/routes/start", response_model=schemas.RouteOut)
+def start_route(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    route = models.Route(vendor_id=vendor_id, points="[]")
+    db.add(route)
+    db.commit()
+    db.refresh(route)
+    return {
+        "id": route.id,
+        "start_time": route.start_time.isoformat(),
+        "end_time": route.end_time,
+        "distance_m": route.distance_m,
+        "points": [],
+    }
+
+
+@app.post("/vendors/{vendor_id}/routes/stop", response_model=schemas.RouteOut)
+def stop_route(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    route = (
+        db.query(models.Route)
+        .filter(models.Route.vendor_id == vendor_id, models.Route.end_time == None)
+        .order_by(models.Route.start_time.desc())
+        .first()
+    )
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+    points = json.loads(route.points or "[]")
+    distance = 0.0
+    for p1, p2 in zip(points, points[1:]):
+        distance += haversine(p1["lat"], p1["lng"], p2["lat"], p2["lng"])
+    route.distance_m = distance
+    route.end_time = datetime.utcnow()
+    db.commit()
+    db.refresh(route)
+    return {
+        "id": route.id,
+        "start_time": route.start_time.isoformat(),
+        "end_time": route.end_time.isoformat(),
+        "distance_m": route.distance_m,
+        "points": points,
+    }
+
+
+@app.get("/vendors/{vendor_id}/routes", response_model=list[schemas.RouteOut])
+def list_routes(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    routes = (
+        db.query(models.Route)
+        .filter(models.Route.vendor_id == vendor_id)
+        .order_by(models.Route.start_time.desc())
+        .all()
+    )
+    result = []
+    for r in routes:
+        result.append(
+            {
+                "id": r.id,
+                "start_time": r.start_time.isoformat(),
+                "end_time": r.end_time.isoformat() if r.end_time else None,
+                "distance_m": r.distance_m,
+                "points": json.loads(r.points or "[]"),
+            }
+        )
+    return result
 
 # --------------------------
 # Criar sessão de pagamento no Stripe

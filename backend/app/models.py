@@ -26,6 +26,7 @@ class Vendor(Base):
     password_reset_expires = Column(DateTime, nullable=True)
 
     reviews = relationship("Review", back_populates="vendor")
+    routes = relationship("Route", back_populates="vendor")
 
 
 class Review(Base):
@@ -39,4 +40,19 @@ class Review(Base):
     comment = Column(String)
 
     vendor = relationship("Vendor", back_populates="reviews")
+
+
+class Route(Base):
+    """Trajetos percorridos pelos vendedores."""
+
+    __tablename__ = "routes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    start_time = Column(DateTime, default=datetime.utcnow)
+    end_time = Column(DateTime, nullable=True)
+    points = Column(String)
+    distance_m = Column(Float, default=0.0)
+
+    vendor = relationship("Vendor", back_populates="routes")
 

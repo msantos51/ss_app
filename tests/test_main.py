@@ -208,3 +208,48 @@ def test_vendor_average_rating(client):
     vendor = next(v for v in resp.json() if v["id"] == vendor_id)
     assert pytest.approx(vendor["rating_average"], 0.01) == 4.0
 
+
+def test_routes_flow(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+    confirm_latest_email(client)
+    token = get_token(client)
+
+    # start route
+    resp = client.post(
+        f"/vendors/{vendor_id}/routes/start",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+
+    # send a couple of locations
+    client.put(
+        f"/vendors/{vendor_id}/location",
+        json={"lat": 1.0, "lng": 1.0},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    client.put(
+        f"/vendors/{vendor_id}/location",
+        json={"lat": 1.001, "lng": 1.001},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    # stop route
+    resp = client.post(
+        f"/vendors/{vendor_id}/routes/stop",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    route = resp.json()
+    assert route["distance_m"] >= 0
+    assert len(route["points"]) >= 2
+
+    # list routes
+    resp = client.get(
+        f"/vendors/{vendor_id}/routes",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    routes = resp.json()
+    assert len(routes) == 1
+

@@ -51,3 +51,20 @@ class ReviewOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class RoutePoint(BaseModel):
+    lat: float
+    lng: float
+    t: str
+
+
+class RouteOut(BaseModel):
+    id: int
+    start_time: str
+    end_time: Optional[str]
+    distance_m: float
+    points: list[RoutePoint]
+
+    class Config:
+        orm_mode = True

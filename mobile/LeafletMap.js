@@ -3,7 +3,11 @@ import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 const LeafletMap = forwardRef((props, ref) => {
-  const { markers = [], initialPosition = { latitude: 38.736946, longitude: -9.142685 } } = props;
+  const {
+    markers = [],
+    initialPosition = { latitude: 38.736946, longitude: -9.142685 },
+    polyline = [],
+  } = props;
   const webviewRef = useRef(null);
 
   const html = `
@@ -48,6 +52,7 @@ const LeafletMap = forwardRef((props, ref) => {
           ], 13);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
           var markers = ${JSON.stringify(markers)};
+          var line = ${JSON.stringify(polyline)};
           markers.forEach(function(m) {
             var opts = {};
             if (m.iconHtml) {
@@ -55,6 +60,10 @@ const LeafletMap = forwardRef((props, ref) => {
             }
             L.marker([m.latitude, m.longitude], opts).addTo(map).bindPopup(m.title || '');
           });
+          if (line.length > 0) {
+            L.polyline(line, { color: 'red' }).addTo(map);
+            map.fitBounds(line);
+          }
           window.setView = function(lat, lng) { map.setView([lat, lng], 15); };
         </script>
       </body>

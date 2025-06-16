@@ -21,6 +21,18 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
   const [pinColor, setPinColor] = useState('#FF0000');
+  const colorOptions = [
+    '#FF0000',
+    '#FFA500',
+    '#FFFF00',
+    '#008000',
+    '#00FFFF',
+    '#0000FF',
+    '#800080',
+    '#FFC0CB',
+    '#808080',
+    '#000000',
+  ];
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -127,12 +139,20 @@ export default function RegisterScreen({ navigation }) {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Cor do pin (ex: #FF0000)"
-        value={pinColor}
-        onChangeText={setPinColor}
-      />
+      <Text style={styles.pinColorLabel}>Cor do contorno do pin</Text>
+      <View style={styles.colorOptions}>
+        {colorOptions.map((c) => (
+          <TouchableOpacity
+            key={c}
+            onPress={() => setPinColor(c)}
+            style={[
+              styles.colorOption,
+              { backgroundColor: c },
+              pinColor === c && styles.colorOptionSelected,
+            ]}
+          />
+        ))}
+      </View>
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />
 
@@ -171,4 +191,16 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignSelf: 'center',
   },
+  pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
+  colorOptions: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },
+  colorOption: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+  colorOptionSelected: { borderWidth: 3 },
 });

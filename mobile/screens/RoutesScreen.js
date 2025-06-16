@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Text, List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -32,16 +33,15 @@ export default function RoutesScreen({ navigation }) {
     const start = new Date(item.start_time);
     const end = item.end_time ? new Date(item.end_time) : null;
     const durationMin = end ? Math.round((end - start) / 60000) : 0;
+    const title = start.toLocaleString();
+    const description = `${durationMin} min - ${(item.distance_m / 1000).toFixed(2)} km`;
     return (
-      <TouchableOpacity
+      <List.Item
         style={styles.item}
+        title={title}
+        description={description}
         onPress={() => navigation.navigate('RouteDetail', { route: item })}
-      >
-        <Text>
-          {start.toLocaleString()} - {durationMin} min -{' '}
-          {(item.distance_m / 1000).toFixed(2)} km
-        </Text>
-      </TouchableOpacity>
+      />
     );
   };
 

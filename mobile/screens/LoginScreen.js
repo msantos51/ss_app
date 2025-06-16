@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import {
-  View,
   TextInput,
   Button,
-  StyleSheet,
   Text,
   ActivityIndicator,
-} from 'react-native';
+} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -52,8 +51,9 @@ export default function LoginScreen({ navigation }) {
       {error && <Text style={styles.error}>{error}</Text>}
 
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Email"
+        label="Email"
         value={email}
         onChangeText={(text) => {
           setEmail(text);
@@ -63,8 +63,9 @@ export default function LoginScreen({ navigation }) {
       />
 
       <TextInput
+        mode="outlined"
         style={styles.input}
-        placeholder="Password"
+        label="Password"
         secureTextEntry
         value={password}
         onChangeText={(text) => {
@@ -74,34 +75,29 @@ export default function LoginScreen({ navigation }) {
       />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator animating size="large" />
       ) : (
-        <Button
-          title="Entrar"
-          onPress={login}
-          disabled={!email || !password}
-        />
+        <Button mode="contained" onPress={login} disabled={!email || !password}
+        >Entrar</Button>
       )}
 
       <View style={{ marginTop: 12 }} />
-      <Button title="Registar" onPress={() => navigation.navigate('Register')} />
+      <Button mode="outlined" onPress={() => navigation.navigate('Register')}>
+        Registar
+      </Button>
       <View style={{ marginTop: 12 }} />
       <Button
-        title="Esqueci a minha password"
+        mode="text"
         onPress={() => navigation.navigate('ForgotPassword')}
-      />
+      >
+        Esqueci a minha password
+      </Button>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 12,
-    padding: 8,
-    borderRadius: 8,
-  },
+  input: { marginBottom: 12 },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
 });

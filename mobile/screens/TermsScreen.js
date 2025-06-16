@@ -3,6 +3,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
+import { theme } from '../theme';
 
 export default function TermsScreen() {
   return (
@@ -63,7 +64,7 @@ export default function TermsScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   title: {
     fontSize: 20,

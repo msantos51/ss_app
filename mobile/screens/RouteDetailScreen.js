@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
+import { theme } from '../theme';
 import LeafletMap from '../LeafletMap';
 
 export default function RouteDetailScreen({ route }) {
@@ -26,6 +27,6 @@ export default function RouteDetailScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: theme.colors.background },
   info: { padding: 16 },
 });

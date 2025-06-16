@@ -4,6 +4,7 @@ import { Text, List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { theme } from '../theme';
 
 export default function RoutesScreen({ navigation }) {
   const [routes, setRoutes] = useState([]);
@@ -53,7 +54,7 @@ export default function RoutesScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  container: { flex: 1, padding: 16, backgroundColor: theme.colors.background },
   item: {
     paddingVertical: 8,
     borderBottomWidth: 1,

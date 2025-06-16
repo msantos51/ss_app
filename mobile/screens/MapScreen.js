@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LeafletMap from '../LeafletMap';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { theme } from '../theme';
 import { subscribe as subscribeLocations } from '../socketService';
 import {
   startLocationSharing,
@@ -264,13 +265,13 @@ export default function MapScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: theme.colors.background },
   filterContainer: {
     position: 'absolute',
     top: 10,
     left: 70,
     right: 70,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     borderRadius: 16,
     padding: 6,
   },
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchInput: { marginBottom: 4 },
-  listToggle: { backgroundColor: '#2196F3', padding: 6, borderRadius: 8, marginBottom: 4 },
+  listToggle: { backgroundColor: theme.colors.primary, padding: 6, borderRadius: 8, marginBottom: 4 },
   listToggleText: { color: '#fff', textAlign: 'center' },
   vendorImage: {
     width: 32,
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 110,
     right: 20,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     borderRadius: 20,
     padding: 8,
     borderWidth: 1,

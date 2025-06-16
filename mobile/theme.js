@@ -13,8 +13,8 @@ export const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#3E87D1',
-    accent: '#FBBD09',
-    background: '#F2F2F2',
+    accent: '#3E87D1',
+    background: '#FBBD09',
     surface: '#FFFFFF',
     text: '#1F1B10',
     error: '#BA1A1A',

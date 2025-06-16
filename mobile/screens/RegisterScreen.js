@@ -21,16 +21,8 @@ export default function RegisterScreen({ navigation }) {
   const [product, setProduct] = useState('');
   const [pinColor, setPinColor] = useState('#FF0000');
   const colorOptions = [
-    '#FF0000',
-    '#FFA500',
-    '#FFFF00',
-    '#008000',
-    '#00FFFF',
-    '#0000FF',
-    '#800080',
-    '#FFC0CB',
-    '#808080',
-    '#000000',
+    '#FF0000', '#FFA500', '#FFFF00', '#008000', '#00FFFF',
+    '#0000FF', '#800080', '#FFC0CB', '#808080', '#000000',
   ];
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
@@ -73,21 +65,22 @@ export default function RegisterScreen({ navigation }) {
         });
       }
 
-      await axios.post(`${BASE_URL}/vendors/`, data);
+      await axios.post(`${BASE_URL}/vendors/`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       navigation.navigate('Login');
     } catch (err) {
       console.error("Erro no registo:", err);
 
-      if (err.response && err.response.data) {
-        if (err.response.data.detail) {
-          setError(err.response.data.detail);
-        } else if (typeof err.response.data === 'string') {
-          setError(err.response.data);
-        } else {
-          setError('Erro inesperado no servidor.');
-        }
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (typeof err.response?.data === 'string') {
+        setError(err.response.data);
       } else {
-        setError('Não foi possível contactar o servidor.');
+        setError('Ocorreu um erro ao registar.');
       }
     } finally {
       setLoading(false);

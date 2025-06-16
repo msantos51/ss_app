@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  TextInput,
-  Button,
   StyleSheet,
-  Text,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
   Linking,
   ScrollView,
 } from 'react-native';
+import {
+  TextInput,
+  Button,
+  Text,
+  ActivityIndicator,
+} from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -235,7 +237,7 @@ export default function DashboardScreen({ navigation }) {
   if (!vendor) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator animating size="large" />
         <Text>A carregar...</Text>
         {error && <Text style={styles.error}>{error}</Text>}
       </View>
@@ -272,15 +274,17 @@ export default function DashboardScreen({ navigation }) {
             )}
 
             <TextInput
+              mode="outlined"
               style={styles.input}
-              placeholder="Nome"
+              label="Nome"
               value={name}
               onChangeText={setName}
             />
 
             <TextInput
+              mode="outlined"
               style={styles.input}
-              placeholder="Email"
+              label="Email"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -289,15 +293,17 @@ export default function DashboardScreen({ navigation }) {
             {changingPassword ? (
               <>
                 <TextInput
+                  mode="outlined"
                   style={styles.input}
-                  placeholder="Password atual"
+                  label="Password atual"
                   secureTextEntry
                   value={oldPassword}
                   onChangeText={setOldPassword}
                 />
                 <TextInput
+                  mode="outlined"
                   style={styles.input}
-                  placeholder="Nova password"
+                  label="Nova password"
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
@@ -306,12 +312,15 @@ export default function DashboardScreen({ navigation }) {
             ) : (
               <>
                 <TextInput
+                  mode="outlined"
                   style={[styles.input, styles.inputDisabled]}
-                  placeholder="Password"
+                  label="Password"
                   value="********"
                   editable={false}
                 />
-                <Button title="Alterar password" onPress={() => setChangingPassword(true)} />
+                <Button mode="outlined" onPress={() => setChangingPassword(true)}>
+                  Alterar password
+                </Button>
               </>
             )}
 
@@ -338,11 +347,11 @@ export default function DashboardScreen({ navigation }) {
 
             <View style={styles.row}>
               <View style={styles.halfButton}>
-                <Button title="Guardar" onPress={updateProfile} />
+                <Button mode="contained" onPress={updateProfile}>Guardar</Button>
               </View>
               <View style={[styles.halfButton, styles.leftSpacing]}>
                 <Button
-                  title="Cancelar"
+                  mode="outlined"
                   onPress={() => {
                     setName(vendor.name);
                     setEmail(vendor.email);
@@ -354,7 +363,9 @@ export default function DashboardScreen({ navigation }) {
                     setChangingPassword(false);
                     setEditing(false);
                   }}
-                />
+                >
+                  Cancelar
+                </Button>
               </View>
             </View>
           </>
@@ -383,7 +394,12 @@ export default function DashboardScreen({ navigation }) {
         )}
 
         <View style={styles.fullButton}>
-          <Button title={sharingLocation ? 'Desativar Localização' : 'Ativar Localização'} onPress={toggleLocation} />
+          <Button
+            mode="contained"
+            onPress={toggleLocation}
+          >
+            {sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
+          </Button>
         </View>
 
         <Text style={{ color: sharingLocation ? 'green' : 'gray', marginVertical: 8, textAlign: 'center' }}>
@@ -428,16 +444,24 @@ export default function DashboardScreen({ navigation }) {
         </View>
 
         <View style={[styles.fullButton, styles.logoutButton]}>
-          <Button title="Logout" onPress={logout} />
+          <Button mode="outlined" onPress={logout}>Logout</Button>
         </View>
       </ScrollView>
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Button title="Atualizar Dados" onPress={() => { setMenuOpen(false); setEditing(true); }} />
-          <Button title="Pagar Semanalidade" onPress={() => { setMenuOpen(false); paySubscription(); }} />
-          <Button title="Trajetos" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }} />
-          <Button title="Termos e Condi\u00e7\u00f5es" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }} />
+          <Button mode="text" onPress={() => { setMenuOpen(false); setEditing(true); }}>
+            Atualizar Dados
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); paySubscription(); }}>
+            Pagar Semanalidade
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }}>
+            Trajetos
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
+            Termos e Condições
+          </Button>
         </View>
       )}
     </View>
@@ -453,14 +477,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 12,
-    padding: 8,
-    borderRadius: 8,
-    width: '100%',
-  },
+  input: { marginBottom: 12, width: '100%' },
   inputDisabled: { backgroundColor: '#eee', color: '#666' },
   infoText: { marginBottom: 8, width: '100%' },
   label: { fontWeight: 'bold' },

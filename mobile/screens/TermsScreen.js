@@ -1,7 +1,8 @@
 // Este ficheiro exibe os Termos e Condições completos da aplicação Sunny Sales
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Text } from 'react-native-paper';
 
 export default function TermsScreen() {
   return (

@@ -5,13 +5,15 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Text,
   FlatList,
   Image,
-  ActivityIndicator,
-  TextInput,
 } from 'react-native';
-import { Button } from 'react-native-paper';
+import {
+  Button,
+  Text,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LeafletMap from '../LeafletMap';
@@ -132,7 +134,7 @@ export default function MapScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {loadingLocation ? (
-        <ActivityIndicator size="large" style={StyleSheet.absoluteFill} />
+        <ActivityIndicator animating size="large" style={StyleSheet.absoluteFill} />
       ) : (
         <LeafletMap
           ref={mapRef}

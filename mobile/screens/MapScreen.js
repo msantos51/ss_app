@@ -145,7 +145,7 @@ export default function MapScreen({ navigation }) {
               longitude: v.current_lng,
               title: v.name || 'Vendedor',
               iconHtml: photo
-                ? `<img src="${photo}" style="border: 2px solid ${v.pin_color || '#FF0000'};" />`
+                ? `<div class="gm-pin" style="border: 4px solid ${v.pin_color || '#FF0000'};"><img src="${photo}" /></div>`
                 : null,
             };
           })}

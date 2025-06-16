@@ -7,6 +7,7 @@ import {
   Text,
   Image,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';

@@ -17,7 +17,24 @@ const LeafletMap = forwardRef((props, ref) => {
         />
         <style>
           html, body, #map { height: 100%; margin: 0; padding: 0; }
-          .custom-icon { font-size: 24px; }
+          .custom-icon .gm-pin {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            overflow: hidden;
+            background: white;
+          }
+          .custom-icon .gm-pin img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform: rotate(45deg);
+          }
         </style>
       </head>
       <body>
@@ -32,8 +49,8 @@ const LeafletMap = forwardRef((props, ref) => {
           var markers = ${JSON.stringify(markers)};
           markers.forEach(function(m) {
             var opts = {};
-            if (m.icon) {
-              opts.icon = L.divIcon({ className: 'custom-icon', html: m.icon });
+            if (m.iconHtml) {
+              opts.icon = L.divIcon({ className: 'custom-icon', html: m.iconHtml });
             }
             L.marker([m.latitude, m.longitude], opts).addTo(map).bindPopup(m.title || '');
           });

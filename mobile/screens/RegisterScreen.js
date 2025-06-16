@@ -13,14 +13,14 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
-const AVAILABLE_ICONS = ['📍', '🍦', '🍩', '🌭', '🏖️'];
+
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [product, setProduct] = useState('');
-  const [icon, setIcon] = useState('📍');
+  const [pinColor, setPinColor] = useState('#FF0000');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ export default function RegisterScreen({ navigation }) {
       data.append('email', email);
       data.append('password', password);
       data.append('product', product);
-      data.append('icon', icon);
+      data.append('pin_color', pinColor);
 
       if (profilePhoto) {
         data.append('profile_photo', {
@@ -127,15 +127,12 @@ export default function RegisterScreen({ navigation }) {
         <Picker.Item label="Acessórios" value="Acessórios" />
       </Picker>
 
-      <Picker
-        selectedValue={icon}
-        onValueChange={(val) => setIcon(val)}
+      <TextInput
         style={styles.input}
-      >
-        {AVAILABLE_ICONS.map((ic) => (
-          <Picker.Item key={ic} label={ic} value={ic} />
-        ))}
-      </Picker>
+        placeholder="Cor do pin (ex: #FF0000)"
+        value={pinColor}
+        onChangeText={setPinColor}
+      />
 
       <Button title="Escolher Foto de Perfil" onPress={pickImage} />
 

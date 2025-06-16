@@ -12,8 +12,8 @@ export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#1E88E5',
-    accent: '#1E88E5',
+    primary: '#3E87D1',
+    accent: '#FBBD09',
     background: '#F2F2F2',
     surface: '#FFFFFF',
     text: '#1F1B10',

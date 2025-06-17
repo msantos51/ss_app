@@ -1,17 +1,21 @@
 // Tela com detalhes do vendedor
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, FlatList } from 'react-native';
+import { View, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
+import { isFavorite, addFavorite, removeFavorite } from '../favoritesService';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import t from '../i18n';
 
 export default function VendorDetailScreen({ route }) {
   const { vendor } = route.params;
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [favorite, setFavorite] = useState(false);
 
   const loadReviews = async () => {
     try {
@@ -24,6 +28,7 @@ export default function VendorDetailScreen({ route }) {
 
   useEffect(() => {
     loadReviews();
+    isFavorite(vendor.id).then(setFavorite);
   }, []);
 
   const submitReview = async () => {
@@ -47,7 +52,27 @@ export default function VendorDetailScreen({ route }) {
   return (
     <View style={styles.container}>
       {photoUri && <Image source={{ uri: photoUri }} style={styles.photo} />}
-      <Text style={styles.name}>{vendor.name || 'Vendedor'}</Text>
+      <View style={styles.nameRow}>
+        <Text style={styles.name}>{vendor.name || 'Vendedor'}</Text>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={favorite ? t('removeFavorite') : t('addFavorite')}
+          onPress={async () => {
+            if (favorite) {
+              await removeFavorite(vendor.id);
+            } else {
+              await addFavorite(vendor.id);
+            }
+            setFavorite(!favorite);
+          }}
+        >
+          <MaterialCommunityIcons
+            name={favorite ? 'star' : 'star-outline'}
+            size={28}
+            color={theme.colors.accent}
+          />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.product}>Produto: {vendor.product}</Text>
 
       <FlatList
@@ -86,4 +111,9 @@ const styles = StyleSheet.create({
   reviewItem: { paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
   reviewRating: { fontWeight: 'bold' },
   input: { marginBottom: 8 },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

@@ -536,9 +536,53 @@ def create_review(
 def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
     return (
         db.query(models.Review)
-        .filter(models.Review.vendor_id == vendor_id)
+        .filter(models.Review.vendor_id == vendor_id, models.Review.active == True)
         .all()
     )
+
+
+@app.post("/vendors/{vendor_id}/reviews/{review_id}/response", response_model=schemas.ReviewOut)
+def respond_review(
+    vendor_id: int,
+    review_id: int,
+    data: schemas.ReviewResponse,
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    review = (
+        db.query(models.Review)
+        .filter(models.Review.id == review_id, models.Review.vendor_id == vendor_id)
+        .first()
+    )
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    review.response = data.response
+    db.commit()
+    db.refresh(review)
+    return review
+
+
+@app.delete("/vendors/{vendor_id}/reviews/{review_id}")
+def delete_review(
+    vendor_id: int,
+    review_id: int,
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    review = (
+        db.query(models.Review)
+        .filter(models.Review.id == review_id, models.Review.vendor_id == vendor_id)
+        .first()
+    )
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    review.active = False
+    db.commit()
+    return {"status": "deleted"}
 
 # --------------------------
 # Webhook do Stripe

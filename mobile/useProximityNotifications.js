@@ -16,7 +16,11 @@ function distanceMeters(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-export default function useProximityNotifications(vendors, radius = 500) {
+export default function useProximityNotifications(
+  vendors,
+  radius = 500,
+  favoriteIds = []
+) {
   useEffect(() => {
     let sub;
     const start = async () => {
@@ -29,6 +33,7 @@ export default function useProximityNotifications(vendors, radius = 500) {
         { accuracy: Location.Accuracy.Balanced, distanceInterval: 50 },
         (loc) => {
           vendors.forEach((v) => {
+            if (favoriteIds.length && !favoriteIds.includes(v.id)) return;
             if (v.current_lat != null && v.current_lng != null) {
               const dist = distanceMeters(
                 loc.coords.latitude,
@@ -54,5 +59,5 @@ export default function useProximityNotifications(vendors, radius = 500) {
     return () => {
       sub && sub.remove();
     };
-  }, [vendors, radius]);
+  }, [vendors, radius, favoriteIds]);
 }

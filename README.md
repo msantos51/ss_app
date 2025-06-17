@@ -31,6 +31,13 @@ scripts/    Utilidades auxiliares
    npm install
    npx expo start
    ```
+
+## Novidades
+
+- **Estatísticas**: painel no aplicativo mostra gráfico das distâncias diárias percorridas.
+- **Favoritos**: clientes podem marcar vendedores favoritos para receber notificações de proximidade.
+- **Respostas a reviews**: vendedores podem responder ou ocultar avaliações via API.
+- **Tradução e acessibilidade**: interface com suporte a português e inglês e elementos com labels acessíveis.
    A variável `BASE_URL` em `mobile/config.js` deve apontar para o endereço do backend.
 
 ## Testes

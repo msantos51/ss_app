@@ -43,11 +43,17 @@ class ReviewCreate(BaseModel):
     comment: Optional[str] = None
 
 
+class ReviewResponse(BaseModel):
+    response: str
+
+
 class ReviewOut(BaseModel):
     id: int
     vendor_id: int
     rating: int
     comment: Optional[str] = None
+    response: Optional[str] = None
+    active: bool
 
     class Config:
         orm_mode = True

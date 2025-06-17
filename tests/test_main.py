@@ -197,6 +197,32 @@ def test_reviews_endpoints(client):
     assert len(reviews) == 1 and reviews[0]["comment"] == "Bom"
 
 
+def test_review_response_and_delete(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+    review = client.post(f"/vendors/{vendor_id}/reviews", json={"rating": 5}).json()
+
+    confirm_latest_email(client)
+    token = get_token(client)
+
+    resp = client.post(
+        f"/vendors/{vendor_id}/reviews/{review['id']}/response",
+        json={"response": "ok"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["response"] == "ok"
+
+    resp = client.delete(
+        f"/vendors/{vendor_id}/reviews/{review['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+
+    resp = client.get(f"/vendors/{vendor_id}/reviews")
+    assert resp.json() == []
+
+
 def test_vendor_average_rating(client):
     resp = register_vendor(client)
     vendor_id = resp.json()["id"]

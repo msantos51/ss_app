@@ -28,6 +28,13 @@ import {
 } from '../locationService';
 import * as Location from 'expo-location';
 import useProximityNotifications from '../useProximityNotifications';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+} from '../favoritesService';
+import t from '../i18n';
 
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
@@ -38,6 +45,7 @@ export default function MapScreen({ navigation }) {
   const [initialPosition, setInitialPosition] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [selectedVendorId, setSelectedVendorId] = useState(null);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const mapRef = useRef(null);
 
   const fetchVendors = async () => {
@@ -73,13 +81,20 @@ export default function MapScreen({ navigation }) {
     }
   };
 
+  const loadFavorites = async () => {
+    const favs = await getFavorites();
+    setFavoriteIds(favs);
+  };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchVendors();
       loadUser();
+      loadFavorites();
     });
     fetchVendors();
     loadUser();
+    loadFavorites();
     return unsubscribe;
   }, [navigation]);
 
@@ -131,7 +146,7 @@ export default function MapScreen({ navigation }) {
       (searchQuery === '' || v?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  useProximityNotifications(filteredVendors);
+  useProximityNotifications(filteredVendors, 500, favoriteIds);
 
   return (
     <View style={styles.container}>
@@ -202,9 +217,11 @@ export default function MapScreen({ navigation }) {
                 const photoUri = item.profile_photo
                   ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
                   : null;
+                const fav = favoriteIds.includes(item.id);
                 return (
                   <TouchableOpacity
                     style={styles.vendorItem}
+                    accessible
                     onPress={() => {
                       setSelectedVendorId(item.id);
                       mapRef.current?.setView(item.current_lat, item.current_lng);
@@ -223,6 +240,25 @@ export default function MapScreen({ navigation }) {
                         ? ` \u2013 ${item.rating_average.toFixed(1)}\u2605`
                         : ''}
                     </Text>
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={fav ? t('removeFavorite') : t('addFavorite')}
+                      onPress={async () => {
+                        if (fav) {
+                          await removeFavorite(item.id);
+                        } else {
+                          await addFavorite(item.id);
+                        }
+                        loadFavorites();
+                      }}
+                      accessible
+                    >
+                      <MaterialCommunityIcons
+                        name={fav ? 'star' : 'star-outline'}
+                        size={24}
+                        color={theme.colors.accent}
+                      />
+                    </TouchableOpacity>
                   </TouchableOpacity>
                 );
               }}

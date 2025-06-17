@@ -38,6 +38,8 @@ class Review(Base):
     vendor_id = Column(Integer, ForeignKey("vendors.id"))
     rating = Column(Integer)
     comment = Column(String)
+    response = Column(String, nullable=True)
+    active = Column(Boolean, default=True)
 
     vendor = relationship("Vendor", back_populates="reviews")
 

@@ -21,6 +21,7 @@ import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
+import t from '../i18n';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -459,6 +460,9 @@ export default function DashboardScreen({ navigation }) {
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }}>
             Trajetos
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
+            {t('statsTitle')}
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
             Termos e Condições

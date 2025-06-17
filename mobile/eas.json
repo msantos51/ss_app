@@ -8,20 +8,26 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "node": "18.18.0",
+      "installCommand": "npm install"
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "node": "18.18.0",
+      "installCommand": "npm install"
     },
     "production": {
       "developmentClient": false,
       "distribution": "store",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "node": "18.18.0",
+      "installCommand": "npm install"
     }
   }
 }

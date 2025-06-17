@@ -1,3 +1,4 @@
+# Testes automatizados do backend com pytest
 import os
 import importlib
 import shutil

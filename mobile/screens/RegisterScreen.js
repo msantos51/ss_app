@@ -1,3 +1,4 @@
+// Tela de registo de novos vendedores
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, Alert } from 'react-native';
 import {

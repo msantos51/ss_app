@@ -1,3 +1,4 @@
+// Dashboard do vendedor
 import React, { useEffect, useState } from 'react';
 import {
   View,

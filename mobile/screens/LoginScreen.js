@@ -1,3 +1,4 @@
+// Tela de login do utilizador
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import {

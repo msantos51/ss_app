@@ -1,3 +1,4 @@
+// Definicoes de tema para React Native Paper
 import { DefaultTheme, configureFonts } from 'react-native-paper';
 
 const fontConfig = {

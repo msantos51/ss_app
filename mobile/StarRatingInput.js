@@ -1,3 +1,4 @@
+// Componente reutilizavel para escolher classificacao em estrelas
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 

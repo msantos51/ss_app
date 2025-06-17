@@ -1,3 +1,4 @@
+// Ficheiro de entrada para registrar o componente principal
 import { registerRootComponent } from 'expo';
 
 import App from './App';

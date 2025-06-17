@@ -18,7 +18,7 @@
     "expo-file-system": "~18.1.10",
     "expo-image-picker": "~16.1.4",
     "expo-location": "~18.1.5",
-    "react-native-svg": "13.9.0",
+    "react-native-svg": "7.0.3",
     "react-native-svg-charts": "5.4.0",
     "i18n-js": "4.2.0",
     "react": "19.0.0",
@@ -35,3 +35,4 @@
   },
   "private": true
 }
+

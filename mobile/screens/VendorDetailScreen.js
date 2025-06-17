@@ -1,3 +1,4 @@
+// Tela com detalhes do vendedor
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, FlatList } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';

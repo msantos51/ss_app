@@ -1,3 +1,4 @@
+# Script para simular deslocamento de um vendedor enviando localizacoes
 import os
 import time
 import httpx

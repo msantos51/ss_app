@@ -1,3 +1,4 @@
+// Componente de mapa baseado em Leaflet exibido em WebView
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';

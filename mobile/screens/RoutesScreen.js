@@ -1,3 +1,4 @@
+// Tela que lista os trajetos do vendedor
 import React, { useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text, List } from 'react-native-paper';

@@ -1,3 +1,4 @@
+// Gerencia conexao WebSocket com o servidor para atualizacoes em tempo real
 import { BASE_URL } from './config';
 
 let socket = null;

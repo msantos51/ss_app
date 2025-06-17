@@ -1,3 +1,4 @@
+// Configuracao da URL base para o backend
 import Constants from 'expo-constants';
 
 // Allow BASE_URL to be configured via environment variable or Expo config

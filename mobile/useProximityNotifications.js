@@ -1,3 +1,4 @@
+// Hook para enviar notificacoes quando um vendedor esta perto
 import { useEffect } from 'react';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';

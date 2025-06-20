@@ -41,6 +41,15 @@ const LeafletMap = forwardRef((props, ref) => {
             border-radius: 50%;
             transform: rotate(45deg);
           }
+          /* Novo estilo para pins simples (ex: cliente) */
+          .gm-pin {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #0077FF;
+            border: 2px solid white;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+          }
         </style>
       </head>
       <body>
@@ -57,7 +66,11 @@ const LeafletMap = forwardRef((props, ref) => {
           markers.forEach(function(m) {
             var opts = {};
             if (m.iconHtml) {
-              opts.icon = L.divIcon({ className: 'custom-icon', html: m.iconHtml });
+opts.icon = L.divIcon({
+  className: m.iconHtml.includes('img') ? 'custom-icon' : '',
+  html: m.iconHtml
+});
+
             }
             if (m.selected) {
               opts.zIndexOffset = 1000;
@@ -68,16 +81,18 @@ const LeafletMap = forwardRef((props, ref) => {
             L.polyline(line, { color: 'red' }).addTo(map);
             map.fitBounds(line);
           }
-          window.setView = function(lat, lng) { map.setView([lat, lng], 15); };
+          window.setView = function(lat, lng, zoom) {
+            map.setView([lat, lng], zoom || 15);
+          };
         </script>
       </body>
     </html>
   `;
 
   useImperativeHandle(ref, () => ({
-    setView: (lat, lng) => {
+    setView: (lat, lng, zoom) => {
       if (webviewRef.current) {
-        const js = `window.setView(${lat}, ${lng}); true;`;
+        const js = `window.setView(${lat}, ${lng}, ${zoom}); true;`;
         webviewRef.current.injectJavaScript(js);
       }
     },

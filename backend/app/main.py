@@ -15,13 +15,16 @@ import shutil
 from uuid import uuid4
 from secrets import token_urlsafe
 from email.message import EmailMessage
+from email import policy
 import smtplib
 import time
 import json
+import asyncio
 import base64
 import hmac
 import hashlib
 from math import radians, sin, cos, sqrt, atan2
+from fastapi.responses import HTMLResponse
 
 # Diretório para guardar fotos de perfil
 PROFILE_PHOTO_DIR = "profile_photos"
@@ -29,6 +32,11 @@ os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)
 
 # Inicializar app
 app = FastAPI()
+
+# Endpoint raiz simples para verificação de funcionamento
+@app.get("/")
+def read_root():
+    return {"status": "ok"}
 
 # Habilitar CORS (permitir acesso do frontend)
 origins = ["*"]  # Em produção, usar domínios específicos
@@ -84,18 +92,25 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 def send_email(to: str, subject: str, body: str):
     if not SMTP_USER or not SMTP_PASSWORD:
-        # Silenciosamente ignore se as credenciais nao foram definidas
+        print("❌ Credenciais de email não definidas")
         return
-    msg = EmailMessage()
+
+    msg = EmailMessage(policy=policy.SMTP.clone(max_line_length=1000))
     msg["From"] = SMTP_USER
     msg["To"] = to
     msg["Subject"] = subject
     msg.set_content(body)
 
-    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-        server.starttls()
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.send_message(msg)
+    try:
+        print(f"📤 Enviando email para: {to}")
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.send_message(msg)
+        print("✅ Email enviado com sucesso para", to)
+    except Exception as e:
+        print("❌ Erro ao enviar email:", str(e))
+
 
 # Gerenciador de WebSockets
 class ConnectionManager:
@@ -131,7 +146,7 @@ def _b64decode(segment: str) -> bytes:
     padded = segment + "=" * (-len(segment) % 4)
     return base64.urlsafe_b64decode(padded)
 
-def create_access_token(payload: dict, expires_sec: int = 3600) -> str:
+def create_access_token(payload: dict, expires_sec: int = 604800) -> str:
     data = payload.copy()
     data["exp"] = int(time.time()) + expires_sec
     header = {"alg": "HS256", "typ": "JWT"}
@@ -243,7 +258,7 @@ async def create_vendor(
     send_email(
         new_vendor.email,
         "Confirme o seu registro",
-        f"Clique no link para confirmar sua conta: {confirm_link}",
+        f"Clique no link para confirmar sua conta:\n{confirm_link}",
     )
     return new_vendor
 
@@ -260,7 +275,19 @@ def confirm_email(token: str, db: Session = Depends(get_db)):
 
 
 @app.post("/password-reset-request")
-def password_reset_request(email: str = Form(...), db: Session = Depends(get_db)):
+async def password_reset_request(
+    request: Request,
+    email: str = Form(None),
+    db: Session = Depends(get_db),
+):
+    if email is None:
+        try:
+            data = await request.json()
+            email = data.get("email")
+        except Exception:
+            email = None
+    if not email:
+        raise HTTPException(status_code=422, detail="Email is required")
     vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found")
@@ -271,7 +298,7 @@ def password_reset_request(email: str = Form(...), db: Session = Depends(get_db)
     send_email(
         vendor.email,
         "Redefinição de senha",
-        f"Clique no link para alterar sua senha: {reset_link}",
+        f"Clique no link para alterar sua senha:\n{reset_link}",
     )
     return {"message": "E-mail de recuperação enviado"}
 
@@ -370,20 +397,24 @@ async def update_vendor_location(
     if current_vendor.id != vendor_id:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    vendor.current_lat = lat
-    vendor.current_lng = lng
-    db.commit()
-
-    route = (
+    # only allow updates if the vendor has an active route
+    active_route = (
         db.query(models.Route)
         .filter(models.Route.vendor_id == vendor_id, models.Route.end_time == None)
         .order_by(models.Route.start_time.desc())
         .first()
     )
-    if route:
-        points = json.loads(route.points or "[]")
+    if not active_route:
+        raise HTTPException(status_code=400, detail="Location sharing inactive")
+
+    vendor.current_lat = lat
+    vendor.current_lng = lng
+    db.commit()
+
+    if active_route:
+        points = json.loads(active_route.points or "[]")
         points.append({"lat": lat, "lng": lng, "t": datetime.utcnow().isoformat()})
-        route.points = json.dumps(points)
+        active_route.points = json.dumps(points)
         db.commit()
 
     await manager.broadcast({"vendor_id": vendor_id, "lat": lat, "lng": lng})
@@ -400,6 +431,21 @@ def start_route(
 ):
     if current_vendor.id != vendor_id:
         raise HTTPException(status_code=403, detail="Not authorized")
+
+    # close any previously active routes to avoid duplicates
+    active_routes = (
+        db.query(models.Route)
+        .filter(models.Route.vendor_id == vendor_id, models.Route.end_time == None)
+        .all()
+    )
+    for r in active_routes:
+        pts = json.loads(r.points or "[]")
+        dist = 0.0
+        for p1, p2 in zip(pts, pts[1:]):
+            dist += haversine(p1["lat"], p1["lng"], p2["lat"], p2["lng"])
+        r.distance_m = dist
+        r.end_time = datetime.utcnow()
+
     route = models.Route(vendor_id=vendor_id, points="[]")
     db.add(route)
     db.commit()
@@ -414,35 +460,52 @@ def start_route(
 
 
 @app.post("/vendors/{vendor_id}/routes/stop", response_model=schemas.RouteOut)
-def stop_route(
+async def stop_route(
     vendor_id: int,
     db: Session = Depends(get_db),
     current_vendor: models.Vendor = Depends(get_current_vendor),
 ):
     if current_vendor.id != vendor_id:
         raise HTTPException(status_code=403, detail="Not authorized")
-    route = (
+    routes = (
         db.query(models.Route)
         .filter(models.Route.vendor_id == vendor_id, models.Route.end_time == None)
         .order_by(models.Route.start_time.desc())
-        .first()
+        .all()
     )
-    if not route:
+    if not routes:
         raise HTTPException(status_code=404, detail="Route not found")
-    points = json.loads(route.points or "[]")
-    distance = 0.0
-    for p1, p2 in zip(points, points[1:]):
-        distance += haversine(p1["lat"], p1["lng"], p2["lat"], p2["lng"])
-    route.distance_m = distance
-    route.end_time = datetime.utcnow()
+
+    latest = routes[0]
+    for r in routes:
+        pts = json.loads(r.points or "[]")
+        dist = 0.0
+        for p1, p2 in zip(pts, pts[1:]):
+            dist += haversine(p1["lat"], p1["lng"], p2["lat"], p2["lng"])
+        r.distance_m = dist
+        r.end_time = datetime.utcnow()
+
+    # Clear vendor's current location so clients remove it from the map
+    current_vendor.current_lat = None
+    current_vendor.current_lng = None
     db.commit()
-    db.refresh(route)
+    for r in routes:
+        db.refresh(r)
+    db.refresh(current_vendor)
+    # Notify via websocket that the vendor stopped sharing location
+    await manager.broadcast({
+    "vendor_id": vendor_id,
+    "lat": None,
+    "lng": None,
+    "remove": True  # 👈 Esta linha é essencial!
+})
+
     return {
-        "id": route.id,
-        "start_time": route.start_time.isoformat(),
-        "end_time": route.end_time.isoformat(),
-        "distance_m": route.distance_m,
-        "points": points,
+        "id": latest.id,
+        "start_time": latest.start_time.isoformat(),
+        "end_time": latest.end_time.isoformat(),
+        "distance_m": latest.distance_m,
+        "points": json.loads(latest.points or "[]"),
     }
 
 
@@ -472,6 +535,25 @@ def list_routes(
             }
         )
     return result
+
+
+@app.get("/password-reset/{token}", response_class=HTMLResponse)
+async def show_password_reset_form(token: str):
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Redefinir Senha</title>
+    </head>
+    <body style="font-family: Arial; background: #f0f0f0; padding: 30px;">
+        <h2>Redefinir Senha</h2>
+        <form action="/password-reset/{token}" method="post">
+            <input type="password" name="new_password" placeholder="Nova senha" required style="padding: 8px; width: 200px;"><br><br>
+            <button type="submit" style="padding: 10px 20px;">Redefinir</button>
+        </form>
+    </body>
+    </html>"""
 
 # --------------------------
 # Criar sessão de pagamento no Stripe

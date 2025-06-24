@@ -22,7 +22,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
-import t, { i18n } from '../i18n';
+import t, { getLanguage } from '../i18n';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -141,11 +141,10 @@ if (share) {
   }, [navigation, vendor?.id]);
 
   useFocusEffect(
-  React.useCallback(() => {
-    setLang(i18n.locale);
-  }, [])
-);
-
+    React.useCallback(() => {
+      getLanguage().then(setLang);
+    }, [])
+  );
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -485,9 +484,6 @@ if (share) {
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
             {t('statsTitle')}
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('AccountSettings'); }}>
-            {t('accountSettingsTitle')}
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Language'); }}>
             {t('languageTitle')}

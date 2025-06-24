@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "ssTester",
+    "slug": "sstester",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/adaptive-icon.png",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -31,7 +31,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "d47b7aba-f68f-4e24-88ae-7f8e6b1f8814"
+        "projectId": "5437c619-a136-41f8-9807-8b943f5b0528"
       }
     }
   }

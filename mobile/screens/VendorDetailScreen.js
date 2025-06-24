@@ -32,24 +32,46 @@ export default function VendorDetailScreen({ route }) {
     isFavorite(vendor.id).then(setFavorite);
   }, []);
 
-  const submitReview = async () => {
-    try {
-      const token = await AsyncStorage.getItem('clientToken');
-      await axios.post(
-        `${BASE_URL}/vendors/${vendor.id}/reviews`,
-        {
-          rating: rating,
-          comment,
-        },
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-      );
-      setRating(0);
-      setComment('');
-      loadReviews();
-    } catch (e) {
-      console.log('Erro ao enviar review:', e);
+const submitReview = async () => {
+  try {
+    // 1️⃣ Vai buscar o token ao AsyncStorage
+    const token = await AsyncStorage.getItem('clientToken');
+
+    // 2️⃣ Mostra no log o token e os dados enviados
+    console.log("🚀 Token usado na review:", token);
+    console.log("🚀 Dados enviados na review:", { rating, comment });
+
+    if (!token) {
+      console.warn("⚠️ Nenhum token encontrado. O utilizador fez login como cliente?");
+      return;
     }
-  };
+
+    // 3️⃣ Faz o pedido POST com o token no header
+    await axios.post(
+      `${BASE_URL}/vendors/${vendor.id}/reviews`,
+      {
+        rating: rating,
+        comment: comment,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // 4️⃣ Limpa os campos e atualiza as reviews
+    setRating(0);
+    setComment('');
+    loadReviews();
+
+    console.log("✅ Review enviada com sucesso!");
+
+  } catch (e) {
+    console.error('❌ Erro ao enviar review:', e.response?.data || e.message);
+  }
+};
+
 
   const photoUri = vendor.profile_photo
     ? `${BASE_URL.replace(/\/$/, '')}/${vendor.profile_photo}`

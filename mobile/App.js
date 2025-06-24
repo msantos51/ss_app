@@ -19,6 +19,8 @@ import TermsScreen from './screens/TermsScreen';
 import PaidWeeksScreen from './screens/PaidWeeksScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import AccountSettingsScreen from './screens/AccountSettingsScreen';
+import ManageAccountScreen from './screens/ManageAccountScreen';
+import AboutScreen from './screens/AboutScreen';
 import { theme } from './theme';
 import t from './i18n';
 
@@ -53,6 +55,8 @@ export default function App() {
           <Stack.Screen name="RouteDetail" component={RouteDetailScreen} options={{ title: 'Trajeto' }} />
           <Stack.Screen name="Terms" component={TermsScreen} options={{ title: 'Termos' }} />
           <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} options={{ title: t('accountSettingsTitle') }} />
+          <Stack.Screen name="ManageAccount" component={ManageAccountScreen} options={{ title: 'Definições' }} />
+          <Stack.Screen name="About" component={AboutScreen} options={{ title: 'Sobre/Ajuda' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

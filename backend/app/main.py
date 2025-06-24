@@ -819,11 +819,8 @@ def create_review(
     db.add(new_rev)
     db.commit()
     db.refresh(new_rev)
-    new_rev.client_name = new_rev.client.name if new_rev.client else None
-    new_rev.client_profile_photo = (
-        new_rev.client.profile_photo if new_rev.client else None
-    )
     return new_rev
+
 
 
 @app.get("/vendors/{vendor_id}/reviews", response_model=list[schemas.ReviewOut])
@@ -833,20 +830,10 @@ def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
         .filter(models.Review.vendor_id == vendor_id, models.Review.active == True)
         .all()
     )
-    result = []
-    for r in reviews:
-        result.append({
-            "id": r.id,
-            "vendor_id": r.vendor_id,
-            "client_id": r.client_id,
-            "rating": r.rating,
-            "comment": r.comment,
-            "response": r.response,
-            "created_at": r.created_at,
-            "client_name": r.client.name if r.client else None,
-            "client_profile_photo": r.client.profile_photo if r.client else None
-        })
-    return result
+    return reviews
+
+
+
 
 
 
@@ -861,6 +848,7 @@ def respond_review(
 ):
     if current_vendor.id != vendor_id:
         raise HTTPException(status_code=403, detail="Not authorized")
+
     review = (
         db.query(models.Review)
         .filter(models.Review.id == review_id, models.Review.vendor_id == vendor_id)
@@ -868,12 +856,12 @@ def respond_review(
     )
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
+
     review.response = data.response
     db.commit()
     db.refresh(review)
-    review.client_name = review.client.name if review.client else None
-    review.client_profile_photo = review.client.profile_photo if review.client else None
     return review
+
 
 
 @app.delete("/vendors/{vendor_id}/reviews/{review_id}")

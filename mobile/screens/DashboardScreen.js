@@ -450,12 +450,24 @@ if (share) {
                   : 'Ainda sem avaliações'}
               </Text>
               <ScrollView style={styles.reviewList} nestedScrollEnabled>
-                {reviews.map((r) => (
-                  <View key={r.id} style={styles.reviewItem}>
-                    <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
-                    {r.comment ? <Text>{r.comment}</Text> : null}
-                  </View>
-                ))}
+               {reviews.map((r) => (
+  <View key={r.id} style={styles.reviewItem}>
+    <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
+    {r.client_name && (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+        {r.client_profile_photo && (
+          <Image
+            source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${r.client_profile_photo}` }}
+            style={{ width: 30, height: 30, borderRadius: 15, marginRight: 8 }}
+          />
+        )}
+        <Text>{r.client_name}</Text>
+      </View>
+    )}
+    {r.comment ? <Text>{r.comment}</Text> : null}
+  </View>
+))}
+
               </ScrollView>
             </>
           ) : (

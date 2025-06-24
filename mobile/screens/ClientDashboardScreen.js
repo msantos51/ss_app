@@ -55,7 +55,15 @@ export default function ClientDashboardScreen({ navigation }) {
               onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
             >
               {photoUri && (
-                <Image source={{ uri: photoUri }} style={styles.image} />
+                <Image
+                  source={{ uri: photoUri }}
+                  style={[
+                    styles.image,
+                    item.subscription_active
+                      ? styles.activePhoto
+                      : styles.inactivePhoto,
+                  ]}
+                />
               )}
               <Text>{item.name}</Text>
             </TouchableOpacity>
@@ -87,6 +95,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   image: { width: 40, height: 40, borderRadius: 20, marginRight: 8 },
+  activePhoto: { borderWidth: 2, borderColor: 'green' },
+  inactivePhoto: { borderWidth: 2, borderColor: 'red' },
   settings: { marginTop: 20 },
   logout: { marginTop: 20 },
 });

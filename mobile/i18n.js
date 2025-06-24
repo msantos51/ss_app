@@ -15,6 +15,10 @@ const translations = {
     accountSettingsTitle: 'Account Settings',
     notificationsEnabled: 'Enable notifications',
     notificationRadius: 'Notification radius (m)',
+    clearFavorites: 'Clear favorites',
+    proximityMenu: 'Proximity notifications',
+    manageAccount: 'Manage account',
+    aboutHelp: 'About/Help',
   },
   pt: {
     statsTitle: 'Estatísticas',
@@ -29,6 +33,10 @@ const translations = {
     accountSettingsTitle: 'Definições de Conta',
     notificationsEnabled: 'Ativar notificações',
     notificationRadius: 'Raio para notificações (m)',
+    clearFavorites: 'Limpar favoritos',
+    proximityMenu: 'Notificações de proximidade',
+    manageAccount: 'Definições',
+    aboutHelp: 'Sobre/Ajuda',
   },
 };
 

@@ -833,10 +833,12 @@ def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
         .filter(models.Review.vendor_id == vendor_id, models.Review.active == True)
         .all()
     )
-    for r in reviews:
-        r.client_name = r.client.name if r.client else None
-        r.client_profile_photo = r.client.profile_photo if r.client else None
-    return reviews
+# (em português) Adiciona o nome e foto do cliente às reviews antes de devolver
+for r in reviews:
+    r.client_name = r.client.name if r.client else None
+    r.client_profile_photo = r.client.profile_photo if r.client else None
+return reviews
+
 
 
 @app.post("/vendors/{vendor_id}/reviews/{review_id}/response", response_model=schemas.ReviewOut)

@@ -833,11 +833,21 @@ def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
         .filter(models.Review.vendor_id == vendor_id, models.Review.active == True)
         .all()
     )
-# (em português) Adiciona o nome e foto do cliente às reviews antes de devolver
-for r in reviews:
-    r.client_name = r.client.name if r.client else None
-    r.client_profile_photo = r.client.profile_photo if r.client else None
-return reviews
+    result = []
+    for r in reviews:
+        result.append({
+            "id": r.id,
+            "vendor_id": r.vendor_id,
+            "client_id": r.client_id,
+            "rating": r.rating,
+            "comment": r.comment,
+            "response": r.response,
+            "created_at": r.created_at,
+            "client_name": r.client.name if r.client else None,
+            "client_profile_photo": r.client.profile_photo if r.client else None
+        })
+    return result
+
 
 
 

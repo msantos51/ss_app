@@ -13,6 +13,7 @@ export default function ClientDashboardScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // # Função para carregar os favoritos
   const loadFavorites = async () => {
     const ids = await getFavorites();
     if (ids.length === 0) {
@@ -28,86 +29,87 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
+  // # Função para limpar os favoritos
   const clearAllFavorites = async () => {
     await clearFavorites();
     setFavorites([]);
   };
 
+  // # Função para logout
   const logout = async () => {
     await AsyncStorage.removeItem('client');
     await AsyncStorage.removeItem('clientToken');
     navigation.replace('ClientLogin');
   };
 
+  // # Carregar favoritos ao abrir e quando voltar ao ecrã
   useEffect(() => {
     loadFavorites();
     const unsubscribe = navigation.addListener('focus', loadFavorites);
     return unsubscribe;
   }, [navigation]);
 
+  // # Return do componente
   return (
-// (em português) Este componente mostra os favoritos e um menu lateral para definições e ações
+    // (em português) Este componente mostra os favoritos e um menu lateral para definições e ações
+    <View style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => setMenuOpen(!menuOpen)}
+        >
+          <Text style={styles.menuIcon}>☰</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Favoritos</Text>
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => {
+            const photoUri = item.profile_photo
+              ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+              : null;
+            return (
+              <TouchableOpacity
+                style={styles.vendor}
+                onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
+              >
+                {photoUri && (
+                  <Image
+                    source={{ uri: photoUri }}
+                    style={[
+                      styles.image,
+                      item.subscription_active
+                        ? styles.activePhoto
+                        : styles.inactivePhoto,
+                    ]}
+                  />
+                )}
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
 
-<View style={{ flex: 1 }}>
-  <View style={styles.container}>
-    <TouchableOpacity
-      style={styles.menuButton}
-      onPress={() => setMenuOpen(!menuOpen)}
-    >
-      <Text style={styles.menuIcon}>☰</Text>
-    </TouchableOpacity>
-    <Text style={styles.title}>Favoritos</Text>
-    <FlatList
-      data={favorites}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => {
-        const photoUri = item.profile_photo
-          ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-          : null;
-        return (
-          <TouchableOpacity
-            style={styles.vendor}
-            onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
-          >
-            {photoUri && (
-              <Image
-                source={{ uri: photoUri }}
-                style={[
-                  styles.image,
-                  item.subscription_active
-                    ? styles.activePhoto
-                    : styles.inactivePhoto,
-                ]}
-              />
-            )}
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        );
-      }}
-    />
-  </View>
-
-  {menuOpen && (
-    <View style={styles.menu}>
-      <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
-        {t('clearFavorites')}
-      </Button>
-      <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('AccountSettings'); }}>
-        {t('proximityMenu')}
-      </Button>
-      <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
-        {t('manageAccount')}
-      </Button>
-      <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('About'); }}>
-        {t('aboutHelp')}
-      </Button>
-      <Button mode="text" onPress={() => { setMenuOpen(false); logout(); }}>
-        Sair
-      </Button>
-    </View>
-  )}
-</View>
-
+      {menuOpen && (
+        <View style={styles.menu}>
+          <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
+            {t('clearFavorites')}
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('AccountSettings'); }}>
+            {t('proximityMenu')}
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
+            {t('manageAccount')}
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('About'); }}>
+            {t('aboutHelp')}
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); logout(); }}>
+            Sair
+          </Button>
+        </View>
+      )}
     </View>
   );
 }

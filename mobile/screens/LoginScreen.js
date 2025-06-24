@@ -74,6 +74,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {error && <Text style={styles.error}>{error}</Text>}
+      <Text style={styles.notice}>Esta página destina-se apenas a vendedores.</Text>
 
       <TextInput
         mode="outlined"
@@ -125,4 +126,5 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 16, backgroundColor: theme.colors.background },
   input: { marginBottom: 12 },
   error: { color: 'red', marginBottom: 12, textAlign: 'center' },
+  notice: { marginBottom: 12, textAlign: 'center' },
 });

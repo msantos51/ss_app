@@ -91,7 +91,7 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         mode="outlined"
         style={styles.input}
-        label="Password"
+        label="Palavra-passe"
         secureTextEntry
         value={password}
         onChangeText={(text) => {
@@ -116,7 +116,7 @@ export default function LoginScreen({ navigation }) {
         mode="text"
         onPress={() => navigation.navigate('ForgotPassword')}
       >
-        Esqueci a minha password
+        Esqueci-me da palavra-passe
       </Button>
     </View>
   );

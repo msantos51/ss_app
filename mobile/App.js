@@ -47,7 +47,7 @@ export default function App() {
           <Stack.Screen name="ClientLogin" component={ClientLoginScreen} />
           <Stack.Screen name="ClientRegister" component={ClientRegisterScreen} />
           <Stack.Screen name="ClientDashboard" component={ClientDashboardScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Recuperar Password' }} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Recuperar Palavra-passe' }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
           <Stack.Screen name="Routes" component={RoutesScreen} options={{ title: 'Trajetos' }} />
           <Stack.Screen name="Stats" component={StatsScreen} options={{ title: t('statsTitle') }} />

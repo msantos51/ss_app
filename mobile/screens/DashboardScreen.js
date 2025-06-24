@@ -155,7 +155,7 @@ if (share) {
   const updateProfile = async () => {
     if (!vendor) return;
     if (changingPassword && (!password || !oldPassword)) {
-      setError('Preencha as passwords');
+      setError('Preencha as palavras-passe');
       return;
     }
     try {
@@ -303,7 +303,7 @@ if (share) {
                 <TextInput
                   mode="outlined"
                   style={styles.input}
-                  label="Password atual"
+                  label="Palavra-passe atual"
                   secureTextEntry
                   value={oldPassword}
                   onChangeText={setOldPassword}
@@ -311,7 +311,7 @@ if (share) {
                 <TextInput
                   mode="outlined"
                   style={styles.input}
-                  label="Nova password"
+                  label="Nova palavra-passe"
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
@@ -322,12 +322,12 @@ if (share) {
                 <TextInput
                   mode="outlined"
                   style={[styles.input, styles.inputDisabled]}
-                  label="Password"
+                  label="Palavra-passe"
                   value="********"
                   editable={false}
                 />
                 <Button mode="outlined" onPress={() => setChangingPassword(true)}>
-                  Alterar password
+                  Alterar palavra-passe
                 </Button>
               </>
             )}
@@ -464,7 +464,7 @@ if (share) {
         </View>
 
         <View style={[styles.fullButton, styles.logoutButton]}>
-          <Button mode="outlined" onPress={logout}>Logout</Button>
+          <Button mode="outlined" onPress={logout}>Sair</Button>
         </View>
       </ScrollView>
 

@@ -433,6 +433,15 @@ def list_vendors(db: Session = Depends(get_db)):
             v.rating_average = sum(r.rating for r in v.reviews) / len(v.reviews)
         else:
             v.rating_average = None
+
+        active_route = (
+            db.query(models.Route)
+            .filter(models.Route.vendor_id == v.id, models.Route.end_time == None)
+            .first()
+        )
+        if not active_route:
+            v.current_lat = None
+            v.current_lng = None
     return vendors
 
 # --------------------------

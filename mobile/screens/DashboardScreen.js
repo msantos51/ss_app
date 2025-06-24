@@ -19,9 +19,10 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
-import t from '../i18n';
+import i18n from '../i18n';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -55,6 +56,7 @@ export default function DashboardScreen({ navigation }) {
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [lang, setLang] = useState('en');
 
   const fetchVendorFromServer = async (vendorId) => {
     try {
@@ -90,7 +92,7 @@ export default function DashboardScreen({ navigation }) {
     await stopLocationSharing();
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
-    navigation.replace('Login');
+    navigation.replace('VendorLogin');
   };
 
   useEffect(() => {
@@ -137,6 +139,13 @@ if (share) {
     });
     return unsubscribe;
   }, [navigation, vendor?.id]);
+
+  useFocusEffect(
+  React.useCallback(() => {
+    setLang(i18n.locale);
+  }, [])
+);
+
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -263,6 +272,10 @@ if (share) {
 
         <TouchableOpacity style={styles.mapButton} onPress={() => navigation.navigate('Map')}>
           <MaterialCommunityIcons name="map-outline" size={50} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.langButton} onPress={() => navigation.navigate('Language')}>
+          <Text style={styles.langIcon}>{lang === 'pt' ? '🇵🇹' : '🇺🇸'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuButton} onPress={() => setMenuOpen(!menuOpen)}>
@@ -437,12 +450,14 @@ if (share) {
                   ? `Média: ${vendor.rating_average.toFixed(1)}\u2605`
                   : 'Ainda sem avaliações'}
               </Text>
-              {reviews.map((r) => (
-                <View key={r.id} style={styles.reviewItem}>
-                  <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
-                  {r.comment ? <Text>{r.comment}</Text> : null}
-                </View>
-              ))}
+              <ScrollView style={styles.reviewList} nestedScrollEnabled>
+                {reviews.map((r) => (
+                  <View key={r.id} style={styles.reviewItem}>
+                    <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
+                    {r.comment ? <Text>{r.comment}</Text> : null}
+                  </View>
+                ))}
+              </ScrollView>
             </>
           ) : (
             <Text style={styles.averageText}>Ainda sem avaliações</Text>
@@ -462,11 +477,20 @@ if (share) {
           <Button mode="text" onPress={() => { setMenuOpen(false); paySubscription(); }}>
             Pagar Semanalidade
           </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('PaidWeeks'); }}>
+            {t('paidWeeksTitle')}
+          </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }}>
             Trajetos
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
             {t('statsTitle')}
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('AccountSettings'); }}>
+            {t('accountSettingsTitle')}
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Language'); }}>
+            {t('languageTitle')}
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
             Termos e Condições
@@ -499,6 +523,8 @@ const styles = StyleSheet.create({
   logoutButton: { marginTop: 'auto' },
   mapButton: { position: 'absolute', top: 16, right: 16 },
   mapIcon: { fontSize: 50 },
+  langButton: { position: 'absolute', top: 16, right: 72 },
+  langIcon: { fontSize: 40 },
   menuButton: { position: 'absolute', top: 16, left: 16 },
   menuIcon: { fontSize: 40 },
   menu: {
@@ -514,6 +540,7 @@ const styles = StyleSheet.create({
   reviewSection: { width: '100%', marginTop: 16 },
   sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
   averageText: { marginBottom: 8 },
+  reviewList: { maxHeight: 200 },
   reviewItem: {
     paddingVertical: 4,
     borderBottomWidth: 1,

@@ -33,6 +33,23 @@ class VendorOut(BaseModel):
     rating_average: Optional[float] = None
     subscription_active: Optional[bool] = None
     subscription_valid_until: Optional[str] = None
+    last_seen: Optional[str] = None
+    class Config:
+        orm_mode = True
+
+
+class ClientCreate(BaseModel):
+    name: str
+    email: str
+    password: str
+    profile_photo: str
+
+
+class ClientOut(BaseModel):
+    id: int
+    name: str
+    email: str
+    profile_photo: str
 
     class Config:
         orm_mode = True
@@ -50,6 +67,7 @@ class ReviewResponse(BaseModel):
 class ReviewOut(BaseModel):
     id: int
     vendor_id: int
+    client_name: Optional[str] = None
     rating: int
     comment: Optional[str] = None
     response: Optional[str] = None
@@ -71,6 +89,16 @@ class RouteOut(BaseModel):
     end_time: Optional[str]
     distance_m: float
     points: list[RoutePoint]
+
+    class Config:
+        orm_mode = True
+
+
+class PaidWeekOut(BaseModel):
+    id: int
+    start_date: str
+    end_date: str
+    receipt_url: Optional[str] = None
 
     class Config:
         orm_mode = True

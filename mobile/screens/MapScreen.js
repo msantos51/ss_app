@@ -15,6 +15,7 @@ import LeafletMap from "../LeafletMap";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { theme } from "../theme";
+import { isNotificationsEnabled, getNotificationRadius } from "../settingsService";
 import { subscribe as subscribeLocations } from "../socketService";
 import {
   startLocationSharing,
@@ -29,7 +30,8 @@ import t from "../i18n";
 
 export default function MapScreen({ navigation }) {
   const [vendors, setVendors] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [vendorUser, setVendorUser] = useState(null);
+  const [clientUser, setClientUser] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState("Todos os vendedores");
   const [showList, setShowList] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,6 +41,9 @@ export default function MapScreen({ navigation }) {
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [userPosition, setUserPosition] = useState(null);
   const [mapKey, setMapKey] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(13);
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  const [notifRadius, setNotifRadius] = useState(20);
   const mapRef = useRef(null);
   const watchRef = useRef(null);
 
@@ -70,12 +75,12 @@ export default function MapScreen({ navigation }) {
     }
   };
 
-  const loadUser = async () => {
+  const loadVendor = async () => {
     try {
       const stored = await AsyncStorage.getItem("user");
       if (stored) {
         const v = JSON.parse(stored);
-        setCurrentUser(v);
+        setVendorUser(v);
         const share = await isLocationSharing();
         if (share) {
           try {
@@ -85,12 +90,26 @@ export default function MapScreen({ navigation }) {
           }
         }
       } else {
-        setCurrentUser(null);
+        setVendorUser(null);
         await stopLocationSharing();
       }
     } catch (err) {
-      console.log("Erro ao carregar utilizador:", err);
-      setCurrentUser(null);
+      console.log("Erro ao carregar vendedor:", err);
+      setVendorUser(null);
+    }
+  };
+
+  const loadClient = async () => {
+    try {
+      const stored = await AsyncStorage.getItem("client");
+      if (stored) {
+        setClientUser(JSON.parse(stored));
+      } else {
+        setClientUser(null);
+      }
+    } catch (err) {
+      console.log("Erro ao carregar cliente:", err);
+      setClientUser(null);
     }
   };
 
@@ -102,11 +121,13 @@ export default function MapScreen({ navigation }) {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       fetchVendors();
-      loadUser();
+      loadVendor();
+      loadClient();
       loadFavorites();
     });
     fetchVendors();
-    loadUser();
+    loadVendor();
+    loadClient();
     loadFavorites();
     return unsubscribe;
   }, [navigation]);
@@ -159,6 +180,7 @@ export default function MapScreen({ navigation }) {
           userPosition.longitude,
           zoom,
         );
+        setZoomLevel(zoom);
         return;
       }
 
@@ -185,6 +207,7 @@ export default function MapScreen({ navigation }) {
           ),
         100,
       );
+      setZoomLevel(zoom);
     } catch (err) {
       console.log("Erro ao obter localização:", err);
     }
@@ -198,6 +221,13 @@ export default function MapScreen({ navigation }) {
     init();
   }, []);
 
+  useEffect(() => {
+    const load = async () => {
+      setNotifEnabled(await isNotificationsEnabled());
+      setNotifRadius(await getNotificationRadius());
+    };
+    load();
+  }, []);
   const activeVendors = vendors.filter(
     (v) => v?.current_lat != null && v?.current_lng != null,
   );
@@ -209,7 +239,8 @@ export default function MapScreen({ navigation }) {
         v?.name?.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
-  useProximityNotifications(filteredVendors, 500, favoriteIds);
+  // Enviar notificações de proximidade se estiver ativo
+  useProximityNotifications(filteredVendors, notifRadius, favoriteIds, notifEnabled);
 
   return (
     <View style={styles.container}>
@@ -224,6 +255,7 @@ export default function MapScreen({ navigation }) {
           key={mapKey}
           ref={mapRef}
           initialPosition={userPosition || initialPosition}
+          initialZoom={zoomLevel}
           markers={[
             ...filteredVendors.map((v) => {
               const photo = v.profile_photo
@@ -253,6 +285,22 @@ export default function MapScreen({ navigation }) {
           ]}
         />
       )}
+
+      <TouchableOpacity
+        style={styles.vendorIcon}
+        onPress={() =>
+          navigation.navigate(vendorUser ? "Dashboard" : "VendorLogin")
+        }
+        accessibilityRole="button"
+        accessibilityLabel="Login Vendedor"
+        accessible
+      >
+        <MaterialCommunityIcons
+          name="account"
+          size={32}
+          color={theme.colors.primary}
+        />
+      </TouchableOpacity>
 
       {!loadingLocation && (
         <TouchableOpacity
@@ -315,6 +363,7 @@ export default function MapScreen({ navigation }) {
                       mapRef.current?.setView(
                         item.current_lat,
                         item.current_lng,
+                        zoomLevel,
                       );
                     }}
                     onLongPress={() => {
@@ -364,11 +413,11 @@ export default function MapScreen({ navigation }) {
       </View>
 
       <View style={styles.buttonsContainer}>
-        {currentUser ? (
+        {clientUser ? (
           <Button
             mode="contained"
             style={styles.button}
-            onPress={() => navigation.navigate("Dashboard")}
+            onPress={() => navigation.navigate("ClientDashboard")}
           >
             Perfil
           </Button>
@@ -377,17 +426,17 @@ export default function MapScreen({ navigation }) {
             <Button
               mode="contained"
               style={styles.button}
-              onPress={() => navigation.navigate("Login")}
+              onPress={() => navigation.navigate("ClientLogin")}
             >
-              Login
+              Login Cliente
             </Button>
 
             <Button
               mode="outlined"
               style={styles.button}
-              onPress={() => navigation.navigate("Register")}
+              onPress={() => navigation.navigate("ClientRegister")}
             >
-              Registar
+              Registar Cliente
             </Button>
           </>
         )}
@@ -446,5 +495,10 @@ const styles = StyleSheet.create({
   },
   locateIcon: {
     fontSize: 24,
+  },
+  vendorIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
 });

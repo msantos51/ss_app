@@ -11,6 +11,7 @@ import t from '../i18n';
 
 export default function ClientDashboardScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const loadFavorites = async () => {
     const ids = await getFavorites();
@@ -46,6 +47,12 @@ export default function ClientDashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => setMenuOpen(!menuOpen)}
+      >
+        <Text style={styles.menuIcon}>☰</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Favoritos</Text>
       <FlatList
         data={favorites}
@@ -75,37 +82,55 @@ export default function ClientDashboardScreen({ navigation }) {
           );
         }}
       />
-      <Button mode="outlined" onPress={clearAllFavorites} style={styles.button}>
-        {t('clearFavorites')}
-      </Button>
-      <Button
-        mode="outlined"
-        onPress={() => navigation.navigate('AccountSettings')}
-        style={styles.button}
-      >
-        {t('proximityMenu')}
-      </Button>
-      <Button
-        mode="outlined"
-        onPress={() => navigation.navigate('ManageAccount')}
-        style={styles.button}
-      >
-        {t('manageAccount')}
-      </Button>
-      <Button
-        mode="outlined"
-        onPress={() => navigation.navigate('About')}
-        style={styles.button}
-      >
-        {t('aboutHelp')}
-      </Button>
-      <Button
-        mode="outlined"
-        onPress={logout}
-        style={styles.logout}
-      >
-        Sair
-      </Button>
+      {menuOpen && (
+        <View style={styles.menu}>
+          <Button
+            mode="text"
+            onPress={() => {
+              setMenuOpen(false);
+              clearAllFavorites();
+            }}
+          >
+            {t('clearFavorites')}
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => {
+              setMenuOpen(false);
+              navigation.navigate('AccountSettings');
+            }}
+          >
+            {t('proximityMenu')}
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => {
+              setMenuOpen(false);
+              navigation.navigate('ManageAccount');
+            }}
+          >
+            {t('manageAccount')}
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => {
+              setMenuOpen(false);
+              navigation.navigate('About');
+            }}
+          >
+            {t('aboutHelp')}
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => {
+              setMenuOpen(false);
+              logout();
+            }}
+          >
+            Sair
+          </Button>
+        </View>
+      )}
     </View>
   );
 }
@@ -125,4 +150,16 @@ const styles = StyleSheet.create({
   inactivePhoto: { borderWidth: 2, borderColor: 'red' },
   button: { marginTop: 12 },
   logout: { marginTop: 20 },
+  menuButton: { position: 'absolute', top: 16, left: 16 },
+  menuIcon: { fontSize: 40 },
+  menu: {
+    position: 'absolute',
+    top: 70,
+    left: 16,
+    backgroundColor: theme.colors.background,
+    padding: 8,
+    borderRadius: 8,
+    elevation: 10,
+    zIndex: 100,
+  },
 });

@@ -452,17 +452,23 @@ if (share) {
               <ScrollView style={styles.reviewList} nestedScrollEnabled>
                 {reviews.map((r) => (
                   <View key={r.id} style={styles.reviewItem}>
-                    <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
-                    {r.client_profile_photo && (
-                      <Image
-                        source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${r.client_profile_photo}` }}
-                        style={styles.reviewPhoto}
-                      />
-                    )}
-                    {r.client_name && <Text style={styles.reviewName}>{r.client_name}</Text>}
-                    {r.comment ? (
-                      <Text style={styles.reviewComment}>{r.comment}</Text>
-                    ) : null}
+                    <View style={styles.reviewHeader}>
+                      {r.client_profile_photo && (
+                        <Image
+                          source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${r.client_profile_photo}` }}
+                          style={styles.reviewPhoto}
+                        />
+                      )}
+                      {r.client_name && (
+                        <Text style={styles.reviewName}>{r.client_name}</Text>
+                      )}
+                    </View>
+                    <View style={styles.reviewRow}>
+                      <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
+                      {r.comment ? (
+                        <Text style={styles.reviewComment}>{r.comment}</Text>
+                      ) : null}
+                    </View>
                   </View>
                 ))}
 
@@ -551,8 +557,15 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  reviewHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4,
+  },
+  reviewRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     flexWrap: 'wrap',
   },
   reviewRating: { fontWeight: 'bold' },
@@ -563,7 +576,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   reviewName: { marginRight: 8 },
-  reviewComment: { flexShrink: 1, flexBasis: '100%' },
+  reviewComment: { flexShrink: 1, marginLeft: 4 },
   pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
   colorOptions: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },
   colorOption: {

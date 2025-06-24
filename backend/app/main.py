@@ -6,10 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from backend.app import models, schemas
+from . import models, schemas
 import stripe
 from datetime import datetime, timedelta
-from backend.app.database import SessionLocal, engine, get_db
+from app.database import SessionLocal, engine, get_db
 import os
 import shutil
 from uuid import uuid4

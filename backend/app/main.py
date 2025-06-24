@@ -829,8 +829,6 @@ def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
         .filter(models.Review.vendor_id == vendor_id, models.Review.active == True)
         .all()
     )
-    for r in reviews:
-        r.client_name = r.client.name if r.client else None
     return reviews
 
 

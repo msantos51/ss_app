@@ -1,6 +1,6 @@
 // Tela com detalhes do vendedor
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
@@ -42,7 +42,10 @@ const submitReview = async () => {
     console.log("🚀 Dados enviados na review:", { rating, comment });
 
     if (!token) {
-      console.warn("⚠️ Nenhum token encontrado. O utilizador fez login como cliente?");
+      Alert.alert(
+        'Inicie sessão',
+        'É necessário iniciar sessão para avaliar um vendedor.'
+      );
       return;
     }
 

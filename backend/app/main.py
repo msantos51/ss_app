@@ -819,6 +819,10 @@ def create_review(
     db.add(new_rev)
     db.commit()
     db.refresh(new_rev)
+    new_rev.client_name = new_rev.client.name if new_rev.client else None
+    new_rev.client_profile_photo = (
+        new_rev.client.profile_photo if new_rev.client else None
+    )
     return new_rev
 
 
@@ -831,6 +835,7 @@ def list_reviews(vendor_id: int, db: Session = Depends(get_db)):
     )
     for r in reviews:
         r.client_name = r.client.name if r.client else None
+        r.client_profile_photo = r.client.profile_photo if r.client else None
     return reviews
 
 
@@ -854,6 +859,8 @@ def respond_review(
     review.response = data.response
     db.commit()
     db.refresh(review)
+    review.client_name = review.client.name if review.client else None
+    review.client_profile_photo = review.client.profile_photo if review.client else None
     return review
 
 

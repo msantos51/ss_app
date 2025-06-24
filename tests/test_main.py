@@ -235,12 +235,16 @@ def test_reviews_endpoints(client):
     assert resp.status_code == 200
     review = resp.json()
     assert review["rating"] == 4
+    assert review["client_profile_photo"] is not None
 
     # list reviews
     resp = client.get(f"/vendors/{vendor_id}/reviews")
     assert resp.status_code == 200
     reviews = resp.json()
-    assert len(reviews) == 1 and reviews[0]["comment"] == "Bom" and reviews[0]["client_name"] == "Client"
+    assert len(reviews) == 1
+    assert reviews[0]["comment"] == "Bom"
+    assert reviews[0]["client_name"] == "Client"
+    assert reviews[0]["client_profile_photo"] is not None
 
 
 def test_review_response_and_delete(client):
@@ -264,7 +268,9 @@ def test_review_response_and_delete(client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert resp.status_code == 200
-    assert resp.json()["response"] == "ok"
+    resp_json = resp.json()
+    assert resp_json["response"] == "ok"
+    assert resp_json["client_profile_photo"] is not None
 
     resp = client.delete(
         f"/vendors/{vendor_id}/reviews/{review['id']}",

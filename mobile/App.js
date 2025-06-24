@@ -1,5 +1,5 @@
 // App.js - ponto de entrada do aplicativo React Native com navegacao
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -20,19 +20,11 @@ import PaidWeeksScreen from './screens/PaidWeeksScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import AccountSettingsScreen from './screens/AccountSettingsScreen';
 import { theme } from './theme';
-import t, { loadLanguage } from './i18n';
-import LanguageScreen from './screens/LanguageScreen';
+import t from './i18n';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    loadLanguage().then(() => setReady(true));
-  }, []);
-
-  if (!ready) return null;
 
   return (
     <PaperProvider theme={theme}>
@@ -61,7 +53,6 @@ export default function App() {
           <Stack.Screen name="RouteDetail" component={RouteDetailScreen} options={{ title: 'Trajeto' }} />
           <Stack.Screen name="Terms" component={TermsScreen} options={{ title: 'Termos' }} />
           <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} options={{ title: t('accountSettingsTitle') }} />
-          <Stack.Screen name="Language" component={LanguageScreen} options={{ title: t('languageTitle') }} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

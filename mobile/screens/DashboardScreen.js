@@ -18,11 +18,10 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
-import t, { getLanguage } from '../i18n';
+import t from '../i18n';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -56,7 +55,6 @@ export default function DashboardScreen({ navigation }) {
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
-  const [lang, setLang] = useState('en');
 
   const fetchVendorFromServer = async (vendorId) => {
     try {
@@ -140,11 +138,7 @@ if (share) {
     return unsubscribe;
   }, [navigation, vendor?.id]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getLanguage().then(setLang);
-    }, [])
-  );
+
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -270,11 +264,7 @@ if (share) {
         {error && <Text style={styles.error}>{error}</Text>}
 
         <TouchableOpacity style={styles.mapButton} onPress={() => navigation.navigate('Map')}>
-          <MaterialCommunityIcons name="map-outline" size={50} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.langButton} onPress={() => navigation.navigate('Language')}>
-          <Text style={styles.langIcon}>{lang === 'pt' ? '🇵🇹' : '🇺🇸'}</Text>
+          <Text style={styles.mapIcon}>🗺️</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuButton} onPress={() => setMenuOpen(!menuOpen)}>
@@ -495,9 +485,6 @@ if (share) {
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
             {t('statsTitle')}
           </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Language'); }}>
-            {t('languageTitle')}
-          </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
             Termos e Condições
           </Button>
@@ -529,8 +516,6 @@ const styles = StyleSheet.create({
   logoutButton: { marginTop: 'auto' },
   mapButton: { position: 'absolute', top: 16, right: 16 },
   mapIcon: { fontSize: 50 },
-  langButton: { position: 'absolute', top: 16, right: 72 },
-  langIcon: { fontSize: 40 },
   menuButton: { position: 'absolute', top: 16, left: 16 },
   menuIcon: { fontSize: 40 },
   menu: {

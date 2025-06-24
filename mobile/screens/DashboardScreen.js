@@ -450,12 +450,23 @@ if (share) {
                   : 'Ainda sem avaliações'}
               </Text>
               <ScrollView style={styles.reviewList} nestedScrollEnabled>
-                {reviews.map((r) => (
-                  <View key={r.id} style={styles.reviewItem}>
-                    <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
-                    {r.comment ? <Text>{r.comment}</Text> : null}
-                  </View>
-                ))}
+                {reviews.map((r) => {
+                  const photoUri = r.client_profile_photo
+                    ? `${BASE_URL.replace(/\/$/, '')}/${r.client_profile_photo}`
+                    : null;
+                  return (
+                    <View key={r.id} style={styles.reviewItem}>
+                      {photoUri && (
+                        <Image source={{ uri: photoUri }} style={styles.reviewerPhoto} />
+                      )}
+                      <View style={styles.reviewBody}>
+                        <Text style={styles.reviewerName}>{r.client_name || 'Cliente'}</Text>
+                        <Text style={styles.reviewRating}>⭐ {r.rating}</Text>
+                        {r.comment ? <Text>{r.comment}</Text> : null}
+                      </View>
+                    </View>
+                  );
+                })}
               </ScrollView>
             </>
           ) : (
@@ -538,10 +549,15 @@ const styles = StyleSheet.create({
   averageText: { marginBottom: 8 },
   reviewList: { maxHeight: 200 },
   reviewItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
+  reviewerPhoto: { width: 40, height: 40, borderRadius: 20, marginRight: 8 },
+  reviewBody: { flex: 1 },
+  reviewerName: { fontWeight: 'bold' },
   reviewRating: { fontWeight: 'bold' },
   pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
   colorOptions: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },

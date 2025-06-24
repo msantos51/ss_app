@@ -107,12 +107,25 @@ const submitReview = async () => {
         data={reviews}
         keyExtractor={(item) => item.id.toString()}
         style={styles.reviewList}
-        renderItem={({ item }) => (
-          <View style={styles.reviewItem}>
-            <Text style={styles.reviewRating}>⭐ {item.rating}</Text>
-            {item.comment ? <Text>{item.comment}</Text> : null}
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const photoUri = item.client_profile_photo
+            ? `${BASE_URL.replace(/\/$/, '')}/${item.client_profile_photo}`
+            : null;
+          return (
+            <View style={styles.reviewItem}>
+              {photoUri && (
+                <Image source={{ uri: photoUri }} style={styles.reviewerPhoto} />
+              )}
+              <View style={styles.reviewBody}>
+                <Text style={styles.reviewerName}>
+                  {item.client_name || 'Cliente'}
+                </Text>
+                <Text style={styles.reviewRating}>⭐ {item.rating}</Text>
+                {item.comment ? <Text>{item.comment}</Text> : null}
+              </View>
+            </View>
+          );
+        }}
       />
 
       <StarRatingInput rating={rating} onChange={setRating} />
@@ -136,7 +149,16 @@ const styles = StyleSheet.create({
   name: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
   product: { textAlign: 'center', marginBottom: 16 },
   reviewList: { marginVertical: 8 },
-  reviewItem: { paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  reviewItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  reviewerPhoto: { width: 40, height: 40, borderRadius: 20, marginRight: 8 },
+  reviewBody: { flex: 1 },
+  reviewerName: { fontWeight: 'bold' },
   reviewRating: { fontWeight: 'bold' },
   input: { marginBottom: 8 },
   nameRow: {

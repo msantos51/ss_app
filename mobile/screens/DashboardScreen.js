@@ -22,7 +22,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
-import i18n from '../i18n';
+import t, { i18n } from '../i18n';
 import {
   startLocationSharing,
   stopLocationSharing,

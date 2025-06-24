@@ -21,7 +21,7 @@ import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import AccountSettingsScreen from './screens/AccountSettingsScreen';
 import LanguageScreen from './screens/LanguageScreen';
 import { theme } from './theme';
-import i18n from './i18n';
+import { i18n } from './i18n';
 
 i18n.locale = 'pt'; // ou 'en', conforme o idioma desejado
 

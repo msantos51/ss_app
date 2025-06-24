@@ -38,11 +38,30 @@ const translations = {
     manageAccount: 'Definições',
     aboutHelp: 'Sobre/Ajuda',
   },
+  'pt-PT': {
+    statsTitle: 'Estatísticas',
+    noRoutes: 'Nenhum trajeto registado',
+    favorites: 'Favoritos',
+    addFavorite: 'Adicionar aos favoritos',
+    removeFavorite: 'Remover favorito',
+    paidWeeksTitle: 'Semanas Pagas',
+    languageTitle: 'Idioma',
+    english: 'Inglês',
+    portuguese: 'Português',
+    accountSettingsTitle: 'Definições de Conta',
+    notificationsEnabled: 'Ativar notificações',
+    notificationRadius: 'Raio para notificações (m)',
+    clearFavorites: 'Limpar favoritos',
+    proximityMenu: 'Notificações de proximidade',
+    manageAccount: 'Definições',
+    aboutHelp: 'Sobre/Ajuda',
+  },
 };
 
 const i18n = new I18n(translations);
 i18n.enableFallback = true;
-i18n.locale = Localization.locale;
+// Forçar português de Portugal por omissão
+i18n.locale = Localization.locale.startsWith('pt') ? 'pt-PT' : 'en';
 
 export default function t(key) {
   return i18n.t(key);

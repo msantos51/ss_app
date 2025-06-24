@@ -19,14 +19,14 @@ export default function ManageAccountScreen() {
       <Text style={styles.title}>Definições</Text>
       <TextInput
         mode="outlined"
-        label="Nova password"
+        label="Nova palavra-passe"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
         style={styles.input}
       />
       <Button mode="contained" onPress={changePassword} style={styles.button}>
-        Alterar Password
+        Alterar Palavra-passe
       </Button>
       <Button mode="contained" onPress={deleteAccount} style={styles.button}>
         Apagar Conta

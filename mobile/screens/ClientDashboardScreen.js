@@ -1,6 +1,6 @@
 // Dashboard simples para o cliente listar os vendedores favoritos
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -65,82 +65,73 @@ export default function ClientDashboardScreen({ navigation }) {
   }, [navigation]);
 
   return (
+
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={favorites}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.container}
-        ListHeaderComponent={
+      <ScrollView contentContainerStyle={styles.container}>
+        <TouchableOpacity
+          style={styles.mapButton}
+          onPress={() => navigation.navigate('Map')}
+        >
+          <Text style={styles.mapIcon}>🗺️</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => setMenuOpen(!menuOpen)}
+        >
+          <Text style={styles.menuIcon}>☰</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.title}>Meu Perfil</Text>
+
+        {client?.profile_photo && (
+          <Image
+            source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${client.profile_photo}` }}
+            style={styles.imagePreview}
+          />
+        )}
+        {client && (
           <>
-            <TouchableOpacity
-              style={styles.mapButton}
-              onPress={() => navigation.navigate('Map')}
-            >
-              <Text style={styles.mapIcon}>🗺️</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuButton}
-              onPress={() => setMenuOpen(!menuOpen)}
-            >
-              <Text style={styles.menuIcon}>☰</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.title}>Meu Perfil</Text>
-
-            {client?.profile_photo && (
-              <Image
-                source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${client.profile_photo}` }}
-                style={styles.imagePreview}
-              />
-            )}
-            {client && (
-              <>
-                <Text style={styles.infoText}>
-                  <Text style={styles.label}>Nome:</Text> {client.name}
-                </Text>
-                <Text style={styles.infoText}>
-                  <Text style={styles.label}>Email:</Text> {client.email}
-                </Text>
-              </>
-            )}
-
-            <View style={styles.favoriteSection}>
-              <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
-            </View>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Nome:</Text> {client.name}
+            </Text>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Email:</Text> {client.email}
+            </Text>
           </>
-        }
-        renderItem={({ item }) => {
-          const photoUri = item.profile_photo
-            ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-            : null;
-          return (
-            <TouchableOpacity
-              style={styles.vendor}
-              onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
-            >
-              {photoUri && (
-                <Image
-                  source={{ uri: photoUri }}
-                  style={[
-                    styles.image,
-                    item.subscription_active
-                      ? styles.activePhoto
-                      : styles.inactivePhoto,
-                  ]}
-                />
-              )}
-              <Text>{item.name}</Text>
-            </TouchableOpacity>
-          );
-        }}
-        ListFooterComponent={
-          <View style={[styles.fullButton, styles.logoutButton]}>
-            <Button mode="outlined" onPress={logout}>Sair</Button>
-          </View>
-        }
-      />
+        )}
 
+        <View style={styles.favoriteSection}>
+          <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
+          {favorites.map((item) => {
+            const photoUri = item.profile_photo
+              ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+              : null;
+            return (
+              <TouchableOpacity
+                key={item.id.toString()}
+                style={styles.vendor}
+                onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
+              >
+                {photoUri && (
+                  <Image
+                    source={{ uri: photoUri }}
+                    style={[
+                      styles.image,
+                      item.subscription_active ? styles.activePhoto : styles.inactivePhoto,
+                    ]}
+                  />
+                )}
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <View style={[styles.fullButton, styles.logoutButton]}>
+          <Button mode="outlined" onPress={logout}>Sair</Button>
+        </View>
+      </ScrollView>
       {menuOpen && (
         <View style={styles.menu}>
           <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
@@ -188,9 +179,21 @@ const styles = StyleSheet.create({
   inactivePhoto: { borderWidth: 2, borderColor: 'red' },
   fullButton: { width: '100%', marginBottom: 12 },
   logoutButton: { marginTop: 'auto' },
-  mapButton: { position: 'absolute', top: 16, right: 16 },
+  mapButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 101,
+    elevation: 10,
+  },
   mapIcon: { fontSize: 50 },
-  menuButton: { position: 'absolute', top: 16, left: 16 },
+  menuButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 101,
+    elevation: 10,
+  },
   menuIcon: { fontSize: 40 },
   menu: {
     position: 'absolute',

@@ -1,4 +1,4 @@
-// (em português) Dashboard do vendedor com proteções no render e menu corrigido
+// (em português) Dashboard do vendedor com proteções no render, menu corrigido e sem conflito de ScrollView + FlatList
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  FlatList,
   Linking,
 } from 'react-native';
 import {
@@ -84,12 +83,10 @@ export default function DashboardScreen({ navigation }) {
     const loadReviews = async () => {
       if (!vendor) return;
       try {
-        const resp = await axios.get(
-          `${BASE_URL}/vendors/${vendor.id}/reviews`
-        );
+        const resp = await axios.get(`${BASE_URL}/vendors/${vendor.id}/reviews`);
         setReviews(resp.data);
-      } catch (e) {
-        console.log('Erro ao carregar reviews:', e);
+      } catch {
+        console.log('Erro ao carregar reviews');
       }
     };
     loadReviews();
@@ -161,7 +158,7 @@ export default function DashboardScreen({ navigation }) {
       setPassword('');
       setOldPassword('');
       setError(null);
-    } catch (err) {
+    } catch {
       setError('Erro ao atualizar perfil');
     }
   };
@@ -274,18 +271,17 @@ export default function DashboardScreen({ navigation }) {
         <Button mode="contained" style={styles.fullButton} onPress={toggleLocation}>
           {sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
         </Button>
+
         <Text style={styles.sectionTitle}>Avaliações</Text>
-        <FlatList
-          data={reviews}
-          keyExtractor={(item) => item.id.toString()}
-          style={styles.reviewList}
-          renderItem={({ item }) => (
-            <View style={styles.reviewItem}>
+        <View style={styles.reviewList}>
+          {reviews.map((item) => (
+            <View key={item.id.toString()} style={styles.reviewItem}>
               <Text style={styles.reviewRating}>⭐ {item.rating}</Text>
               {item.comment ? <Text>{item.comment}</Text> : null}
             </View>
-          )}
-        />
+          ))}
+        </View>
+
         <Button mode="outlined" style={styles.fullButton} onPress={logout}>Sair</Button>
       </ScrollView>
 
@@ -338,7 +334,7 @@ const styles = StyleSheet.create({
   pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
   menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 8, elevation: 10, zIndex: 100 },
   sectionTitle: { alignSelf: 'flex-start', fontWeight: 'bold', marginTop: 8, marginBottom: 4 },
-  reviewList: { width: '100%', maxHeight: 200, marginBottom: 12 },
+  reviewList: { width: '100%', marginBottom: 12 },
   reviewItem: { paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
   reviewRating: { fontWeight: 'bold' },
 });

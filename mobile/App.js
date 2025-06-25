@@ -1,5 +1,6 @@
 // App.js - ponto de entrada do aplicativo React Native com navegacao
 import React from 'react';
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_300Light, Inter_100Thin } from '@expo-google-fonts/inter';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -28,6 +29,16 @@ import t from './i18n';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_300Light,
+    Inter_100Thin,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <PaperProvider theme={theme}>

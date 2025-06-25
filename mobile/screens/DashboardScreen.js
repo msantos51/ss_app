@@ -1,11 +1,12 @@
 // (em português) Dashboard do vendedor com proteções no render, menu corrigido e sem conflito de ScrollView + FlatList
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
   Image,
   TouchableOpacity,
   ScrollView,
+  Animated,
   Linking,
 } from 'react-native';
 import {
@@ -41,6 +42,7 @@ export default function DashboardScreen({ navigation }) {
   const [sharingLocation, setSharingLocation] = useState(false);
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuAnim = useRef(new Animated.Value(0)).current;
   const [paymentsOpen, setPaymentsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -56,6 +58,14 @@ export default function DashboardScreen({ navigation }) {
       setAccountOpen(false);
       setHelpOpen(false);
     }
+  }, [menuOpen]);
+
+  useEffect(() => {
+    Animated.timing(menuAnim, {
+      toValue: menuOpen ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
   }, [menuOpen]);
 
   useEffect(() => {
@@ -285,9 +295,24 @@ export default function DashboardScreen({ navigation }) {
         <Button mode="outlined" style={styles.fullButton} onPress={logout}>Sair</Button>
       </ScrollView>
 
-      {menuOpen && (
-        <View style={styles.menu}>
-          <List.Section>
+      <Animated.View
+        pointerEvents={menuOpen ? 'auto' : 'none'}
+        style={[
+          styles.menu,
+          {
+            opacity: menuAnim,
+            transform: [
+              {
+                scale: menuAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.9, 1],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <List.Section>
             <List.Accordion title="Pagamentos" expanded={paymentsOpen} onPress={() => setPaymentsOpen(!paymentsOpen)}>
               <List.Item title="Pagar Semanalidade" onPress={() => { setMenuOpen(false); paySubscription(); }} />
               <List.Item title="Semanas Pagas" onPress={() => { setMenuOpen(false); navigation.navigate('PaidWeeks'); }} />
@@ -306,7 +331,7 @@ export default function DashboardScreen({ navigation }) {
               <List.Item title="Contactar Suporte" onPress={() => { setMenuOpen(false); Linking.openURL('mailto:suporte@sunnysales.com'); }} />
             </List.Accordion>
           </List.Section>
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -332,7 +357,7 @@ const styles = StyleSheet.create({
   colorOption: { width: 24, height: 24, borderRadius: 12, marginRight: 8, marginBottom: 8, borderWidth: 1, borderColor: '#000' },
   colorOptionSelected: { borderWidth: 3 },
   pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
-  menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 8, elevation: 10, zIndex: 100 },
+  menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 12, elevation: 10, zIndex: 100 },
   sectionTitle: { alignSelf: 'flex-start', fontWeight: 'bold', marginTop: 8, marginBottom: 4 },
   reviewList: { width: '100%', marginBottom: 12 },
   reviewItem: { paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },

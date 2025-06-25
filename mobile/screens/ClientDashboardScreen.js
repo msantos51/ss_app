@@ -1,11 +1,12 @@
 // (em português) Dashboard do cliente com menu estilo hambúrguer e estrutura unificada
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
   Image,
   ScrollView,
   TouchableOpacity,
+  Animated,
   Linking,
 } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
@@ -19,6 +20,7 @@ export default function ClientDashboardScreen({ navigation }) {
   const [client, setClient] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuAnim = useRef(new Animated.Value(0)).current;
   const [accountOpen, setAccountOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
@@ -61,6 +63,14 @@ export default function ClientDashboardScreen({ navigation }) {
       setAccountOpen(false);
       setHelpOpen(false);
     }
+  }, [menuOpen]);
+
+  useEffect(() => {
+    Animated.timing(menuAnim, {
+      toValue: menuOpen ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
   }, [menuOpen]);
 
   useEffect(() => {
@@ -136,9 +146,24 @@ export default function ClientDashboardScreen({ navigation }) {
         </Button>
       </ScrollView>
 
-      {menuOpen && (
-        <View style={styles.menu}>
-          <List.Section>
+      <Animated.View
+        pointerEvents={menuOpen ? 'auto' : 'none'}
+        style={[
+          styles.menu,
+          {
+            opacity: menuAnim,
+            transform: [
+              {
+                scale: menuAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.9, 1],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <List.Section>
             <List.Item
               title="Notificações"
               onPress={() => {
@@ -187,7 +212,7 @@ export default function ClientDashboardScreen({ navigation }) {
               />
             </List.Accordion>
           </List.Section>
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -204,7 +229,7 @@ const styles = StyleSheet.create({
   mapIcon: { fontSize: 40 },
   menuButton: { position: 'absolute', top: 16, left: 16, zIndex: 101, elevation: 10 },
   menuIcon: { fontSize: 40 },
-  menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 8, elevation: 10, zIndex: 100 },
+  menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 12, elevation: 10, zIndex: 100 },
   sectionTitle: { alignSelf: 'flex-start', fontWeight: 'bold', marginTop: 8, marginBottom: 4 },
   favoriteList: { width: '100%', marginBottom: 12 },
   vendor: { flexDirection: 'row', alignItems: 'center', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },

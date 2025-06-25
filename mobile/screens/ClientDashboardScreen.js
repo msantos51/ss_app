@@ -1,6 +1,6 @@
 // Dashboard simples para o cliente listar os vendedores favoritos
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -28,7 +28,6 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // # Função para carregar os favoritos
   const loadFavorites = async () => {
     const ids = await getFavorites();
     if (ids.length === 0) {
@@ -44,20 +43,17 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // # Função para limpar os favoritos
   const clearAllFavorites = async () => {
     await clearFavorites();
     setFavorites([]);
   };
 
-  // # Função para logout
   const logout = async () => {
     await AsyncStorage.removeItem('client');
     await AsyncStorage.removeItem('clientToken');
     navigation.replace('ClientLogin');
   };
 
-  // # Carregar dados ao abrir e quando voltar ao ecrã
   useEffect(() => {
     loadFavorites();
     loadClient();
@@ -68,79 +64,82 @@ export default function ClientDashboardScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // # Return do componente
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <TouchableOpacity
-          style={styles.mapButton}
-          onPress={() => navigation.navigate('Map')}
-        >
-          <Text style={styles.mapIcon}>🗺️</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => setMenuOpen(!menuOpen)}
-        >
-          <Text style={styles.menuIcon}>☰</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Meu Perfil</Text>
-
-        {client?.profile_photo && (
-          <Image
-            source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${client.profile_photo}` }}
-            style={styles.imagePreview}
-          />
-        )}
-        {client && (
+      <FlatList
+        data={favorites}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.container}
+        ListHeaderComponent={
           <>
-            <Text style={styles.infoText}>
-              <Text style={styles.label}>Nome:</Text> {client.name}
-            </Text>
-            <Text style={styles.infoText}>
-              <Text style={styles.label}>Email:</Text> {client.email}
-            </Text>
+            <TouchableOpacity
+              style={styles.mapButton}
+              onPress={() => navigation.navigate('Map')}
+            >
+              <Text style={styles.mapIcon}>🗺️</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() => setMenuOpen(!menuOpen)}
+            >
+              <Text style={styles.menuIcon}>☰</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.title}>Meu Perfil</Text>
+
+            {client?.profile_photo && (
+              <Image
+                source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${client.profile_photo}` }}
+                style={styles.imagePreview}
+              />
+            )}
+            {client && (
+              <>
+                <Text style={styles.infoText}>
+                  <Text style={styles.label}>Nome:</Text> {client.name}
+                </Text>
+                <Text style={styles.infoText}>
+                  <Text style={styles.label}>Email:</Text> {client.email}
+                </Text>
+              </>
+            )}
+
+            <View style={styles.favoriteSection}>
+              <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
+            </View>
           </>
-        )}
-
-        <View style={styles.favoriteSection}>
-          <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
-          <FlatList
-            data={favorites}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => {
-              const photoUri = item.profile_photo
-                ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
-                : null;
-              return (
-                <TouchableOpacity
-                  style={styles.vendor}
-                  onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
-                >
-                  {photoUri && (
-                    <Image
-                      source={{ uri: photoUri }}
-                      style={[
-                        styles.image,
-                        item.subscription_active
-                          ? styles.activePhoto
-                          : styles.inactivePhoto,
-                      ]}
-                    />
-                  )}
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
-
-        <View style={[styles.fullButton, styles.logoutButton]}>
-          <Button mode="outlined" onPress={logout}>Sair</Button>
-        </View>
-      </ScrollView>
+        }
+        renderItem={({ item }) => {
+          const photoUri = item.profile_photo
+            ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
+            : null;
+          return (
+            <TouchableOpacity
+              style={styles.vendor}
+              onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
+            >
+              {photoUri && (
+                <Image
+                  source={{ uri: photoUri }}
+                  style={[
+                    styles.image,
+                    item.subscription_active
+                      ? styles.activePhoto
+                      : styles.inactivePhoto,
+                  ]}
+                />
+              )}
+              <Text>{item.name}</Text>
+            </TouchableOpacity>
+          );
+        }}
+        ListFooterComponent={
+          <View style={[styles.fullButton, styles.logoutButton]}>
+            <Button mode="outlined" onPress={logout}>Sair</Button>
+          </View>
+        }
+      />
 
       {menuOpen && (
         <View style={styles.menu}>
@@ -187,10 +186,6 @@ const styles = StyleSheet.create({
   image: { width: 40, height: 40, borderRadius: 20, marginRight: 8 },
   activePhoto: { borderWidth: 2, borderColor: 'green' },
   inactivePhoto: { borderWidth: 2, borderColor: 'red' },
-  button: { marginTop: 12 },
-  logout: { marginTop: 20 },
-  favoriteSection: { width: '100%', marginTop: 16 },
-  sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
   fullButton: { width: '100%', marginBottom: 12 },
   logoutButton: { marginTop: 'auto' },
   mapButton: { position: 'absolute', top: 16, right: 16 },
@@ -207,4 +202,6 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 100,
   },
+  favoriteSection: { width: '100%', marginTop: 16 },
+  sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
 });

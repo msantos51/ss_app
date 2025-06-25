@@ -14,7 +14,7 @@ export default function ClientDashboardScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // (em português) Função para carregar os dados do cliente guardados localmente
+  // (em português) Carrega os dados do cliente guardados localmente
   const loadClient = async () => {
     try {
       const stored = await AsyncStorage.getItem('client');
@@ -29,7 +29,7 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // (em português) Função para carregar os vendedores favoritos
+  // (em português) Carrega os vendedores favoritos
   const loadFavorites = async () => {
     const ids = await getFavorites();
     if (ids.length === 0) {
@@ -45,20 +45,20 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // (em português) Função para limpar todos os favoritos
+  // (em português) Limpa os favoritos
   const clearAllFavorites = async () => {
     await clearFavorites();
     setFavorites([]);
   };
 
-  // (em português) Função para fazer logout do cliente
+  // (em português) Faz logout do cliente
   const logout = async () => {
     await AsyncStorage.removeItem('client');
     await AsyncStorage.removeItem('clientToken');
     navigation.replace('ClientLogin');
   };
 
-  // (em português) Carrega os dados ao abrir o ecrã e quando volta a estar focado
+  // (em português) Carrega dados ao abrir o ecrã ou ao voltar ao foco
   useEffect(() => {
     loadFavorites();
     loadClient();
@@ -71,7 +71,7 @@ export default function ClientDashboardScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* (em português) Botão para abrir o mapa */}
+      {/* Botão do mapa */}
       <TouchableOpacity
         style={styles.mapButton}
         onPress={() => navigation.navigate('Map')}
@@ -79,7 +79,7 @@ export default function ClientDashboardScreen({ navigation }) {
         <Text style={styles.mapIcon}>🗺️</Text>
       </TouchableOpacity>
 
-      {/* (em português) Botão para abrir o menu */}
+      {/* Botão do menu */}
       <TouchableOpacity
         style={styles.menuButton}
         onPress={() => setMenuOpen(!menuOpen)}
@@ -90,7 +90,6 @@ export default function ClientDashboardScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Meu Perfil</Text>
 
-        {/* (em português) Foto de perfil do cliente */}
         {client?.profile_photo && (
           <Image
             source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${client.profile_photo}` }}
@@ -98,7 +97,6 @@ export default function ClientDashboardScreen({ navigation }) {
           />
         )}
 
-        {/* (em português) Informações do cliente */}
         {client && (
           <>
             <Text style={styles.infoText}>
@@ -110,7 +108,6 @@ export default function ClientDashboardScreen({ navigation }) {
           </>
         )}
 
-        {/* (em português) Secção de vendedores favoritos */}
         <View style={styles.favoriteSection}>
           <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
           {favorites.map((item) => {
@@ -138,13 +135,13 @@ export default function ClientDashboardScreen({ navigation }) {
           })}
         </View>
 
-        {/* (em português) Botão de logout */}
         <View style={[styles.fullButton, styles.logoutButton]}>
-          <Button mode="outlined" onPress={logout}>Sair</Button>
+          <Button mode="outlined" onPress={logout}>
+            Sair
+          </Button>
         </View>
       </ScrollView>
 
-      {/* (em português) Menu lateral */}
       {menuOpen && (
         <View style={styles.menu}>
           <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
@@ -193,9 +190,21 @@ const styles = StyleSheet.create({
   inactivePhoto: { borderWidth: 2, borderColor: 'red' },
   fullButton: { width: '100%', marginBottom: 12 },
   logoutButton: { marginTop: 'auto' },
-  mapButton: { position: 'absolute', top: 16, right: 16 },
+  mapButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 101,
+    elevation: 10,
+  },
   mapIcon: { fontSize: 50 },
-  menuButton: { position: 'absolute', top: 16, left: 16 },
+  menuButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 101,
+    elevation: 10,
+  },
   menuIcon: { fontSize: 40 },
   menu: {
     position: 'absolute',

@@ -135,7 +135,7 @@ const submitReview = async () => {
         onChangeText={setComment}
       />
       <Button mode="contained" onPress={submitReview}>
-        Enviar
+        <Text>Enviar</Text>
       </Button>
     </View>
   );

@@ -427,7 +427,7 @@ export default function MapScreen({ navigation }) {
             style={styles.button}
             onPress={() => navigation.navigate("ClientDashboard")}
           >
-            Perfil
+            <Text>Perfil</Text>
           </Button>
         ) : (
           <>
@@ -436,7 +436,7 @@ export default function MapScreen({ navigation }) {
               style={styles.button}
               onPress={() => navigation.navigate("ClientLogin")}
             >
-              Iniciar sessão Cliente
+              <Text>Iniciar sessão Cliente</Text>
             </Button>
 
             <Button
@@ -444,7 +444,7 @@ export default function MapScreen({ navigation }) {
               style={styles.button}
               onPress={() => navigation.navigate("ClientRegister")}
             >
-              Registar Cliente
+              <Text>Registar Cliente</Text>
             </Button>
           </>
         )}

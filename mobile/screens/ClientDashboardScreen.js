@@ -142,7 +142,7 @@ export default function ClientDashboardScreen({ navigation }) {
         </View>
 
         <Button mode="outlined" style={styles.fullButton} onPress={logout}>
-          Sair
+          <Text>Sair</Text>
         </Button>
       </ScrollView>
 

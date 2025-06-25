@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Alert,
 } from "react-native";
 import { Button, Text, TextInput, ActivityIndicator } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
@@ -389,6 +390,13 @@ export default function MapScreen({ navigation }) {
                         fav ? t("removeFavorite") : t("addFavorite")
                       }
                       onPress={async () => {
+                        if (!clientUser) {
+                          Alert.alert(
+                            'Inicie sessão',
+                            'É necessário iniciar sessão para adicionar favoritos.'
+                          );
+                          return;
+                        }
                         if (fav) {
                           await removeFavorite(item.id);
                         } else {

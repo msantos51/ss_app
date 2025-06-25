@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  FlatList,
   Linking,
 } from 'react-native';
 import {
@@ -45,6 +46,7 @@ export default function DashboardScreen({ navigation }) {
   const [statsOpen, setStatsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [reviews, setReviews] = useState([]);
 
   const colorOptions = ['#FFB6C1', '#ADD8E6', '#90EE90', '#FFFF99', '#C8A2C8', '#98E8D5', '#FFCC99', '#E6E6FA'];
 
@@ -77,6 +79,32 @@ export default function DashboardScreen({ navigation }) {
     };
     loadVendor();
   }, []);
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      if (!vendor) return;
+      try {
+        const resp = await axios.get(
+          `${BASE_URL}/vendors/${vendor.id}/reviews`
+        );
+        setReviews(resp.data);
+      } catch (e) {
+        console.log('Erro ao carregar reviews:', e);
+      }
+    };
+    loadReviews();
+  }, [vendor]);
+
+  const subscriptionText = React.useMemo(() => {
+    if (!vendor) return '';
+    if (!vendor.subscription_active) return 'Subscrição inativa';
+    if (!vendor.subscription_valid_until) return 'Subscrição ativa';
+    const diff = new Date(vendor.subscription_valid_until) - new Date();
+    if (diff <= 0) return 'Subscrição expirada';
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    return `Subscrição ativa - termina em ${days}d ${hours}h`;
+  }, [vendor]);
 
   const profileUri = profilePhoto
     ? profilePhoto.uri
@@ -237,12 +265,27 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.label}>Cor do Pin:</Text>
               <View style={[styles.colorPreview, { backgroundColor: vendor.pin_color || '#FFB6C1' }]} />
             </View>
+            <Text style={styles.infoText}>
+              <Text style={styles.label}>Subscrição:</Text> {subscriptionText}
+            </Text>
           </>
         )}
 
         <Button mode="contained" style={styles.fullButton} onPress={toggleLocation}>
           {sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
         </Button>
+        <Text style={styles.sectionTitle}>Avaliações</Text>
+        <FlatList
+          data={reviews}
+          keyExtractor={(item) => item.id.toString()}
+          style={styles.reviewList}
+          renderItem={({ item }) => (
+            <View style={styles.reviewItem}>
+              <Text style={styles.reviewRating}>⭐ {item.rating}</Text>
+              {item.comment ? <Text>{item.comment}</Text> : null}
+            </View>
+          )}
+        />
         <Button mode="outlined" style={styles.fullButton} onPress={logout}>Sair</Button>
       </ScrollView>
 
@@ -294,4 +337,8 @@ const styles = StyleSheet.create({
   colorOptionSelected: { borderWidth: 3 },
   pinColorLabel: { alignSelf: 'flex-start', marginBottom: 4 },
   menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 8, elevation: 10, zIndex: 100 },
+  sectionTitle: { alignSelf: 'flex-start', fontWeight: 'bold', marginTop: 8, marginBottom: 4 },
+  reviewList: { width: '100%', maxHeight: 200, marginBottom: 12 },
+  reviewItem: { paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  reviewRating: { fontWeight: 'bold' },
 });

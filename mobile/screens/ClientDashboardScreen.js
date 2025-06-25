@@ -1,4 +1,4 @@
-// Dashboard simples para o cliente listar os vendedores favoritos
+// (em português) Este é o dashboard do cliente que mostra o perfil e os vendedores favoritos
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
@@ -14,6 +14,7 @@ export default function ClientDashboardScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // (em português) Função para carregar os dados do cliente guardados localmente
   const loadClient = async () => {
     try {
       const stored = await AsyncStorage.getItem('client');
@@ -28,7 +29,7 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // # Função para carregar os favoritos
+  // (em português) Função para carregar os vendedores favoritos
   const loadFavorites = async () => {
     const ids = await getFavorites();
     if (ids.length === 0) {
@@ -44,20 +45,20 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // # Função para limpar os favoritos
+  // (em português) Função para limpar todos os favoritos
   const clearAllFavorites = async () => {
     await clearFavorites();
     setFavorites([]);
   };
 
-  // # Função para logout
+  // (em português) Função para fazer logout do cliente
   const logout = async () => {
     await AsyncStorage.removeItem('client');
     await AsyncStorage.removeItem('clientToken');
     navigation.replace('ClientLogin');
   };
 
-  // # Carregar dados ao abrir e quando voltar ao ecrã
+  // (em português) Carrega os dados ao abrir o ecrã e quando volta a estar focado
   useEffect(() => {
     loadFavorites();
     loadClient();
@@ -68,9 +69,9 @@ export default function ClientDashboardScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // # Return do componente
   return (
     <View style={{ flex: 1 }}>
+      {/* (em português) Botão para abrir o mapa */}
       <TouchableOpacity
         style={styles.mapButton}
         onPress={() => navigation.navigate('Map')}
@@ -78,6 +79,7 @@ export default function ClientDashboardScreen({ navigation }) {
         <Text style={styles.mapIcon}>🗺️</Text>
       </TouchableOpacity>
 
+      {/* (em português) Botão para abrir o menu */}
       <TouchableOpacity
         style={styles.menuButton}
         onPress={() => setMenuOpen(!menuOpen)}
@@ -87,12 +89,16 @@ export default function ClientDashboardScreen({ navigation }) {
 
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Meu Perfil</Text>
+
+        {/* (em português) Foto de perfil do cliente */}
         {client?.profile_photo && (
           <Image
             source={{ uri: `${BASE_URL.replace(/\/$/, '')}/${client.profile_photo}` }}
             style={styles.imagePreview}
           />
         )}
+
+        {/* (em português) Informações do cliente */}
         {client && (
           <>
             <Text style={styles.infoText}>
@@ -104,6 +110,7 @@ export default function ClientDashboardScreen({ navigation }) {
           </>
         )}
 
+        {/* (em português) Secção de vendedores favoritos */}
         <View style={styles.favoriteSection}>
           <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
           {favorites.map((item) => {
@@ -112,7 +119,7 @@ export default function ClientDashboardScreen({ navigation }) {
               : null;
             return (
               <TouchableOpacity
-                key={item.id}
+                key={item.id.toString()}
                 style={styles.vendor}
                 onPress={() => navigation.navigate('VendorDetail', { vendor: item })}
               >
@@ -131,11 +138,13 @@ export default function ClientDashboardScreen({ navigation }) {
           })}
         </View>
 
+        {/* (em português) Botão de logout */}
         <View style={[styles.fullButton, styles.logoutButton]}>
           <Button mode="outlined" onPress={logout}>Sair</Button>
         </View>
       </ScrollView>
 
+      {/* (em português) Menu lateral */}
       {menuOpen && (
         <View style={styles.menu}>
           <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
@@ -159,6 +168,7 @@ export default function ClientDashboardScreen({ navigation }) {
   );
 }
 
+// (em português) Estilos do dashboard
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -181,10 +191,6 @@ const styles = StyleSheet.create({
   image: { width: 40, height: 40, borderRadius: 20, marginRight: 8 },
   activePhoto: { borderWidth: 2, borderColor: 'green' },
   inactivePhoto: { borderWidth: 2, borderColor: 'red' },
-  button: { marginTop: 12 },
-  logout: { marginTop: 20 },
-  favoriteSection: { width: '100%', marginTop: 16 },
-  sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
   fullButton: { width: '100%', marginBottom: 12 },
   logoutButton: { marginTop: 'auto' },
   mapButton: { position: 'absolute', top: 16, right: 16 },
@@ -201,4 +207,6 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 100,
   },
+  favoriteSection: { width: '100%', marginTop: 16 },
+  sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
 });

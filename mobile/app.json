@@ -27,7 +27,8 @@
     },
     "owner": "msantos51",
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "extra": {
       "eas": {

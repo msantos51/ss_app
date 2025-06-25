@@ -240,7 +240,9 @@ export default function DashboardScreen({ navigation }) {
                 <TextInput mode="outlined" style={styles.input} label="Nova palavra-passe" secureTextEntry value={password} onChangeText={setPassword} />
               </>
             ) : (
-              <Button mode="outlined" onPress={() => setChangingPassword(true)}>Alterar palavra-passe</Button>
+              <Button mode="outlined" onPress={() => setChangingPassword(true)}>
+                <Text>Alterar palavra-passe</Text>
+              </Button>
             )}
             <Picker selectedValue={product} onValueChange={setProduct} style={styles.input}>
               <Picker.Item label="Bolas de Berlim" value="Bolas de Berlim" />
@@ -258,8 +260,12 @@ export default function DashboardScreen({ navigation }) {
               ))}
             </View>
             <View style={styles.row}>
-              <Button mode="contained" onPress={updateProfile}>Guardar</Button>
-              <Button mode="outlined" onPress={() => setEditing(false)}>Cancelar</Button>
+              <Button mode="contained" onPress={updateProfile}>
+                <Text>Guardar</Text>
+              </Button>
+              <Button mode="outlined" onPress={() => setEditing(false)}>
+                <Text>Cancelar</Text>
+              </Button>
             </View>
           </>
         ) : (
@@ -279,7 +285,9 @@ export default function DashboardScreen({ navigation }) {
         )}
 
         <Button mode="contained" style={styles.fullButton} onPress={toggleLocation}>
-          {sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
+          <Text>
+            {sharingLocation ? 'Desativar Localização' : 'Ativar Localização'}
+          </Text>
         </Button>
 
         <Text style={styles.sectionTitle}>Avaliações</Text>
@@ -292,7 +300,9 @@ export default function DashboardScreen({ navigation }) {
           ))}
         </View>
 
-        <Button mode="outlined" style={styles.fullButton} onPress={logout}>Sair</Button>
+        <Button mode="outlined" style={styles.fullButton} onPress={logout}>
+          <Text>Sair</Text>
+        </Button>
       </ScrollView>
 
       <Animated.View

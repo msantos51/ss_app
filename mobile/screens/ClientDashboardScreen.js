@@ -214,7 +214,6 @@ export default function ClientDashboardScreen({ navigation }) {
           </List.Section>
         </Animated.View>
 </View>
-
   );
 }
 

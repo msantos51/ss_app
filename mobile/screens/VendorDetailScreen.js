@@ -89,6 +89,14 @@ const submitReview = async () => {
           accessibilityRole="button"
           accessibilityLabel={favorite ? t('removeFavorite') : t('addFavorite')}
           onPress={async () => {
+            const token = await AsyncStorage.getItem('clientToken');
+            if (!token) {
+              Alert.alert(
+                'Inicie sessão',
+                'É necessário iniciar sessão para adicionar favoritos.'
+              );
+              return;
+            }
             if (favorite) {
               await removeFavorite(vendor.id);
             } else {

@@ -1,7 +1,7 @@
 // (em português) Este é o dashboard do cliente que mostra o perfil e os vendedores favoritos
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { View, StyleSheet, Image, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { Text, Button, List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
@@ -13,6 +13,8 @@ export default function ClientDashboardScreen({ navigation }) {
   const [client, setClient] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // (em português) Carrega os dados do cliente guardados localmente
   const loadClient = async () => {
@@ -52,6 +54,13 @@ export default function ClientDashboardScreen({ navigation }) {
     await AsyncStorage.removeItem('clientToken');
     navigation.replace('ClientLogin');
   };
+
+  useEffect(() => {
+    if (menuOpen) {
+      setAccountOpen(false);
+      setHelpOpen(false);
+    }
+  }, [menuOpen]);
 
   // (em português) Carrega dados ao abrir o ecrã ou ao voltar ao foco
   useEffect(() => {
@@ -139,25 +148,55 @@ export default function ClientDashboardScreen({ navigation }) {
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('AccountSettings'); }}>
-            Notificações
-          </Button>
-
-          <Text style={styles.menuHeader}>Definições de Conta</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
-            Atualizar Dados Pessoais
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
-            Apagar Conta
-          </Button>
-
-          <Text style={styles.menuHeader}>Sobre e Ajuda</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
-            Termos e Condições
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); Linking.openURL('mailto:suporte@sunnysales.com'); }}>
-            Contactar Suporte
-          </Button>
+          <List.Section>
+            <List.Item
+              title="Notificações"
+              onPress={() => {
+                setMenuOpen(false);
+                navigation.navigate('AccountSettings');
+              }}
+            />
+            <List.Accordion
+              title="Definições de Conta"
+              expanded={accountOpen}
+              onPress={() => setAccountOpen(!accountOpen)}
+            >
+              <List.Item
+                title="Atualizar Dados Pessoais"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('ManageAccount');
+                }}
+              />
+              <List.Item
+                title="Apagar Conta"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('ManageAccount');
+                }}
+              />
+            </List.Accordion>
+            <List.Accordion
+              title="Sobre e Ajuda"
+              expanded={helpOpen}
+              onPress={() => setHelpOpen(!helpOpen)}
+            >
+              <List.Item
+                title="Termos e Condições"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Terms');
+                }}
+              />
+              <List.Item
+                title="Contactar Suporte"
+                onPress={() => {
+                  setMenuOpen(false);
+                  Linking.openURL('mailto:suporte@sunnysales.com');
+                }}
+              />
+            </List.Accordion>
+          </List.Section>
         </View>
       )}
     </View>

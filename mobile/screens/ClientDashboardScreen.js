@@ -1,13 +1,19 @@
-// (em português) Este é o dashboard do cliente que mostra o perfil e os vendedores favoritos
+// (em português) Dashboard do cliente com menu estilo hambúrguer e estrutura unificada
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import { getFavorites } from '../favoritesService';
 import { theme } from '../theme';
-import t from '../i18n';
 
 export default function ClientDashboardScreen({ navigation }) {
   const [client, setClient] = useState(null);
@@ -16,7 +22,6 @@ export default function ClientDashboardScreen({ navigation }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
-  // (em português) Carrega os dados do cliente guardados localmente
   const loadClient = async () => {
     try {
       const stored = await AsyncStorage.getItem('client');
@@ -25,30 +30,26 @@ export default function ClientDashboardScreen({ navigation }) {
       } else {
         setClient(null);
       }
-    } catch (e) {
-      console.log('Erro ao carregar cliente:', e);
+    } catch {
       setClient(null);
     }
   };
 
-  // (em português) Carrega os vendedores favoritos
   const loadFavorites = async () => {
-    const ids = await getFavorites();
-    if (ids.length === 0) {
-      setFavorites([]);
-      return;
-    }
     try {
+      const ids = await getFavorites();
+      if (ids.length === 0) {
+        setFavorites([]);
+        return;
+      }
       const resp = await axios.get(`${BASE_URL}/vendors/`);
       const vendors = resp.data.filter((v) => ids.includes(v.id));
       setFavorites(vendors);
-    } catch (e) {
-      console.log('Erro ao carregar favoritos:', e);
+    } catch {
+      setFavorites([]);
     }
   };
 
-
-  // (em português) Faz logout do cliente
   const logout = async () => {
     await AsyncStorage.removeItem('client');
     await AsyncStorage.removeItem('clientToken');
@@ -62,32 +63,23 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   }, [menuOpen]);
 
-  // (em português) Carrega dados ao abrir o ecrã ou ao voltar ao foco
   useEffect(() => {
-    loadFavorites();
     loadClient();
+    loadFavorites();
     const unsubscribe = navigation.addListener('focus', () => {
-      loadFavorites();
       loadClient();
+      loadFavorites();
     });
     return unsubscribe;
   }, [navigation]);
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Botão do mapa */}
-      <TouchableOpacity
-        style={styles.mapButton}
-        onPress={() => navigation.navigate('Map')}
-      >
+      <TouchableOpacity style={styles.mapButton} onPress={() => navigation.navigate('Map')}>
         <Text style={styles.mapIcon}>🗺️</Text>
       </TouchableOpacity>
 
-      {/* Botão do menu */}
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={() => setMenuOpen(!menuOpen)}
-      >
+      <TouchableOpacity style={styles.menuButton} onPress={() => setMenuOpen(!menuOpen)}>
         <Text style={styles.menuIcon}>☰</Text>
       </TouchableOpacity>
 
@@ -112,8 +104,8 @@ export default function ClientDashboardScreen({ navigation }) {
           </>
         )}
 
-        <View style={styles.favoriteSection}>
-          <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
+        <Text style={styles.sectionTitle}>Vendedores Favoritos</Text>
+        <View style={styles.favoriteList}>
           {favorites.map((item) => {
             const photoUri = item.profile_photo
               ? `${BASE_URL.replace(/\/$/, '')}/${item.profile_photo}`
@@ -139,11 +131,9 @@ export default function ClientDashboardScreen({ navigation }) {
           })}
         </View>
 
-        <View style={[styles.fullButton, styles.logoutButton]}>
-          <Button mode="outlined" onPress={logout}>
-            Sair
-          </Button>
-        </View>
+        <Button mode="outlined" style={styles.fullButton} onPress={logout}>
+          Sair
+        </Button>
       </ScrollView>
 
       {menuOpen && (
@@ -203,61 +193,22 @@ export default function ClientDashboardScreen({ navigation }) {
   );
 }
 
-// (em português) Estilos do dashboard
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: theme.colors.background,
-  },
+  container: { flexGrow: 1, padding: 16, alignItems: 'center', backgroundColor: theme.colors.background },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
   infoText: { marginBottom: 8, width: '100%' },
   label: { fontWeight: 'bold' },
-  imagePreview: { width: 120, height: 120, marginVertical: 12, borderRadius: 60 },
-  vendor: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
+  imagePreview: { width: 120, height: 120, borderRadius: 60, marginBottom: 16 },
+  fullButton: { width: '100%', marginVertical: 8 },
+  mapButton: { position: 'absolute', top: 16, right: 16, zIndex: 101, elevation: 10 },
+  mapIcon: { fontSize: 40 },
+  menuButton: { position: 'absolute', top: 16, left: 16, zIndex: 101, elevation: 10 },
+  menuIcon: { fontSize: 40 },
+  menu: { position: 'absolute', top: 70, left: 16, right: 16, backgroundColor: 'white', padding: 8, borderRadius: 8, elevation: 10, zIndex: 100 },
+  sectionTitle: { alignSelf: 'flex-start', fontWeight: 'bold', marginTop: 8, marginBottom: 4 },
+  favoriteList: { width: '100%', marginBottom: 12 },
+  vendor: { flexDirection: 'row', alignItems: 'center', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
   image: { width: 40, height: 40, borderRadius: 20, marginRight: 8 },
   activePhoto: { borderWidth: 2, borderColor: 'green' },
   inactivePhoto: { borderWidth: 2, borderColor: 'red' },
-  fullButton: { width: '100%', marginBottom: 12 },
-  logoutButton: { marginTop: 'auto' },
-  mapButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 101,
-    elevation: 10,
-  },
-  mapIcon: { fontSize: 50 },
-  menuButton: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-    zIndex: 101,
-    elevation: 10,
-  },
-  menuIcon: { fontSize: 40 },
-  menu: {
-    position: 'absolute',
-    top: 70,
-    left: 16,
-    backgroundColor: theme.colors.background,
-    padding: 8,
-    borderRadius: 8,
-    elevation: 10,
-    zIndex: 100,
-  },
-  menuHeader: {
-    marginTop: 8,
-    fontWeight: 'bold',
-  },
-  favoriteSection: { width: '100%', marginTop: 16 },
-  sectionTitle: { fontWeight: 'bold', marginBottom: 4 },
 });

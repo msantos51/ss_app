@@ -470,23 +470,39 @@ if (share) {
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Button mode="text" onPress={() => { setMenuOpen(false); setEditing(true); }}>
-            Atualizar Dados
-          </Button>
+          <Text style={styles.menuHeader}>Pagamentos</Text>
           <Button mode="text" onPress={() => { setMenuOpen(false); paySubscription(); }}>
             Pagar Semanalidade
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('PaidWeeks'); }}>
-            {t('paidWeeksTitle')}
+            Semanas Pagas
           </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Invoices'); }}>
+            Faturas
+          </Button>
+
+          <Text style={styles.menuHeader}>Estatísticas</Text>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }}>
             Trajetos
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
-            {t('statsTitle')}
+            Distância Percorrida
           </Button>
+
+          <Text style={styles.menuHeader}>Definições de Conta</Text>
+          <Button mode="text" onPress={() => { setMenuOpen(false); setEditing(true); }}>
+            Atualizar Dados Pessoais
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
+            Apagar Conta
+          </Button>
+
+          <Text style={styles.menuHeader}>Sobre e Ajuda</Text>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
             Termos e Condições
+          </Button>
+          <Button mode="text" onPress={() => { setMenuOpen(false); Linking.openURL('mailto:suporte@sunnysales.com'); }}>
+            Contactar Suporte
           </Button>
         </View>
       )}
@@ -527,6 +543,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 10,
     zIndex: 100,
+  },
+  menuHeader: {
+    marginTop: 8,
+    fontWeight: 'bold',
   },
   reviewSection: { width: '100%', marginTop: 16 },
   sectionTitle: { fontWeight: 'bold', marginBottom: 4 },

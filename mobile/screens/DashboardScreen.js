@@ -332,8 +332,7 @@ export default function DashboardScreen({ navigation }) {
             </List.Accordion>
           </List.Section>
         </Animated.View>
-      )}
-    </View>
+</View>
   );
 }
 

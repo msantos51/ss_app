@@ -13,6 +13,7 @@ import {
   Button,
   Text,
   ActivityIndicator,
+  List,
 } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -54,6 +55,10 @@ export default function DashboardScreen({ navigation }) {
   const [sharingLocation, setSharingLocation] = useState(false);
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [paymentsOpen, setPaymentsOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
 
   const fetchVendorFromServer = async (vendorId) => {
@@ -470,40 +475,98 @@ if (share) {
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Text style={styles.menuHeader}>Pagamentos</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); paySubscription(); }}>
-            Pagar Semanalidade
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('PaidWeeks'); }}>
-            Semanas Pagas
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Invoices'); }}>
-            Faturas
-          </Button>
+          <List.Section>
+            <List.Accordion
+              title="Pagamentos"
+              expanded={paymentsOpen}
+              onPress={() => setPaymentsOpen(!paymentsOpen)}
+            >
+              <List.Item
+                title="Pagar Semanalidade"
+                onPress={() => {
+                  setMenuOpen(false);
+                  paySubscription();
+                }}
+              />
+              <List.Item
+                title="Semanas Pagas"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('PaidWeeks');
+                }}
+              />
+              <List.Item
+                title="Faturas"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Invoices');
+                }}
+              />
+            </List.Accordion>
 
-          <Text style={styles.menuHeader}>Estatísticas</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }}>
-            Trajetos
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
-            Distância Percorrida
-          </Button>
+            <List.Accordion
+              title="Estatísticas"
+              expanded={statsOpen}
+              onPress={() => setStatsOpen(!statsOpen)}
+            >
+              <List.Item
+                title="Trajetos"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Routes');
+                }}
+              />
+              <List.Item
+                title="Distância Percorrida"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Stats');
+                }}
+              />
+            </List.Accordion>
 
-          <Text style={styles.menuHeader}>Definições de Conta</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); setEditing(true); }}>
-            Atualizar Dados Pessoais
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
-            Apagar Conta
-          </Button>
+            <List.Accordion
+              title="Definições de Conta"
+              expanded={accountOpen}
+              onPress={() => setAccountOpen(!accountOpen)}
+            >
+              <List.Item
+                title="Atualizar Dados Pessoais"
+                onPress={() => {
+                  setMenuOpen(false);
+                  setEditing(true);
+                }}
+              />
+              <List.Item
+                title="Apagar Conta"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('ManageAccount');
+                }}
+              />
+            </List.Accordion>
 
-          <Text style={styles.menuHeader}>Sobre e Ajuda</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
-            Termos e Condições
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); Linking.openURL('mailto:suporte@sunnysales.com'); }}>
-            Contactar Suporte
-          </Button>
+            <List.Accordion
+              title="Sobre e Ajuda"
+              expanded={helpOpen}
+              onPress={() => setHelpOpen(!helpOpen)}
+            >
+              <List.Item
+                title="Termos e Condições"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Terms');
+                }}
+              />
+              <List.Item
+                title="Contactar Suporte"
+                onPress={() => {
+                  setMenuOpen(false);
+                  Linking.openURL('mailto:suporte@sunnysales.com');
+                }}
+              />
+            </List.Accordion>
+          </List.Section>
         </View>
       )}
     </View>
@@ -543,10 +606,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 10,
     zIndex: 100,
-  },
-  menuHeader: {
-    marginTop: 8,
-    fontWeight: 'bold',
   },
   reviewSection: { width: '100%', marginTop: 16 },
   sectionTitle: { fontWeight: 'bold', marginBottom: 4 },

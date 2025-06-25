@@ -17,6 +17,7 @@ import RouteDetailScreen from './screens/RouteDetailScreen';
 import StatsScreen from './screens/StatsScreen';
 import TermsScreen from './screens/TermsScreen';
 import PaidWeeksScreen from './screens/PaidWeeksScreen';
+import InvoicesScreen from './screens/InvoicesScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import AccountSettingsScreen from './screens/AccountSettingsScreen';
 import ManageAccountScreen from './screens/ManageAccountScreen';
@@ -52,6 +53,7 @@ export default function App() {
           <Stack.Screen name="Routes" component={RoutesScreen} options={{ title: 'Trajetos' }} />
           <Stack.Screen name="Stats" component={StatsScreen} options={{ title: t('statsTitle') }} />
           <Stack.Screen name="PaidWeeks" component={PaidWeeksScreen} options={{ title: t('paidWeeksTitle') }} />
+          <Stack.Screen name="Invoices" component={InvoicesScreen} options={{ title: 'Faturas' }} />
           <Stack.Screen name="RouteDetail" component={RouteDetailScreen} options={{ title: 'Trajeto' }} />
           <Stack.Screen name="Terms" component={TermsScreen} options={{ title: 'Termos' }} />
           <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} options={{ title: t('accountSettingsTitle') }} />

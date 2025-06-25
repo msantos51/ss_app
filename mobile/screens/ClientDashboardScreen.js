@@ -5,7 +5,7 @@ import { Text, Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
-import { getFavorites, clearFavorites } from '../favoritesService';
+import { getFavorites } from '../favoritesService';
 import { theme } from '../theme';
 import t from '../i18n';
 
@@ -45,11 +45,6 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
-  // (em português) Limpa os favoritos
-  const clearAllFavorites = async () => {
-    await clearFavorites();
-    setFavorites([]);
-  };
 
   // (em português) Faz logout do cliente
   const logout = async () => {
@@ -144,20 +139,24 @@ export default function ClientDashboardScreen({ navigation }) {
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
-            {t('clearFavorites')}
-          </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('AccountSettings'); }}>
-            {t('proximityMenu')}
+            Notificações
+          </Button>
+
+          <Text style={styles.menuHeader}>Definições de Conta</Text>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
+            Atualizar Dados Pessoais
           </Button>
           <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
-            {t('manageAccount')}
+            Apagar Conta
           </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('About'); }}>
-            {t('aboutHelp')}
+
+          <Text style={styles.menuHeader}>Sobre e Ajuda</Text>
+          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
+            Termos e Condições
           </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); logout(); }}>
-            Sair
+          <Button mode="text" onPress={() => { setMenuOpen(false); Linking.openURL('mailto:suporte@sunnysales.com'); }}>
+            Contactar Suporte
           </Button>
         </View>
       )}
@@ -215,6 +214,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 10,
     zIndex: 100,
+  },
+  menuHeader: {
+    marginTop: 8,
+    fontWeight: 'bold',
   },
   favoriteSection: { width: '100%', marginTop: 16 },
   sectionTitle: { fontWeight: 'bold', marginBottom: 4 },

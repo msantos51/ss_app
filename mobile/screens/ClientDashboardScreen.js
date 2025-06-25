@@ -1,4 +1,4 @@
-// Dashboard simples para o cliente listar os vendedores favoritos
+// (em português) Este é o dashboard do cliente que mostra o perfil e os vendedores favoritos
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
@@ -14,6 +14,7 @@ export default function ClientDashboardScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // (em português) Carrega os dados do cliente guardados localmente
   const loadClient = async () => {
     try {
       const stored = await AsyncStorage.getItem('client');
@@ -28,6 +29,7 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
+  // (em português) Carrega os vendedores favoritos
   const loadFavorites = async () => {
     const ids = await getFavorites();
     if (ids.length === 0) {
@@ -43,17 +45,20 @@ export default function ClientDashboardScreen({ navigation }) {
     }
   };
 
+  // (em português) Limpa os favoritos
   const clearAllFavorites = async () => {
     await clearFavorites();
     setFavorites([]);
   };
 
+  // (em português) Faz logout do cliente
   const logout = async () => {
     await AsyncStorage.removeItem('client');
     await AsyncStorage.removeItem('clientToken');
     navigation.replace('ClientLogin');
   };
 
+  // (em português) Carrega dados ao abrir o ecrã ou ao voltar ao foco
   useEffect(() => {
     loadFavorites();
     loadClient();
@@ -65,23 +70,24 @@ export default function ClientDashboardScreen({ navigation }) {
   }, [navigation]);
 
   return (
-
     <View style={{ flex: 1 }}>
+      {/* Botão do mapa */}
+      <TouchableOpacity
+        style={styles.mapButton}
+        onPress={() => navigation.navigate('Map')}
+      >
+        <Text style={styles.mapIcon}>🗺️</Text>
+      </TouchableOpacity>
+
+      {/* Botão do menu */}
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => setMenuOpen(!menuOpen)}
+      >
+        <Text style={styles.menuIcon}>☰</Text>
+      </TouchableOpacity>
+
       <ScrollView contentContainerStyle={styles.container}>
-        <TouchableOpacity
-          style={styles.mapButton}
-          onPress={() => navigation.navigate('Map')}
-        >
-          <Text style={styles.mapIcon}>🗺️</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => setMenuOpen(!menuOpen)}
-        >
-          <Text style={styles.menuIcon}>☰</Text>
-        </TouchableOpacity>
-
         <Text style={styles.title}>Meu Perfil</Text>
 
         {client?.profile_photo && (
@@ -90,6 +96,7 @@ export default function ClientDashboardScreen({ navigation }) {
             style={styles.imagePreview}
           />
         )}
+
         {client && (
           <>
             <Text style={styles.infoText}>
@@ -129,9 +136,12 @@ export default function ClientDashboardScreen({ navigation }) {
         </View>
 
         <View style={[styles.fullButton, styles.logoutButton]}>
-          <Button mode="outlined" onPress={logout}>Sair</Button>
+          <Button mode="outlined" onPress={logout}>
+            Sair
+          </Button>
         </View>
       </ScrollView>
+
       {menuOpen && (
         <View style={styles.menu}>
           <Button mode="text" onPress={() => { setMenuOpen(false); clearAllFavorites(); }}>
@@ -155,6 +165,7 @@ export default function ClientDashboardScreen({ navigation }) {
   );
 }
 
+// (em português) Estilos do dashboard
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

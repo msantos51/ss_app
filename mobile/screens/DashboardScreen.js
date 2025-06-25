@@ -54,7 +54,21 @@ export default function DashboardScreen({ navigation }) {
   const [sharingLocation, setSharingLocation] = useState(false);
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [paymentsOpen, setPaymentsOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
+
+  // Ensure all submenus start closed whenever the hamburger menu opens
+  useEffect(() => {
+    if (menuOpen) {
+      setPaymentsOpen(false);
+      setStatsOpen(false);
+      setAccountOpen(false);
+      setHelpOpen(false);
+    }
+  }, [menuOpen]);
 
   const fetchVendorFromServer = async (vendorId) => {
     try {
@@ -470,40 +484,118 @@ if (share) {
 
       {menuOpen && (
         <View style={styles.menu}>
-          <Text style={styles.menuHeader}>Pagamentos</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); paySubscription(); }}>
-            Pagar Semanalidade
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('PaidWeeks'); }}>
-            Semanas Pagas
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Invoices'); }}>
-            Faturas
-          </Button>
+          <TouchableOpacity onPress={() => setPaymentsOpen(!paymentsOpen)}>
+            <Text style={styles.menuHeader}>Pagamentos</Text>
+          </TouchableOpacity>
+          {paymentsOpen && (
+            <>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  paySubscription();
+                }}
+              >
+                Pagar Semanalidade
+              </Button>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('PaidWeeks');
+                }}
+              >
+                Semanas Pagas
+              </Button>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Invoices');
+                }}
+              >
+                Faturas
+              </Button>
+            </>
+          )}
 
-          <Text style={styles.menuHeader}>Estatísticas</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Routes'); }}>
-            Trajetos
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Stats'); }}>
-            Distância Percorrida
-          </Button>
+          <TouchableOpacity onPress={() => setStatsOpen(!statsOpen)}>
+            <Text style={styles.menuHeader}>Estatísticas</Text>
+          </TouchableOpacity>
+          {statsOpen && (
+            <>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Routes');
+                }}
+              >
+                Trajetos
+              </Button>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Stats');
+                }}
+              >
+                Distância Percorrida
+              </Button>
+            </>
+          )}
 
-          <Text style={styles.menuHeader}>Definições de Conta</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); setEditing(true); }}>
-            Atualizar Dados Pessoais
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }}>
-            Apagar Conta
-          </Button>
+          <TouchableOpacity onPress={() => setAccountOpen(!accountOpen)}>
+            <Text style={styles.menuHeader}>Definições de Conta</Text>
+          </TouchableOpacity>
+          {accountOpen && (
+            <>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  setEditing(true);
+                }}
+              >
+                Atualizar Dados Pessoais
+              </Button>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('ManageAccount');
+                }}
+              >
+                Apagar Conta
+              </Button>
+            </>
+          )}
 
-          <Text style={styles.menuHeader}>Sobre e Ajuda</Text>
-          <Button mode="text" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }}>
-            Termos e Condições
-          </Button>
-          <Button mode="text" onPress={() => { setMenuOpen(false); Linking.openURL('mailto:suporte@sunnysales.com'); }}>
-            Contactar Suporte
-          </Button>
+          <TouchableOpacity onPress={() => setHelpOpen(!helpOpen)}>
+            <Text style={styles.menuHeader}>Sobre e Ajuda</Text>
+          </TouchableOpacity>
+          {helpOpen && (
+            <>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  navigation.navigate('Terms');
+                }}
+              >
+                Termos e Condições
+              </Button>
+              <Button
+                mode="text"
+                onPress={() => {
+                  setMenuOpen(false);
+                  Linking.openURL('mailto:suporte@sunnysales.com');
+                }}
+              >
+                Contactar Suporte
+              </Button>
+            </>
+          )}
         </View>
       )}
     </View>

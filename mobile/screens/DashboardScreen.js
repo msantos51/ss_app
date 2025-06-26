@@ -179,8 +179,17 @@ export default function DashboardScreen({ navigation }) {
       await stopLocationSharing();
       setSharingLocation(false);
     } else {
-      await startLocationSharing(vendor.id);
-      setSharingLocation(true);
+      try {
+        await startLocationSharing(vendor.id);
+        setSharingLocation(true);
+        setError(null);
+      } catch (err) {
+        const msg =
+          err?.response?.data?.detail === 'Subscription inactive'
+            ? 'Dever\u00e1 pagar a semanalidade para poder ativar a localiza\u00e7\u00e3o'
+            : 'Erro ao ativar localiza\u00e7\u00e3o';
+        setError(msg);
+      }
     }
   };
 

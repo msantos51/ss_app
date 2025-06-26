@@ -64,7 +64,7 @@ export default function MapScreen({ navigation }) {
           longitude: loc.coords.longitude,
         };
         setUserPosition(coords);
-      },
+      }
     );
   };
 
@@ -125,8 +125,8 @@ export default function MapScreen({ navigation }) {
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-          locationQuery,
-        )}&format=json&limit=1`,
+          locationQuery
+        )}&format=json&limit=1`
       );
       const data = await res.json();
       if (data && data.length > 0) {
@@ -134,10 +134,10 @@ export default function MapScreen({ navigation }) {
         mapRef.current?.setView(parseFloat(lat), parseFloat(lon), 15);
         setZoomLevel(15);
       } else {
-        Alert.alert('Local não encontrado');
+        Alert.alert("Local não encontrado");
       }
     } catch (err) {
-      Alert.alert('Erro', 'Não foi possível pesquisar o local.');
+      Alert.alert("Erro", "Não foi possível pesquisar o local.");
     }
   };
 
@@ -167,7 +167,7 @@ export default function MapScreen({ navigation }) {
             return prev.map((v) =>
               v.id === vendor_id
                 ? { ...v, current_lat: lat, current_lng: lng }
-                : v,
+                : v
             );
           } else {
             return [
@@ -176,15 +176,11 @@ export default function MapScreen({ navigation }) {
             ];
           }
         });
-      },
+      }
     );
     return unsubscribe;
   }, []);
 
-  // Remove previous effect. The map will be remounted when the first
-  // location is obtained inside `locateUser`.
-
-  // Inicia o tracking da localização quando o componente monta
   useEffect(() => {
     startWatch();
     return () => {
@@ -201,7 +197,7 @@ export default function MapScreen({ navigation }) {
         mapRef.current?.setView(
           userPosition.latitude,
           userPosition.longitude,
-          zoom,
+          zoom
         );
         setZoomLevel(zoom);
         return;
@@ -217,8 +213,6 @@ export default function MapScreen({ navigation }) {
       setInitialPosition(coords);
       setUserPosition(coords);
       startWatch();
-
-      // Remount the map so the user pin becomes visible
       setMapKey((k) => k + 1);
 
       setTimeout(
@@ -226,9 +220,9 @@ export default function MapScreen({ navigation }) {
           mapRef.current?.setView(
             loc.coords.latitude,
             loc.coords.longitude,
-            zoom,
+            zoom
           ),
-        100,
+        100
       );
       setZoomLevel(zoom);
     } catch (err) {
@@ -251,19 +245,24 @@ export default function MapScreen({ navigation }) {
     };
     load();
   }, []);
+
   const activeVendors = vendors.filter(
-    (v) => v?.current_lat != null && v?.current_lng != null,
+    (v) => v?.current_lat != null && v?.current_lng != null
   );
   const filteredVendors = activeVendors.filter(
     (v) =>
       (selectedProduct === "Todos os vendedores" ||
         v?.product === selectedProduct) &&
       (searchQuery === "" ||
-        v?.name?.toLowerCase().includes(searchQuery.toLowerCase())),
+        v?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // Enviar notificações de proximidade se estiver ativo
-  useProximityNotifications(filteredVendors, notifRadius, favoriteIds, notifEnabled);
+  useProximityNotifications(
+    filteredVendors,
+    notifRadius,
+    favoriteIds,
+    notifEnabled
+  );
 
   return (
     <View style={styles.container}>
@@ -289,7 +288,9 @@ export default function MapScreen({ navigation }) {
                 longitude: v.current_lng,
                 title: v.name || "Vendedor",
                 iconHtml: photo
-                  ? `<div class="gm-pin" style="border: 2px solid ${v.pin_color || "#FFB6C1"};"><img src="${photo}" /></div>`
+                  ? `<div class="gm-pin" style="border: 2px solid ${
+                      v.pin_color || "#FFB6C1"
+                    };"><img src="${photo}" /></div>`
                   : null,
                 selected: v.id === selectedVendorId,
               };
@@ -308,6 +309,17 @@ export default function MapScreen({ navigation }) {
           ]}
         />
       )}
+
+      <View style={styles.searchContainer}>
+        <TextInput
+          mode="outlined"
+          style={styles.searchLocationInput}
+          label="Pesquisar local no mapa"
+          value={locationQuery}
+          onChangeText={setLocationQuery}
+          onSubmitEditing={handleLocationSearch}
+        />
+      </View>
 
       <TouchableOpacity
         style={styles.vendorIcon}
@@ -348,14 +360,7 @@ export default function MapScreen({ navigation }) {
           <Picker.Item label="Acessórios" value="Acessórios" />
           <Picker.Item label="Gelados" value="Gelados" />
         </Picker>
-        <TextInput
-          mode="outlined"
-          style={styles.locationInput}
-          label="Ir para..."
-          value={locationQuery}
-          onChangeText={setLocationQuery}
-          onSubmitEditing={handleLocationSearch}
-        />
+
         <TouchableOpacity
           style={styles.listToggle}
           onPress={() => setShowList((v) => !v)}
@@ -370,7 +375,7 @@ export default function MapScreen({ navigation }) {
             <TextInput
               mode="outlined"
               style={styles.searchInput}
-              label="Procurar..."
+              label="Procurar vendedor..."
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -394,7 +399,7 @@ export default function MapScreen({ navigation }) {
                       mapRef.current?.setView(
                         item.current_lat,
                         item.current_lng,
-                        zoomLevel,
+                        zoomLevel
                       );
                     }}
                     onLongPress={() => {
@@ -422,8 +427,8 @@ export default function MapScreen({ navigation }) {
                       onPress={async () => {
                         if (!clientUser) {
                           Alert.alert(
-                            'Inicie sessão',
-                            'É necessário iniciar sessão para adicionar favoritos.'
+                            "Inicie sessão",
+                            "É necessário iniciar sessão para adicionar favoritos."
                           );
                           return;
                         }
@@ -485,14 +490,25 @@ export default function MapScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
-  filterContainer: {
+  searchContainer: {
     position: "absolute",
     top: 10,
+    left: 70,
+    right: 70,
+    zIndex: 10,
+  },
+  searchLocationInput: {
+    backgroundColor: "#fff",
+  },
+  filterContainer: {
+    position: "absolute",
+    top: 90,
     left: 70,
     right: 70,
     backgroundColor: theme.colors.background,
     borderRadius: 16,
     padding: 6,
+    zIndex: 5,
   },
   picker: { backgroundColor: "#eee", marginBottom: 4 },
   vendorList: { maxHeight: 200 },
@@ -504,7 +520,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchInput: { marginBottom: 4 },
-  locationInput: { marginBottom: 4 },
   listToggle: {
     backgroundColor: theme.colors.primary,
     padding: 6,

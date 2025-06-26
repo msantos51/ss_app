@@ -396,13 +396,13 @@ const styles = StyleSheet.create({
     borderRadius: 60, 
     marginBottom: 16, 
     borderWidth: 2, 
-    borderColor: '#FFEB3B' // cor do amarelo principal 
+    borderColor: '#FDC500' // cor do amarelo principal 
   },
   fullButton: { 
     width: '100%', 
     marginVertical: 8, 
     borderRadius: 12, 
-    backgroundColor: '#FFEB3B' 
+    backgroundColor: '#FDC500' 
   },
   row: { 
     flexDirection: 'row', 

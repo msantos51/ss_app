@@ -1,3 +1,4 @@
+// Ecrã para gestão de conta com mudança e remoção de utilizador
 import React from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
@@ -25,9 +26,11 @@ export default function ManageAccountScreen() {
         onChangeText={setPassword}
         style={styles.input}
       />
+      {/* Botão para alterar a palavra-passe */}
       <Button mode="contained" onPress={changePassword} style={styles.button}>
         <Text>Alterar Palavra-passe</Text>
       </Button>
+      {/* Botão para apagar a conta */}
       <Button mode="contained" onPress={deleteAccount} style={styles.button}>
         <Text>Apagar Conta</Text>
       </Button>

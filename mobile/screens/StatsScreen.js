@@ -1,3 +1,4 @@
+// Ecrã de estatísticas de distâncias percorridas
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -45,6 +46,7 @@ export default function StatsScreen({ navigation }) {
       {data.length > 0 ? (
         <>
           <Text style={styles.title}>{t('statsTitle')}</Text>
+          {/* Gráfico de barras com as distâncias por dia */}
           <BarChart
             data={{
               labels: labels,

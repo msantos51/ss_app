@@ -1,3 +1,4 @@
+// Ecrã que apresenta informações de ajuda e navegação para Termos ou Suporte
 import React from 'react';
 import { View, StyleSheet, Linking } from 'react-native';
 import { Button, Text } from 'react-native-paper';
@@ -7,6 +8,7 @@ export default function AboutScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sobre e Ajuda</Text>
+      {/* Botão para abrir ecrã de Termos */}
       <Button
         mode="outlined"
         onPress={() => navigation.navigate('Terms')}
@@ -14,6 +16,7 @@ export default function AboutScreen({ navigation }) {
       >
         <Text>Termos e Condições</Text>
       </Button>
+      {/* Botão para contactar a equipa de suporte */}
       <Button
         mode="outlined"
         onPress={() => Linking.openURL('mailto:suporte@sunnysales.com')}

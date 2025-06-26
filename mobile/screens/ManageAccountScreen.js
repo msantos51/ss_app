@@ -3,6 +3,7 @@ import React from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { theme } from '../theme';
+import BackButton from '../BackButton';
 
 export default function ManageAccountScreen() {
   const [password, setPassword] = React.useState('');
@@ -17,6 +18,7 @@ export default function ManageAccountScreen() {
 
   return (
     <View style={styles.container}>
+      <BackButton style={styles.back} />
       <Text style={styles.title}>Definições</Text>
       <TextInput
         mode="outlined"
@@ -43,4 +45,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, marginBottom: 16, textAlign: 'center' },
   input: { marginBottom: 16 },
   button: { marginBottom: 12 },
+  back: { position: 'absolute', top: 16, left: 16 },
 });

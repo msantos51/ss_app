@@ -11,6 +11,7 @@ import {
 } from '../settingsService';
 import { theme } from '../theme';
 import t from '../i18n';
+import BackButton from '../BackButton';
 
 export default function AccountSettingsScreen() {
   const [enabled, setEnabled] = useState(true);
@@ -38,6 +39,7 @@ export default function AccountSettingsScreen() {
 
   return (
     <View style={styles.container}>
+      <BackButton style={styles.back} />
       <Text style={styles.title}>{t('accountSettingsTitle')}</Text>
       {/* Interruptor para ativar ou desativar notificações */}
       <View style={styles.row}>
@@ -64,4 +66,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, marginBottom: 16 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
   picker: { marginBottom: 16 },
+  back: { position: 'absolute', top: 16, left: 16 },
 });

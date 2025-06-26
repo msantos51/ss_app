@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
+import BackButton from '../BackButton';
 
 export default function PaidWeeksScreen({ navigation }) {
   const [weeks, setWeeks] = useState([]);
@@ -47,6 +48,7 @@ const renderItem = ({ item }) => {
 
   return (
     <View style={styles.container}>
+      <BackButton style={styles.back} />
       <FlatList data={weeks} keyExtractor={(w) => w.id.toString()} renderItem={renderItem} />
     </View>
   );
@@ -59,4 +61,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
+  back: { position: 'absolute', top: 16, left: 16 },
 });

@@ -1,3 +1,4 @@
+// Ecrã de configurações de conta onde o utilizador ajusta notificações
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Switch, Text } from 'react-native-paper';
@@ -38,11 +39,13 @@ export default function AccountSettingsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('accountSettingsTitle')}</Text>
+      {/* Interruptor para ativar ou desativar notificações */}
       <View style={styles.row}>
         <Text>{t('notificationsEnabled')}</Text>
         <Switch value={enabled} onValueChange={toggleNotifications} />
       </View>
       <Text>{t('notificationRadius')}</Text>
+      {/* Menu suspenso para escolher o raio de alertas */}
       <Picker
         selectedValue={parseInt(radius, 10)}
         onValueChange={changeRadius}

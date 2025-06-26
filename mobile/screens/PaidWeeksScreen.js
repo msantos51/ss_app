@@ -1,3 +1,4 @@
+// Ecrã que lista semanas pagas e respetivos recibos
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, Linking } from 'react-native';
 import { Text, List } from 'react-native-paper';
@@ -35,6 +36,7 @@ export default function PaidWeeksScreen({ navigation }) {
     const start = new Date(item.start_date).toLocaleDateString();
     const end = new Date(item.end_date).toLocaleDateString();
     return (
+      {/* Item que abre o recibo da semana paga */}
       <List.Item
         style={styles.item}
         title={`${start} - ${end}`}

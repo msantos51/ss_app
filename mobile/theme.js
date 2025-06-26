@@ -19,17 +19,17 @@ const fontConfig = {
 export const theme = {
   ...DefaultTheme,
   roundness: 8,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#FDC500',    // Amarelo solar moderno
-    accent: '#0077B6',     // Azul mar moderno
-    background: '#FAFAFA', // Fundo branco moderno
-    surface: '#FFFFFF',
-    text: '#212121',       // Cinzento escuro para melhor leitura
-    error: '#D32F2F',
-    onPrimary: '#000000',
-    onSecondary: '#FFFFFF',
-    onSurface: '#212121',
-  },
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#EFA00B',   // Laranja vibrante
+      accent: '#125E8A',    // Azul profundo
+      background: '#12130F',
+      surface: '#12130F',
+      text: '#FFFFFF',
+      error: '#D32F2F',
+      onPrimary: '#12130F',
+      onSecondary: '#FFFFFF',
+      onSurface: '#FFFFFF',
+    },
   fonts: configureFonts(fontConfig),
 };

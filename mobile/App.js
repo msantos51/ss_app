@@ -43,7 +43,7 @@ export default function App() {
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Map">
+        <Stack.Navigator initialRouteName="Map" screenOptions={{ headerShown: false }}>
           <Stack.Screen
             name="Map"
             component={MapScreen}

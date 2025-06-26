@@ -32,19 +32,18 @@ export default function PaidWeeksScreen({ navigation }) {
     return unsub;
   }, [navigation]);
 
-  const renderItem = ({ item }) => {
-    const start = new Date(item.start_date).toLocaleDateString();
-    const end = new Date(item.end_date).toLocaleDateString();
-    return (
-      {/* Item que abre o recibo da semana paga */}
-      <List.Item
-        style={styles.item}
-        title={`${start} - ${end}`}
-        description={item.receipt_url ? 'Recibo disponível' : ''}
-        onPress={() => item.receipt_url && Linking.openURL(item.receipt_url)}
-      />
-    );
-  };
+const renderItem = ({ item }) => {
+  const start = new Date(item.start_date).toLocaleDateString();
+  const end = new Date(item.end_date).toLocaleDateString();
+  return (
+    <List.Item
+      style={styles.item}
+      title={`${start} - ${end}`}
+      description={item.receipt_url ? 'Recibo disponível' : ''}
+      onPress={() => item.receipt_url && Linking.openURL(item.receipt_url)}
+    />
+  );
+};
 
   return (
     <View style={styles.container}>

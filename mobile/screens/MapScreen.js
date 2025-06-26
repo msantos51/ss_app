@@ -36,6 +36,7 @@ export default function MapScreen({ navigation }) {
   const [selectedProduct, setSelectedProduct] = useState("Todos os vendedores");
   const [showList, setShowList] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
   const [initialPosition, setInitialPosition] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [selectedVendorId, setSelectedVendorId] = useState(null);
@@ -117,6 +118,27 @@ export default function MapScreen({ navigation }) {
   const loadFavorites = async () => {
     const favs = await getFavorites();
     setFavoriteIds(favs);
+  };
+
+  const handleLocationSearch = async () => {
+    if (!locationQuery) return;
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          locationQuery,
+        )}&format=json&limit=1`,
+      );
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        mapRef.current?.setView(parseFloat(lat), parseFloat(lon), 15);
+        setZoomLevel(15);
+      } else {
+        Alert.alert('Local não encontrado');
+      }
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível pesquisar o local.');
+    }
   };
 
   useEffect(() => {
@@ -326,6 +348,14 @@ export default function MapScreen({ navigation }) {
           <Picker.Item label="Acessórios" value="Acessórios" />
           <Picker.Item label="Gelados" value="Gelados" />
         </Picker>
+        <TextInput
+          mode="outlined"
+          style={styles.locationInput}
+          label="Ir para..."
+          value={locationQuery}
+          onChangeText={setLocationQuery}
+          onSubmitEditing={handleLocationSearch}
+        />
         <TouchableOpacity
           style={styles.listToggle}
           onPress={() => setShowList((v) => !v)}
@@ -474,6 +504,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchInput: { marginBottom: 4 },
+  locationInput: { marginBottom: 4 },
   listToggle: {
     backgroundColor: theme.colors.primary,
     padding: 6,

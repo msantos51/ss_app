@@ -5,10 +5,10 @@ Aplicação composta por backend em **FastAPI** e app móvel em **React Native**
 ## Estrutura
 
 ```
-backend/    Código do servidor FastAPI
-mobile/     Aplicação React Native (Expo)
-web/        Site React para navegadores
-scripts/    Utilidades auxiliares
+backend/        Código do servidor FastAPI
+mobile/         Aplicação React Native (Expo)
+sunny_sales_web/  Site React para navegadores
+scripts/        Utilidades auxiliares
 ```
 
 ## Configuração Rápida
@@ -32,11 +32,12 @@ scripts/    Utilidades auxiliares
    npm install
    npx expo start
    ```
-6. Para o site Web entre em `web`, instale dependências e execute:
+6. Para o site Web entre em `sunny_sales_web`, instale dependências e execute:
    ```bash
    npm install
-   npm start
+   npm run dev
    ```
+   Pode definir a variável `VITE_BASE_URL` para apontar para o endereço do backend.
 
 ## Novidades
 
@@ -44,7 +45,7 @@ scripts/    Utilidades auxiliares
 - **Favoritos**: clientes podem marcar vendedores favoritos para receber notificações de proximidade.
 - **Respostas a reviews**: vendedores podem responder ou ocultar avaliações via API.
 - **Tradução e acessibilidade**: interface com suporte a português e inglês e elementos com labels acessíveis.
-   A variável `BASE_URL` em `mobile/config.js` deve apontar para o endereço do backend.
+  A variável `BASE_URL` em `mobile/config.js` e `VITE_BASE_URL` para o site devem apontar para o endereço do backend.
 
 ## Testes
 

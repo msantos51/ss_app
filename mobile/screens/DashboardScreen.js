@@ -23,6 +23,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import { theme } from '../theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   startLocationSharing,
   stopLocationSharing,
@@ -347,6 +348,20 @@ export default function DashboardScreen({ navigation }) {
         </Button>
       </ScrollView>
 
+      <TouchableOpacity
+        style={styles.storyButton}
+        onPress={addStory}
+        disabled={uploadingStory}
+        accessibilityRole="button"
+        accessibilityLabel="Adicionar story"
+      >
+        <MaterialCommunityIcons
+          name="plus-circle"
+          size={48}
+          color={theme.colors.accent}
+        />
+      </TouchableOpacity>
+
       <Animated.View
         pointerEvents={menuOpen ? 'auto' : 'none'}
         style={[
@@ -377,7 +392,6 @@ export default function DashboardScreen({ navigation }) {
             <List.Accordion title="Definições de Conta" expanded={accountOpen} onPress={() => setAccountOpen(!accountOpen)}>
               <List.Item title="Atualizar Dados Pessoais" onPress={() => { setMenuOpen(false); setEditing(true); }} />
               <List.Item title="Apagar Conta" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }} />
-              <List.Item title="Adicionar Story" disabled={uploadingStory} onPress={() => { setMenuOpen(false); addStory(); }} />
             </List.Accordion>
             <List.Accordion title="Sobre e Ajuda" expanded={helpOpen} onPress={() => setHelpOpen(!helpOpen)}>
               <List.Item title="Termos e Condições" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }} />
@@ -520,7 +534,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: '#ccc' 
   },
-  reviewRating: { 
-    fontWeight: 'bold' 
+  reviewRating: {
+    fontWeight: 'bold'
+  },
+  storyButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    zIndex: 101
   }
 });

@@ -1,6 +1,6 @@
 // Tela com detalhes do vendedor
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, FlatList, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Alert, Modal, FlatList } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
@@ -19,6 +19,12 @@ export default function VendorDetailScreen({ route }) {
   const [favorite, setFavorite] = useState(false);
   const [stories, setStories] = useState([]);
   const [selectedStory, setSelectedStory] = useState(null);
+
+  const openStory = () => {
+    if (stories.length > 0) {
+      setSelectedStory(stories[0].media_url);
+    }
+  };
 
   const loadReviews = async () => {
     try {
@@ -93,7 +99,14 @@ const submitReview = async () => {
 
   return (
     <View style={styles.container}>
-      {photoUri && <Image source={{ uri: photoUri }} style={styles.photo} />}
+      {photoUri && (
+        <TouchableOpacity onPress={openStory} activeOpacity={stories.length > 0 ? 0.7 : 1}>
+          <Image
+            source={{ uri: photoUri }}
+            style={[styles.photo, stories.length > 0 && styles.storyBorder]}
+          />
+        </TouchableOpacity>
+      )}
       <View style={styles.nameRow}>
         <Text style={styles.name}>{vendor.name || 'Vendedor'}</Text>
         <TouchableOpacity
@@ -125,41 +138,20 @@ const submitReview = async () => {
       </View>
       <Text style={styles.product}>Produto: {vendor.product}</Text>
 
-      {stories.length > 0 && (
-        <>
-          <FlatList
-            data={stories}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            style={styles.storyList}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => setSelectedStory(item.media_url)}>
-                <Image
-                  source={{ uri: `${baseUrl}/${item.media_url}` }}
-                  style={styles.storyThumb}
-                />
-              </TouchableOpacity>
-            )}
-          />
-          <Modal
-            visible={!!selectedStory}
-            transparent
-            onRequestClose={() => setSelectedStory(null)}
-          >
-            <TouchableOpacity
-              style={styles.modalBg}
-              onPress={() => setSelectedStory(null)}
-            >
-              {selectedStory && (
-                <Image
-                  source={{ uri: `${baseUrl}/${selectedStory}` }}
-                  style={styles.fullStory}
-                />
-              )}
-            </TouchableOpacity>
-          </Modal>
-        </>
-      )}
+      <Modal
+        visible={!!selectedStory}
+        transparent
+        onRequestClose={() => setSelectedStory(null)}
+      >
+        <TouchableOpacity style={styles.modalBg} onPress={() => setSelectedStory(null)}>
+          {selectedStory && (
+            <Image
+              source={{ uri: `${baseUrl}/${selectedStory}` }}
+              style={styles.fullStory}
+            />
+          )}
+        </TouchableOpacity>
+      </Modal>
 
       <FlatList
         data={reviews}
@@ -202,8 +194,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  storyList: { marginBottom: 12 },
-  storyThumb: { width: 60, height: 60, borderRadius: 8, marginRight: 8 },
+  storyBorder: { borderWidth: 3, borderColor: 'purple' },
   modalBg: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.8)',

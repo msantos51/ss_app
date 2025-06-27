@@ -23,12 +23,14 @@ function ClientDashboardPage() {
     load();
   }, []);
 
-  // logout
-  const logout = () => {
+  // handleLogout
+  const handleLogout = () => {
     localStorage.removeItem('client');
     localStorage.removeItem('clientToken');
     navigate('/client/login');
   };
+  // alias for backward compatibility
+  const logout = handleLogout;
 
   return (
     <main style={{ padding: '1rem' }}>
@@ -39,7 +41,7 @@ function ClientDashboardPage() {
           <li key={v.id}>{v.name}</li>
         ))}
       </ul>
-      <button onClick={logout}>Sair</button>
+      <button onClick={handleLogout}>Sair</button>
     </main>
   );
 }

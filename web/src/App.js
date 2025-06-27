@@ -3,21 +3,25 @@ import LoginPage from './pages/LoginPage';
 import VendorDashboard from './pages/VendorDashboard';
 import PublicMapPage from './pages/PublicMapPage';
 import PrivateRoute from './components/PrivateRoute';
+import LanguageSelector from './components/LanguageSelector';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/vendor"
-        element={
-          <PrivateRoute>
-            <VendorDashboard />
-          </PrivateRoute>
-        }
-      />
-      <Route path="*" element={<PublicMapPage />} />
-    </Routes>
+    <>
+      <LanguageSelector />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/vendor"
+          element={
+            <PrivateRoute>
+              <VendorDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<PublicMapPage />} />
+      </Routes>
+    </>
   );
 }
 

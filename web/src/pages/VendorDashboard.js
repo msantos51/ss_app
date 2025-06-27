@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchVendorProfile, updateVendorLocation } from '../services/api';
 import styles from './VendorDashboard.module.css';
+import { useTranslation } from '../i18n';
 
 function VendorDashboard() {
   const navigate = useNavigate();
+  const t = useTranslation();
   const [vendor, setVendor] = useState(null);
   const token = localStorage.getItem('token');
 
@@ -32,14 +34,18 @@ function VendorDashboard() {
 
   return (
     <div className={styles.container}>
-      <h1>Painel do Vendedor</h1>
-      <p>Nome: {vendor.name}</p>
-      <p>Produto: {vendor.product}</p>
+      <h1>{t('vendorPanel')}</h1>
       <p>
-        Localização: {vendor.current_lat}, {vendor.current_lng}
+        {t('name')}: {vendor.name}
       </p>
-      <button onClick={shareLocation}>Partilhar localização</button>
-      <button onClick={logout}>Sair</button>
+      <p>
+        {t('product')}: {vendor.product}
+      </p>
+      <p>
+        {t('location')}: {vendor.current_lat}, {vendor.current_lng}
+      </p>
+      <button onClick={shareLocation}>{t('shareLocation')}</button>
+      <button onClick={logout}>{t('logout')}</button>
     </div>
   );
 }

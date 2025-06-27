@@ -12,23 +12,13 @@ function VendorDashboard() {
   const [vendor, setVendor] = useState(null);
   const token = localStorage.getItem('token');
 
-
-  useEffect(() => {
-    if (!token) return;
-    fetchVendorProfile(token).then(setVendor);
-  }, [token]);
-
-=======
-
-  // handleLogout
+  // Função de logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
-  // alias for backward compatibility
-  const logout = handleLogout;
 
-  // useEffect para carregar perfil
+  // useEffect para carregar o perfil
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -75,4 +65,3 @@ function VendorDashboard() {
 }
 
 export default VendorDashboard;
-

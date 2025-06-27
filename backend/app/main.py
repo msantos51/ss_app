@@ -261,9 +261,40 @@ def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
 # --------------------------
 @app.post("/token")
 # generate_token
-def generate_token(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
-    vendor = db.query(models.Vendor).filter(models.Vendor.email == credentials.email).first()
-    if not vendor or not pwd_context.verify(credentials.password, vendor.hashed_password):
+async def generate_token(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Allow token generation using either JSON or form-encoded data."""
+    email = None
+    password = None
+
+    content_type = request.headers.get("content-type", "").lower()
+
+    if "application/json" in content_type:
+        data = await request.json()
+        email = data.get("email") or data.get("username")
+        password = data.get("password")
+    elif "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+        form = await request.form()
+        email = form.get("email") or form.get("username")
+        password = form.get("password")
+    else:
+        # fallback: tentar json primeiro, depois form
+        try:
+            data = await request.json()
+            email = data.get("email") or data.get("username")
+            password = data.get("password")
+        except Exception:
+            form = await request.form()
+            email = form.get("email") or form.get("username")
+            password = form.get("password")
+
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password required")
+
+    vendor = db.query(models.Vendor).filter(models.Vendor.email == email).first()
+    if not vendor or not pwd_context.verify(password, vendor.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     if not vendor.email_confirmed:
         raise HTTPException(status_code=400, detail="Email not confirmed")

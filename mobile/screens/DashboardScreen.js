@@ -132,20 +132,14 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  const addStory = async () => {
-    if (!vendor) return;
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-    if (result.canceled || result.assets.length === 0) return;
+  const addStory = async (asset) => {
+    if (!vendor || !asset) return;
     try {
       setUploadingStory(true);
       const token = await AsyncStorage.getItem('token');
       const data = new FormData();
       data.append('file', {
-        uri: result.assets[0].uri,
+        uri: asset.uri,
         name: 'story.jpg',
         type: 'image/jpeg',
       });
@@ -161,6 +155,30 @@ export default function DashboardScreen({ navigation }) {
     } finally {
       setUploadingStory(false);
     }
+  };
+
+  const handleAddStory = () => {
+    Alert.alert('Novo Story', 'Escolha uma opção', [
+      {
+        text: 'Câmara',
+        onPress: async () => {
+          const res = await ImagePicker.launchCameraAsync({ quality: 1 });
+          if (!res.canceled && res.assets.length > 0) addStory(res.assets[0]);
+        },
+      },
+      {
+        text: 'Galeria',
+        onPress: async () => {
+          const res = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 1,
+          });
+          if (!res.canceled && res.assets.length > 0) addStory(res.assets[0]);
+        },
+      },
+      { text: 'Cancelar', style: 'cancel' },
+    ]);
   };
 
   const updateProfile = async () => {
@@ -347,6 +365,14 @@ export default function DashboardScreen({ navigation }) {
         </Button>
       </ScrollView>
 
+      <TouchableOpacity
+        style={styles.storyButton}
+        onPress={handleAddStory}
+        disabled={uploadingStory}
+      >
+        <Text style={styles.storyIcon}>📷</Text>
+      </TouchableOpacity>
+
       <Animated.View
         pointerEvents={menuOpen ? 'auto' : 'none'}
         style={[
@@ -377,7 +403,6 @@ export default function DashboardScreen({ navigation }) {
             <List.Accordion title="Definições de Conta" expanded={accountOpen} onPress={() => setAccountOpen(!accountOpen)}>
               <List.Item title="Atualizar Dados Pessoais" onPress={() => { setMenuOpen(false); setEditing(true); }} />
               <List.Item title="Apagar Conta" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }} />
-              <List.Item title="Adicionar Story" disabled={uploadingStory} onPress={() => { setMenuOpen(false); addStory(); }} />
             </List.Accordion>
             <List.Accordion title="Sobre e Ajuda" expanded={helpOpen} onPress={() => setHelpOpen(!helpOpen)}>
               <List.Item title="Termos e Condições" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }} />
@@ -520,7 +545,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: '#ccc' 
   },
-  reviewRating: { 
-    fontWeight: 'bold' 
-  }
+  reviewRating: {
+    fontWeight: 'bold'
+  },
+  storyButton: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+  },
+  storyIcon: {
+    fontSize: 28,
+  },
 });

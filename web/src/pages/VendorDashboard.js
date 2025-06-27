@@ -12,11 +12,21 @@ function VendorDashboard() {
   const [vendor, setVendor] = useState(null);
   const token = localStorage.getItem('token');
 
+
+  useEffect(() => {
+    if (!token) return;
+    fetchVendorProfile(token).then(setVendor);
+  }, [token]);
+
+=======
+
   // handleLogout
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
+  // alias for backward compatibility
+  const logout = handleLogout;
 
   // useEffect para carregar perfil
   useEffect(() => {

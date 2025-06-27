@@ -269,6 +269,28 @@ async def generate_token(
     email = None
     password = None
 
+
+    content_type = request.headers.get("content-type", "").lower()
+
+    if "application/json" in content_type:
+        data = await request.json()
+        email = data.get("email") or data.get("username")
+        password = data.get("password")
+    elif "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+        form = await request.form()
+        email = form.get("email") or form.get("username")
+        password = form.get("password")
+    else:
+        # fallback: tentar json primeiro, depois form
+        try:
+            data = await request.json()
+            email = data.get("email") or data.get("username")
+            password = data.get("password")
+        except Exception:
+            form = await request.form()
+            email = form.get("email") or form.get("username")
+            password = form.get("password")
+=======
     # Tentar ler como JSON
     try:
         data = await request.json()
@@ -282,6 +304,7 @@ async def generate_token(
         form = await request.form()
         email = form.get("email") or form.get("username")
         password = form.get("password")
+
 
     if not email or not password:
         raise HTTPException(status_code=400, detail="Email and password required")

@@ -7,6 +7,7 @@ Aplicação composta por backend em **FastAPI** e app móvel em **React Native**
 ```
 backend/    Código do servidor FastAPI
 mobile/     Aplicação React Native (Expo)
+web/        Site React para navegadores
 scripts/    Utilidades auxiliares
 ```
 
@@ -30,6 +31,11 @@ scripts/    Utilidades auxiliares
    ```bash
    npm install
    npx expo start
+   ```
+6. Para o site Web entre em `web`, instale dependências e execute:
+   ```bash
+   npm install
+   npm start
    ```
 
 ## Novidades

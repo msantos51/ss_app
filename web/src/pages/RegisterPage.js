@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerVendor } from '../services/api';
 
+// RegisterPage
 function RegisterPage() {
+  // navigate
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -11,6 +13,7 @@ function RegisterPage() {
   const [product, setProduct] = useState('');
   const [error, setError] = useState('');
 
+  // handleSubmit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

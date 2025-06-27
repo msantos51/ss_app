@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchVendor } from '../services/api';
 
+// VendorDetailPage
 function VendorDetailPage() {
   const { id } = useParams();
   const [vendor, setVendor] = useState(null);

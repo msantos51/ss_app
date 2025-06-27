@@ -2,6 +2,7 @@
 const ENABLED_KEY = 'notifications_enabled';
 
 export function isNotificationsEnabled() {
+  // val
   const val = localStorage.getItem(ENABLED_KEY);
   return val !== 'false';
 }

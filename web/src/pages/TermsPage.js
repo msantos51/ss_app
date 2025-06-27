@@ -1,6 +1,7 @@
 // Página web que mostra os Termos e Condições completos
 import React from 'react';
 
+// TermsPage
 function TermsPage() {
   return (
     <div style={{ padding: '1rem' }}>

@@ -4,10 +4,14 @@ import { fetchVendorProfile, updateVendorLocation } from '../services/api';
 import styles from './VendorDashboard.module.css';
 import { useTranslation } from '../i18n';
 
+// VendorDashboard
 function VendorDashboard() {
+  // navigate
   const navigate = useNavigate();
+  // t
   const t = useTranslation();
   const [vendor, setVendor] = useState(null);
+  // token
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -15,11 +19,13 @@ function VendorDashboard() {
     fetchVendorProfile(token).then(setVendor);
   }, [token]);
 
+  // logout
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
 
+  // shareLocation
   const shareLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) => {

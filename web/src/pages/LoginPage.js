@@ -4,16 +4,21 @@ import { login } from '../services/api';
 import styles from './LoginPage.module.css';
 import { useTranslation } from '../i18n';
 
+// LoginPage
 function LoginPage() {
+  // navigate
   const navigate = useNavigate();
+  // t
   const t = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  // handleSubmit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // data
       const data = await login(email, password);
       localStorage.setItem('token', data.access_token);
       navigate('/vendor');

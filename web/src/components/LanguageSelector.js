@@ -1,5 +1,6 @@
 import { useLang } from '../i18n';
 
+// LanguageSelector
 function LanguageSelector() {
   const { lang, setLang } = useLang();
   return (

@@ -30,8 +30,10 @@ export default function VendorDetailScreen({ route }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [hasUnseen, setHasUnseen] = useState(false);
 
+  // loadReviews
   const loadReviews = async () => {
     try {
+      // resp
       const resp = await axios.get(`${BASE_URL}/vendors/${vendor.id}/reviews`);
       setReviews(resp.data);
     } catch (e) {
@@ -39,11 +41,15 @@ export default function VendorDetailScreen({ route }) {
     }
   };
 
+  // loadStories
   const loadStories = async () => {
     try {
+      // resp
       const resp = await axios.get(`${BASE_URL}/vendors/${vendor.id}/stories`);
       setStories(resp.data);
+      // seen
       const seen = await getSeenStories();
+      // unseen
       const unseen = resp.data.some((s) => !seen.includes(s.id));
       setHasUnseen(unseen);
     } catch (e) {
@@ -57,6 +63,7 @@ export default function VendorDetailScreen({ route }) {
     loadStories();
   }, []);
 
+// submitReview
 const submitReview = async () => {
   try {
     // 1️⃣ Vai buscar o token ao AsyncStorage
@@ -101,16 +108,20 @@ const submitReview = async () => {
 };
 
 
+  // baseUrl
   const baseUrl = BASE_URL.replace(/\/$/, '');
+  // photoUri
   const photoUri = vendor.profile_photo
     ? `${baseUrl}/${vendor.profile_photo}`
     : null;
 
+  // openStories
   const openStories = (index = 0) => {
     if (!stories.length) return;
     setStoryIndex(index);
   };
 
+  // closeStories
   const closeStories = async () => {
     setStoryIndex(null);
     await markStoriesSeen(stories.map((s) => s.id));
@@ -133,6 +144,7 @@ const submitReview = async () => {
           accessibilityRole="button"
           accessibilityLabel={favorite ? t('removeFavorite') : t('addFavorite')}
           onPress={async () => {
+            // token
             const token = await AsyncStorage.getItem('clientToken');
             if (!token) {
               Alert.alert(
@@ -227,6 +239,7 @@ const submitReview = async () => {
   );
 }
 
+// styles
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: theme.colors.background },
   photo: { width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginBottom: 16 },

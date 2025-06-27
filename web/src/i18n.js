@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
+// translations
 const translations = {
   en: {
     loginTitle: 'Vendor Login',
@@ -29,8 +30,10 @@ const translations = {
   },
 };
 
+// defaultLang
 const defaultLang = localStorage.getItem('lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
 
+// I18nContext
 const I18nContext = createContext({ lang: defaultLang, setLang: () => {} });
 
 export const I18nProvider = ({ children }) => {

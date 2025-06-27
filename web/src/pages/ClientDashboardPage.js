@@ -4,20 +4,26 @@ import { useNavigate } from 'react-router-dom';
 import { fetchFavorites } from '../services/api';
 import { getFavorites } from '../services/favorites';
 
+// ClientDashboardPage
 function ClientDashboardPage() {
+  // navigate
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
+    // load
     const load = async () => {
+      // ids
       const ids = getFavorites();
       if (ids.length === 0) return;
+      // vendors
       const vendors = await fetchFavorites(ids);
       setFavorites(vendors);
     };
     load();
   }, []);
 
+  // logout
   const logout = () => {
     localStorage.removeItem('client');
     localStorage.removeItem('clientToken');

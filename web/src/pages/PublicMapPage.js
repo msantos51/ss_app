@@ -4,6 +4,7 @@ import { fetchActiveVendors } from '../services/api';
 import 'leaflet/dist/leaflet.css';
 import styles from './PublicMapPage.module.css';
 
+// PublicMapPage
 function PublicMapPage() {
   const [vendors, setVendors] = useState([]);
 
@@ -11,6 +12,7 @@ function PublicMapPage() {
     fetchActiveVendors().then(setVendors);
   }, []);
 
+  // center
   const center = vendors.length
     ? [vendors[0].current_lat, vendors[0].current_lng]
     : [38.716, -9.139];

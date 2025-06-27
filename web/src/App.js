@@ -19,6 +19,7 @@ import PublicMapPage from './pages/PublicMapPage';
 import PrivateRoute from './components/PrivateRoute';
 import LanguageSelector from './components/LanguageSelector';
 
+// App
 function App() {
   return (
     <>

@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Polyline } from 'react-leaflet';
 import { fetchRoute } from '../services/api';
 import 'leaflet/dist/leaflet.css';
 
+// RouteDetailPage
 function RouteDetailPage() {
   const { id } = useParams();
   const [route, setRoute] = useState(null);
@@ -15,7 +16,9 @@ function RouteDetailPage() {
 
   if (!route) return <p>Carregando...</p>;
 
+  // polyline
   const polyline = route.points.map((p) => [p.lat, p.lng]);
+  // position
   const position = polyline.length ? polyline[0] : [0, 0];
 
   return (

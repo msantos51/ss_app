@@ -19,8 +19,8 @@ function VendorDashboard() {
     fetchVendorProfile(token).then(setVendor);
   }, [token]);
 
-  // logout
-  const logout = () => {
+  // handleLogout
+  const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
@@ -51,7 +51,7 @@ function VendorDashboard() {
         {t('location')}: {vendor.current_lat}, {vendor.current_lng}
       </p>
       <button onClick={shareLocation}>{t('shareLocation')}</button>
-      <button onClick={logout}>{t('logout')}</button>
+      <button onClick={handleLogout}>{t('logout')}</button>
     </main>
   );
 }

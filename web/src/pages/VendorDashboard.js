@@ -1,3 +1,4 @@
+// (em português) Painel do vendedor com carregamento do perfil, botão de logout e partilha de localização
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchVendorProfile, updateVendorLocation } from '../services/api';
@@ -6,28 +7,39 @@ import { useTranslation } from '../i18n';
 
 // VendorDashboard
 function VendorDashboard() {
-  // navigate
   const navigate = useNavigate();
-  // t
   const t = useTranslation();
   const [vendor, setVendor] = useState(null);
-  // token
   const token = localStorage.getItem('token');
-
-  useEffect(() => {
-    if (!token) return;
-    fetchVendorProfile(token).then(setVendor);
-  }, [token]);
 
   // handleLogout
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
-  // alias for backward compatibility
-  const logout = handleLogout;
 
-  // shareLocation
+  // useEffect para carregar perfil
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        const data = await fetchVendorProfile(token);
+        setVendor(data);
+      } catch (err) {
+        console.error('Erro ao carregar perfil:', err);
+        localStorage.removeItem('token');
+        navigate('/login');
+      }
+    };
+
+    loadProfile();
+  }, [token, navigate]);
+
+  // Partilha de localização
   const shareLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -43,15 +55,9 @@ function VendorDashboard() {
   return (
     <main className={styles.container}>
       <h1>{t('vendorPanel')}</h1>
-      <p>
-        {t('name')}: {vendor.name}
-      </p>
-      <p>
-        {t('product')}: {vendor.product}
-      </p>
-      <p>
-        {t('location')}: {vendor.current_lat}, {vendor.current_lng}
-      </p>
+      <p>{t('name')}: {vendor.name}</p>
+      <p>{t('product')}: {vendor.product}</p>
+      <p>{t('location')}: {vendor.current_lat}, {vendor.current_lng}</p>
       <button onClick={shareLocation}>{t('shareLocation')}</button>
       <button onClick={handleLogout}>{t('logout')}</button>
     </main>
@@ -59,3 +65,4 @@ function VendorDashboard() {
 }
 
 export default VendorDashboard;
+

@@ -7,8 +7,18 @@ const api = axios.create({
 });
 
 // Login de vendedores
-export const login = (email, password) =>
-  api.post('/token', { email, password }).then((r) => r.data);
+export const login = (email, password) => {
+  const params = new URLSearchParams();
+  params.append('username', email);  // FastAPI espera 'username', não 'email'
+  params.append('password', password);
+
+  return api.post('/token', params, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  }).then((r) => r.data);
+};
+
 
 // Obtém o perfil do vendedor autenticado
 export const fetchVendorProfile = (token) =>

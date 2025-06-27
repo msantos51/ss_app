@@ -1055,3 +1055,7 @@ def admin_deactivate_vendor(vendor_id: int, db: Session = Depends(get_db), admin
     vendor.subscription_active = False
     db.commit()
     return {"status": "deactivated"}
+
+@app.get("/vendors/me", response_model=schemas.VendorOut)
+def get_my_vendor_profile(current_vendor: models.Vendor = Depends(get_current_vendor)):
+    return current_vendor

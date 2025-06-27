@@ -1,0 +1,24 @@
+import { Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import VendorDashboard from './pages/VendorDashboard';
+import PublicMapPage from './pages/PublicMapPage';
+import PrivateRoute from './components/PrivateRoute';
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/vendor"
+        element={
+          <PrivateRoute>
+            <VendorDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route path="*" element={<PublicMapPage />} />
+    </Routes>
+  );
+}
+
+export default App;

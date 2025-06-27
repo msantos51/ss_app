@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const BASE_URL = 'https://ss-tester.onrender.com';
+import { BASE_URL } from '../config';
 
 export default function ClientLogin() {
   const [email, setEmail] = useState('');

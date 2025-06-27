@@ -5,6 +5,7 @@ import App from './App';
 import './index.css';
 import { I18nProvider } from './i18n';
 
+// root
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>

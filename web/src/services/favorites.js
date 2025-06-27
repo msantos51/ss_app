@@ -2,11 +2,13 @@
 const KEY = 'favorites';
 
 export function getFavorites() {
+  // data
   const data = localStorage.getItem(KEY);
   return data ? JSON.parse(data) : [];
 }
 
 export function addFavorite(id) {
+  // favs
   const favs = getFavorites();
   if (!favs.includes(id)) {
     favs.push(id);

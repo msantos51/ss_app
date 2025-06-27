@@ -18,6 +18,7 @@ engine = create_engine(DATABASE_URL, **connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# get_db
 def get_db():
     db = SessionLocal()
     try:

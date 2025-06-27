@@ -3,11 +3,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { requestPasswordReset } from '../services/api';
 
+// ForgotPasswordPage
 function ForgotPasswordPage() {
+  // navigate
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
 
+  // handleSubmit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

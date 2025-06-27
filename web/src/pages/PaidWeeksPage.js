@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { fetchPaidWeeks } from '../services/api';
 
+// PaidWeeksPage
 function PaidWeeksPage() {
   const [weeks, setWeeks] = useState([]);
 

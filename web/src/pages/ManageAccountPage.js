@@ -1,9 +1,11 @@
 // Página com ações para alteração e remoção de conta
 function ManageAccountPage() {
+  // changePassword
   const changePassword = () => {
     alert('Funcionalidade indisponível');
   };
 
+  // deleteAccount
   const deleteAccount = () => {
     alert('Funcionalidade indisponível');
   };

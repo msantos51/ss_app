@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { isNotificationsEnabled, setNotificationsEnabled } from '../services/settings';
 
+// AccountSettingsPage
 function AccountSettingsPage() {
   const [enabled, setEnabled] = useState(true);
 
@@ -9,7 +10,9 @@ function AccountSettingsPage() {
     setEnabled(isNotificationsEnabled());
   }, []);
 
+  // toggle
   const toggle = () => {
+    // val
     const val = !enabled;
     setEnabled(val);
     setNotificationsEnabled(val);

@@ -1,6 +1,14 @@
 // Tela com detalhes do vendedor
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, FlatList, TouchableOpacity, Alert, Modal } from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  Modal,
+} from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import StarRatingInput from '../StarRatingInput';
 import axios from 'axios';
@@ -10,6 +18,7 @@ import { theme } from '../theme';
 import { isFavorite, addFavorite, removeFavorite } from '../favoritesService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import t from '../i18n';
+import { getSeenStories, markStoriesSeen } from '../storyViewService';
 
 export default function VendorDetailScreen({ route }) {
   const { vendor } = route.params;
@@ -18,7 +27,8 @@ export default function VendorDetailScreen({ route }) {
   const [comment, setComment] = useState('');
   const [favorite, setFavorite] = useState(false);
   const [stories, setStories] = useState([]);
-  const [selectedStory, setSelectedStory] = useState(null);
+  const [storyIndex, setStoryIndex] = useState(null);
+  const [hasUnseen, setHasUnseen] = useState(false);
 
   const loadReviews = async () => {
     try {
@@ -33,6 +43,9 @@ export default function VendorDetailScreen({ route }) {
     try {
       const resp = await axios.get(`${BASE_URL}/vendors/${vendor.id}/stories`);
       setStories(resp.data);
+      const seen = await getSeenStories();
+      const unseen = resp.data.some((s) => !seen.includes(s.id));
+      setHasUnseen(unseen);
     } catch (e) {
       console.log('Erro ao buscar stories:', e);
     }
@@ -89,11 +102,31 @@ const submitReview = async () => {
 
 
   const baseUrl = BASE_URL.replace(/\/$/, '');
-  const photoUri = vendor.profile_photo ? `${baseUrl}/${vendor.profile_photo}` : null;
+  const photoUri = vendor.profile_photo
+    ? `${baseUrl}/${vendor.profile_photo}`
+    : null;
+
+  const openStories = (index = 0) => {
+    if (!stories.length) return;
+    setStoryIndex(index);
+  };
+
+  const closeStories = async () => {
+    setStoryIndex(null);
+    await markStoriesSeen(stories.map((s) => s.id));
+    setHasUnseen(false);
+  };
 
   return (
     <View style={styles.container}>
-      {photoUri && <Image source={{ uri: photoUri }} style={styles.photo} />}
+      {photoUri && (
+        <TouchableOpacity onPress={() => openStories(0)}>
+          <Image
+            source={{ uri: photoUri }}
+            style={[styles.photo, hasUnseen && styles.storyRing]}
+          />
+        </TouchableOpacity>
+      )}
       <View style={styles.nameRow}>
         <Text style={styles.name}>{vendor.name || 'Vendedor'}</Text>
         <TouchableOpacity
@@ -132,8 +165,8 @@ const submitReview = async () => {
             keyExtractor={(item) => item.id.toString()}
             horizontal
             style={styles.storyList}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => setSelectedStory(item.media_url)}>
+            renderItem={({ item, index }) => (
+              <TouchableOpacity onPress={() => openStories(index)}>
                 <Image
                   source={{ uri: `${baseUrl}/${item.media_url}` }}
                   style={styles.storyThumb}
@@ -142,17 +175,23 @@ const submitReview = async () => {
             )}
           />
           <Modal
-            visible={!!selectedStory}
+            visible={storyIndex !== null}
             transparent
-            onRequestClose={() => setSelectedStory(null)}
+            onRequestClose={closeStories}
           >
             <TouchableOpacity
               style={styles.modalBg}
-              onPress={() => setSelectedStory(null)}
+              onPress={() => {
+                if (storyIndex < stories.length - 1) {
+                  setStoryIndex(storyIndex + 1);
+                } else {
+                  closeStories();
+                }
+              }}
             >
-              {selectedStory && (
+              {storyIndex !== null && (
                 <Image
-                  source={{ uri: `${baseUrl}/${selectedStory}` }}
+                  source={{ uri: `${baseUrl}/${stories[storyIndex].media_url}` }}
                   style={styles.fullStory}
                 />
               )}
@@ -191,6 +230,10 @@ const submitReview = async () => {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: theme.colors.background },
   photo: { width: 120, height: 120, borderRadius: 60, alignSelf: 'center', marginBottom: 16 },
+  storyRing: {
+    borderWidth: 3,
+    borderColor: '#9b5de5',
+  },
   name: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
   product: { textAlign: 'center', marginBottom: 16 },
   reviewList: { marginVertical: 8 },

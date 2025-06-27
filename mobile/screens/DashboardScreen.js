@@ -309,7 +309,7 @@ export default function DashboardScreen({ navigation }) {
           ))}
         </View>
 
-        <Button mode="outlined" style={styles.fullButton} onPress={logout}>
+        <Button mode="contained" style={styles.fullButton} onPress={logout}>
           <Text>Sair</Text>
         </Button>
       </ScrollView>

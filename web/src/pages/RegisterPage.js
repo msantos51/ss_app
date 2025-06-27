@@ -26,7 +26,7 @@ function RegisterPage() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '2rem auto' }}>
+    <main style={{ maxWidth: '400px', margin: '2rem auto' }}>
       <h1>Registar Vendedor</h1>
       <form onSubmit={handleSubmit}>
         <input
@@ -53,7 +53,7 @@ function RegisterPage() {
         <button type="submit">Registar</button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
-    </div>
+    </main>
   );
 }
 

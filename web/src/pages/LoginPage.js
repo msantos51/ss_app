@@ -28,7 +28,7 @@ function LoginPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <main className={styles.container}>
       <h1>{t('loginTitle')}</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
         <input
@@ -45,7 +45,7 @@ function LoginPage() {
         <button type="submit">{t('loginButton')}</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
-    </div>
+    </main>
   );
 }
 

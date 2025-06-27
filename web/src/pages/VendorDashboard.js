@@ -39,7 +39,7 @@ function VendorDashboard() {
   if (!vendor) return <p>Carregando...</p>;
 
   return (
-    <div className={styles.container}>
+    <main className={styles.container}>
       <h1>{t('vendorPanel')}</h1>
       <p>
         {t('name')}: {vendor.name}
@@ -52,7 +52,7 @@ function VendorDashboard() {
       </p>
       <button onClick={shareLocation}>{t('shareLocation')}</button>
       <button onClick={logout}>{t('logout')}</button>
-    </div>
+    </main>
   );
 }
 

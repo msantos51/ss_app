@@ -12,7 +12,7 @@ function RoutesPage() {
   }, []);
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <main style={{ padding: '1rem' }}>
       <h1>Trajetos</h1>
       <ul>
         {routes.map((r) => (
@@ -21,7 +21,7 @@ function RoutesPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </main>
   );
 }
 

@@ -19,12 +19,12 @@ function AccountSettingsPage() {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <main style={{ padding: '1rem' }}>
       <h1>Notificações</h1>
       <label>
         <input type="checkbox" checked={enabled} onChange={toggle} /> Ativar
       </label>
-    </div>
+    </main>
   );
 }
 

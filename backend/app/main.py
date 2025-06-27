@@ -269,6 +269,7 @@ async def generate_token(
     email = None
     password = None
 
+
     content_type = request.headers.get("content-type", "").lower()
 
     if "application/json" in content_type:
@@ -289,6 +290,21 @@ async def generate_token(
             form = await request.form()
             email = form.get("email") or form.get("username")
             password = form.get("password")
+=======
+    # Tentar ler como JSON
+    try:
+        data = await request.json()
+        email = data.get("email")
+        password = data.get("password")
+    except Exception:
+        pass
+
+    # Se falhou, tentar como form-urlencoded
+    if email is None or password is None:
+        form = await request.form()
+        email = form.get("email") or form.get("username")
+        password = form.get("password")
+
 
     if not email or not password:
         raise HTTPException(status_code=400, detail="Email and password required")
@@ -1062,3 +1078,7 @@ def admin_deactivate_vendor(vendor_id: int, db: Session = Depends(get_db), admin
     vendor.subscription_active = False
     db.commit()
     return {"status": "deactivated"}
+
+@app.get("/vendors/me", response_model=schemas.VendorOut)
+def get_my_vendor_profile(current_vendor: models.Vendor = Depends(get_current_vendor)):
+    return current_vendor

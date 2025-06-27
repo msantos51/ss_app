@@ -31,7 +31,7 @@ function ClientDashboardPage() {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <main style={{ padding: '1rem' }}>
       <h1>Perfil do Cliente</h1>
       <h2>Favoritos</h2>
       <ul>
@@ -40,7 +40,7 @@ function ClientDashboardPage() {
         ))}
       </ul>
       <button onClick={logout}>Sair</button>
-    </div>
+    </main>
   );
 }
 

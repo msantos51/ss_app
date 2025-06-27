@@ -18,12 +18,14 @@ import VendorDetailPage from './pages/VendorDetailPage';
 import PublicMapPage from './pages/PublicMapPage';
 import PrivateRoute from './components/PrivateRoute';
 import LanguageSelector from './components/LanguageSelector';
+import NavBar from './components/NavBar';
 
 // App
 function App() {
   return (
     <>
       <LanguageSelector />
+      <NavBar />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -48,6 +50,7 @@ function App() {
         <Route path="/vendor/:id" element={<VendorDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="/" element={<PublicMapPage />} />
         <Route path="*" element={<PublicMapPage />} />
       </Routes>
     </>

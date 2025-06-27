@@ -35,10 +35,10 @@ function StatsPage() {
   if (!chartData) return <p>Nenhum dado</p>;
 
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
+    <main style={{ maxWidth: '600px', margin: '2rem auto' }}>
       <h1>Estatísticas</h1>
       <Bar data={chartData} />
-    </div>
+    </main>
   );
 }
 

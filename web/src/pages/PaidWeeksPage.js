@@ -11,7 +11,7 @@ function PaidWeeksPage() {
   }, []);
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <main style={{ padding: '1rem' }}>
       <h1>Semanas Pagas</h1>
       <ul>
         {weeks.map((w) => (
@@ -20,7 +20,7 @@ function PaidWeeksPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </main>
   );
 }
 

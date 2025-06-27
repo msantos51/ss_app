@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 // AboutPage
 function AboutPage() {
   return (
-    <div style={{ padding: '1rem' }}>
+    <main style={{ padding: '1rem' }}>
       <h1>Sobre e Ajuda</h1>
       <p>
         Esta área permite consultar os Termos e contactar a equipa de suporte.
@@ -16,7 +16,7 @@ function AboutPage() {
       <p>
         <a href="mailto:suporte@sunnysales.com">Contactar Suporte</a>
       </p>
-    </div>
+    </main>
   );
 }
 

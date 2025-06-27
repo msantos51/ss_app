@@ -4,7 +4,7 @@ import React from 'react';
 // TermsPage
 function TermsPage() {
   return (
-    <div style={{ padding: '1rem' }}>
+    <main style={{ padding: '1rem' }}>
       <h1>Termos e Condições</h1>
       <h2>1. Aceitação dos Termos</h2>
       <p>
@@ -57,7 +57,7 @@ function TermsPage() {
         Para dúvidas contacte a equipa de suporte através do email:
         suporte@sunnysales.com
       </p>
-    </div>
+    </main>
   );
 }
 

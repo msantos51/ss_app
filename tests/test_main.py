@@ -386,3 +386,24 @@ def test_paid_weeks_listing(client):
     assert len(weeks) == 1
     assert weeks[0]["receipt_url"] == "http://r"
 
+
+def test_story_creation_and_listing(client):
+    resp = register_vendor(client)
+    vendor_id = resp.json()["id"]
+    confirm_latest_email(client)
+    token = get_token(client)
+
+    resp = client.post(
+        f"/vendors/{vendor_id}/stories",
+        files={"file": ("s.png", b"img", "image/png")},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    story = resp.json()
+    assert story["media_url"].startswith("stories/")
+
+    resp = client.get(f"/vendors/{vendor_id}/stories")
+    assert resp.status_code == 200
+    stories = resp.json()
+    assert len(stories) == 1
+

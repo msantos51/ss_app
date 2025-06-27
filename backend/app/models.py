@@ -114,3 +114,17 @@ class Favorite(Base):
     client = relationship("Client", back_populates="favorites")
     vendor = relationship("Vendor")
 
+
+class Story(Base):
+    """Stories efêmeras publicadas pelos vendedores."""
+
+    __tablename__ = "stories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    media_path = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime)
+
+    vendor = relationship("Vendor")
+

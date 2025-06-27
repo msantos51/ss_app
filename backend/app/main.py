@@ -30,6 +30,10 @@ from fastapi.responses import HTMLResponse
 PROFILE_PHOTO_DIR = "profile_photos"
 os.makedirs(PROFILE_PHOTO_DIR, exist_ok=True)
 
+# Diretório para stories dos vendedores
+STORY_DIR = "stories"
+os.makedirs(STORY_DIR, exist_ok=True)
+
 # Inicializar app
 app = FastAPI()
 
@@ -50,6 +54,7 @@ app.add_middleware(
 
 # Montar rota para servir fotos publicamente
 app.mount("/profile_photos", StaticFiles(directory=PROFILE_PHOTO_DIR), name="profile_photos")
+app.mount("/stories", StaticFiles(directory=STORY_DIR), name="stories")
 
 # Criar as tabelas na base de dados
 models.Base.metadata.create_all(bind=engine)
@@ -883,6 +888,56 @@ def delete_review(
     review.active = False
     db.commit()
     return {"status": "deleted"}
+
+
+@app.post("/vendors/{vendor_id}/stories", response_model=schemas.StoryOut)
+async def create_story(
+    vendor_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_vendor: models.Vendor = Depends(get_current_vendor),
+):
+    if current_vendor.id != vendor_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    ext = os.path.splitext(file.filename)[1]
+    file_name = f"{uuid4().hex}{ext}"
+    file_path = os.path.join(STORY_DIR, file_name)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    created = datetime.utcnow()
+    story = models.Story(
+        vendor_id=vendor_id,
+        media_path=f"stories/{file_name}",
+        created_at=created,
+        expires_at=created + timedelta(hours=2),
+    )
+    db.add(story)
+    db.commit()
+    db.refresh(story)
+    return {
+        "id": story.id,
+        "media_url": story.media_path,
+        "created_at": story.created_at.isoformat(),
+    }
+
+
+@app.get("/vendors/{vendor_id}/stories", response_model=list[schemas.StoryOut])
+def list_stories(vendor_id: int, db: Session = Depends(get_db)):
+    now = datetime.utcnow()
+    stories = (
+        db.query(models.Story)
+        .filter(models.Story.vendor_id == vendor_id, models.Story.expires_at > now)
+        .order_by(models.Story.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": s.id,
+            "media_url": s.media_path,
+            "created_at": s.created_at.isoformat(),
+        }
+        for s in stories
+    ]
 
 # --------------------------
 # Webhook do Stripe

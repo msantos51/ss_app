@@ -8,6 +8,7 @@ import {
   ScrollView,
   Animated,
   Linking,
+  Alert,
 } from 'react-native';
 import {
   TextInput,
@@ -48,6 +49,7 @@ export default function DashboardScreen({ navigation }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [uploadingStory, setUploadingStory] = useState(false);
 
   const colorOptions = ['#FFB6C1', '#ADD8E6', '#90EE90', '#FFFF99', '#C8A2C8', '#98E8D5', '#FFCC99', '#E6E6FA'];
 
@@ -127,6 +129,37 @@ export default function DashboardScreen({ navigation }) {
     });
     if (!result.canceled && result.assets.length > 0) {
       setProfilePhoto(result.assets[0]);
+    }
+  };
+
+  const addStory = async () => {
+    if (!vendor) return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+    if (result.canceled || result.assets.length === 0) return;
+    try {
+      setUploadingStory(true);
+      const token = await AsyncStorage.getItem('token');
+      const data = new FormData();
+      data.append('file', {
+        uri: result.assets[0].uri,
+        name: 'story.jpg',
+        type: 'image/jpeg',
+      });
+      await axios.post(`${BASE_URL}/vendors/${vendor.id}/stories`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Alert.alert('Story publicado');
+    } catch (e) {
+      setError('Erro ao publicar story');
+    } finally {
+      setUploadingStory(false);
     }
   };
 
@@ -344,6 +377,7 @@ export default function DashboardScreen({ navigation }) {
             <List.Accordion title="Definições de Conta" expanded={accountOpen} onPress={() => setAccountOpen(!accountOpen)}>
               <List.Item title="Atualizar Dados Pessoais" onPress={() => { setMenuOpen(false); setEditing(true); }} />
               <List.Item title="Apagar Conta" onPress={() => { setMenuOpen(false); navigation.navigate('ManageAccount'); }} />
+              <List.Item title="Adicionar Story" disabled={uploadingStory} onPress={() => { setMenuOpen(false); addStory(); }} />
             </List.Accordion>
             <List.Accordion title="Sobre e Ajuda" expanded={helpOpen} onPress={() => setHelpOpen(!helpOpen)}>
               <List.Item title="Termos e Condições" onPress={() => { setMenuOpen(false); navigation.navigate('Terms'); }} />

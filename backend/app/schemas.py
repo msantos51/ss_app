@@ -103,3 +103,12 @@ class PaidWeekOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class StoryOut(BaseModel):
+    id: int
+    media_url: str
+    created_at: str
+
+    class Config:
+        orm_mode = True

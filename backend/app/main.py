@@ -290,20 +290,6 @@ async def generate_token(
             form = await request.form()
             email = form.get("email") or form.get("username")
             password = form.get("password")
-=======
-    # Tentar ler como JSON
-    try:
-        data = await request.json()
-        email = data.get("email")
-        password = data.get("password")
-    except Exception:
-        pass
-
-    # Se falhou, tentar como form-urlencoded
-    if email is None or password is None:
-        form = await request.form()
-        email = form.get("email") or form.get("username")
-        password = form.get("password")
 
 
     if not email or not password:

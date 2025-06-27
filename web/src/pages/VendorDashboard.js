@@ -14,16 +14,25 @@ function VendorDashboard() {
   // token
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    if (!token) return;
-    fetchVendorProfile(token).then(setVendor);
-  }, [token]);
-
-  // logout
-  const logout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+ useEffect(() => {
+  const loadProfile = async () => {
+    try {
+      const data = await fetchVendorProfile(token);
+      setVendor(data);
+    } catch (err) {
+      console.error('Erro ao carregar perfil:', err);
+      localStorage.removeItem('token'); // remove token inválido
+      navigate('/login'); // volta para o login
+    }
   };
+
+  if (token) {
+    loadProfile();
+  } else {
+    navigate('/login'); // sem token, volta ao login
+  }
+}, [token, navigate]);
+
 
   // shareLocation
   const shareLocation = () => {

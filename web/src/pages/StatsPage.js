@@ -1,6 +1,7 @@
 // Página que exibe um gráfico simples das distâncias percorridas
 import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
+import 'chart.js/auto';
 import { fetchVendorRoutes } from '../services/api';
 
 // StatsPage

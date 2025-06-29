@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const BASE_URL = 'https://ss-tester.onrender.com';
+import { BASE_URL } from '../config';
 
 export default function DashboardCliente() {
   const [client, setClient] = useState(null);

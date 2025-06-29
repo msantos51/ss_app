@@ -16,6 +16,8 @@ import RoutesScreen from './pages/RoutesScreen';
 import StatsScreen from './pages/StatsScreen';
 import TermsScreen from './pages/TermsScreen';
 import VendorDetailScreen from './pages/VendorDetailScreen';
+import Invoices from './pages/Invoices';
+import Dashboard from './pages/Dashboard';
 
 
 
@@ -40,6 +42,7 @@ return (
     <Route path="/vendor-login" element={<VendorLogin />} />
     <Route path="/account" element={<ManageAccount />} />
     <Route path="/paid-weeks" element={<PaidWeeksScreen />} />
+    <Route path="/invoices" element={<Invoices />} />
     <Route path="/map" element={<MapScreen />} />
     <Route path="/vendor-register" element={<VendorRegister />} />
     <Route path="/route-detail" element={<RouteDetail />} />
@@ -47,6 +50,7 @@ return (
     <Route path="/stats" element={<StatsScreen />} />
     <Route path="/terms" element={<TermsScreen />} />
     <Route path="/vendors/:id" element={<VendorDetailScreen />} />
+    <Route path="/dashboard" element={<Dashboard />} />
 
 
   </Routes>

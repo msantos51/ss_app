@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-const BASE_URL = 'https://ss-tester.onrender.com';
+import { BASE_URL } from '../config';
 
 export default function ClientRegister() {
   const [name, setName] = useState('');

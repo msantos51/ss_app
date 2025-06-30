@@ -43,7 +43,16 @@ export default function VendorDashboard() {
 
   return (
     <div style={styles.container}>
-      <button style={styles.menuButton} onClick={() => setMenuOpen(!menuOpen)}>☰</button>
+
+      <button
+        style={styles.menuButton}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Abrir menu"
+      >
+        ☰
+      </button>
+
+
       {menuOpen && (
         <div style={styles.menu}>
           <div>
@@ -115,6 +124,7 @@ const styles = {
     maxWidth: '600px',
     margin: '0 auto',
     textAlign: 'center',
+    position: 'relative',
   },
   title: {
     marginBottom: '1rem',
@@ -146,6 +156,8 @@ const styles = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
+    zIndex: 20,
+
   },
   menu: {
     position: 'absolute',

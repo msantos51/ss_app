@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { BASE_URL } from '../config';
 
 export default function VendorDashboard() {
   const [vendor, setVendor] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [paymentsOpen, setPaymentsOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const navigate = useNavigate();
 
   // carrega dados do vendedor guardados no localStorage
@@ -20,8 +26,72 @@ export default function VendorDashboard() {
     navigate('/vendor-login');
   };
 
+  const paySubscription = async () => {
+    if (!vendor) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        `${BASE_URL}/vendors/${vendor.id}/create-checkout-session`,
+        null,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      if (res.data.checkout_url) window.open(res.data.checkout_url, '_blank');
+    } catch {
+      alert('Erro no pagamento');
+    }
+  };
+
   return (
     <div style={styles.container}>
+      <button
+        style={styles.menuButton}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Abrir menu"
+      >
+        ☰
+      </button>
+      {menuOpen && (
+        <div style={styles.menu}>
+          <div>
+            <button style={styles.sectionHeader} onClick={() => setPaymentsOpen(!paymentsOpen)}>Pagamentos</button>
+            {paymentsOpen && (
+              <div style={styles.subMenu}>
+                <button style={styles.menuItem} onClick={() => { setMenuOpen(false); paySubscription(); }}>Pagar Semanalidade</button>
+                <Link to="/paid-weeks" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Semanas Pagas</Link>
+                <Link to="/invoices" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Faturas</Link>
+              </div>
+            )}
+          </div>
+          <div>
+            <button style={styles.sectionHeader} onClick={() => setStatsOpen(!statsOpen)}>Estatísticas</button>
+            {statsOpen && (
+              <div style={styles.subMenu}>
+                <Link to="/routes" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Trajetos</Link>
+                <Link to="/stats" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Distância Percorrida</Link>
+              </div>
+            )}
+          </div>
+          <div>
+            <button style={styles.sectionHeader} onClick={() => setAccountOpen(!accountOpen)}>Definições de Conta</button>
+            {accountOpen && (
+              <div style={styles.subMenu}>
+                <Link to="/account" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Atualizar Dados Pessoais</Link>
+                <Link to="/account" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Apagar Conta</Link>
+              </div>
+            )}
+          </div>
+          <div>
+            <button style={styles.sectionHeader} onClick={() => setHelpOpen(!helpOpen)}>Sobre e Ajuda</button>
+            {helpOpen && (
+              <div style={styles.subMenu}>
+                <Link to="/terms" style={styles.menuItem} onClick={() => setMenuOpen(false)}>Termos e Condições</Link>
+                <button style={styles.menuItem} onClick={() => { setMenuOpen(false); window.location.href = 'mailto:suporte@sunnysales.com'; }}>Contactar Suporte</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <h2 style={styles.title}>Painel do Vendedor</h2>
       {vendor && (
         <>
@@ -40,12 +110,6 @@ export default function VendorDashboard() {
         </>
       )}
 
-      <div style={styles.links}>
-        <Link style={styles.link} to="/routes">Trajetos</Link>
-        <Link style={styles.link} to="/paid-weeks">Semanas Pagas</Link>
-        <Link style={styles.link} to="/stats">Estatísticas</Link>
-        <Link style={styles.link} to="/account">Conta</Link>
-      </div>
       <button style={styles.logout} onClick={logout}>Sair</button>
     </div>
   );
@@ -57,6 +121,7 @@ const styles = {
     maxWidth: '600px',
     margin: '0 auto',
     textAlign: 'center',
+    position: 'relative',
   },
   title: {
     marginBottom: '1rem',
@@ -67,16 +132,6 @@ const styles = {
     borderRadius: '50%',
     objectFit: 'cover',
     marginBottom: '1rem',
-  },
-  links: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-    margin: '1rem 0',
-  },
-  link: {
-    textDecoration: 'none',
-    color: '#0077cc',
   },
   subActive: {
     color: 'green',
@@ -89,5 +144,43 @@ const styles = {
     borderRadius: '8px',
     backgroundColor: '#f9c200',
     cursor: 'pointer',
+  },
+  menuButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    fontSize: '2rem',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    zIndex: 20,
+  },
+  menu: {
+    position: 'absolute',
+    top: 70,
+    left: 16,
+    backgroundColor: '#fff',
+    border: '1px solid #ccc',
+    padding: '1rem',
+    borderRadius: '12px',
+    zIndex: 10,
+  },
+  menuItem: {
+    display: 'block',
+    width: '100%',
+    textAlign: 'left',
+    padding: '0.5rem 0',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    textDecoration: 'none',
+    color: '#0077cc',
+  },
+  sectionHeader: {
+    fontWeight: 'bold',
+    marginTop: '0.5rem',
+  },
+  subMenu: {
+    paddingLeft: '1rem',
   },
 };

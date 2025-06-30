@@ -43,6 +43,7 @@ export default function VendorDashboard() {
 
   return (
     <div style={styles.container}>
+
       <button
         style={styles.menuButton}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -50,6 +51,8 @@ export default function VendorDashboard() {
       >
         ☰
       </button>
+
+
       {menuOpen && (
         <div style={styles.menu}>
           <div>
@@ -154,6 +157,7 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
     zIndex: 20,
+
   },
   menu: {
     position: 'absolute',

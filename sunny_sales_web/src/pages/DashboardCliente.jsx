@@ -9,6 +9,8 @@ export default function DashboardCliente() {
   const [client, setClient] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const navigate = useNavigate();
 
   // carregar cliente do localStorage
@@ -43,15 +45,78 @@ export default function DashboardCliente() {
     loadFavorites();
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      setAccountOpen(false);
+      setHelpOpen(false);
+    }
+  }, [menuOpen]);
+
   return (
     <div style={styles.container}>
       <button style={styles.menuButton} onClick={() => setMenuOpen(!menuOpen)}>☰</button>
 
       {menuOpen && (
         <div style={styles.menu}>
-          <Link to="/settings" style={styles.menuItem}>⚙️ Definições</Link>
-          <Link to="/about" style={styles.menuItem}>📄 Sobre</Link>
-          <button style={styles.menuItem} onClick={() => window.location.href = 'mailto:suporte@sunnysales.com'}>📧 Suporte</button>
+          <Link
+            to="/settings"
+            style={styles.menuItem}
+            onClick={() => setMenuOpen(false)}
+          >
+            Notificações
+          </Link>
+
+          <button
+            style={styles.menuItem}
+            onClick={() => setAccountOpen(!accountOpen)}
+          >
+            Definições de Conta {accountOpen ? '▲' : '▼'}
+          </button>
+          {accountOpen && (
+            <div style={styles.subMenu}>
+              <Link
+                to="/account"
+                style={styles.menuItem}
+                onClick={() => setMenuOpen(false)}
+              >
+                Atualizar Dados Pessoais
+              </Link>
+              <Link
+                to="/account"
+                style={styles.menuItem}
+                onClick={() => setMenuOpen(false)}
+              >
+                Apagar Conta
+              </Link>
+            </div>
+          )}
+
+          <button
+            style={styles.menuItem}
+            onClick={() => setHelpOpen(!helpOpen)}
+          >
+            Sobre e Ajuda {helpOpen ? '▲' : '▼'}
+          </button>
+          {helpOpen && (
+            <div style={styles.subMenu}>
+              <Link
+                to="/terms"
+                style={styles.menuItem}
+                onClick={() => setMenuOpen(false)}
+              >
+                Termos e Condições
+              </Link>
+              <button
+                style={styles.menuItem}
+                onClick={() => {
+                  setMenuOpen(false);
+                  window.location.href = 'mailto:suporte@sunnysales.com';
+                }}
+              >
+                Contactar Suporte
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -159,5 +224,18 @@ const styles = {
     padding: '1rem',
     borderRadius: '12px',
     zIndex: 10,
+  },
+  menuItem: {
+    display: 'block',
+    padding: '0.5rem 0',
+    textDecoration: 'none',
+    color: 'black',
+    background: 'none',
+    border: 'none',
+    textAlign: 'left',
+    cursor: 'pointer',
+  },
+  subMenu: {
+    paddingLeft: '1rem',
   }
 }

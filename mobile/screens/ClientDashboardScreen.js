@@ -234,7 +234,13 @@ const styles = StyleSheet.create({
   infoText: { marginBottom: 8, width: '100%' },
   label: { fontWeight: 'bold' },
   imagePreview: { width: 120, height: 120, borderRadius: 60, marginBottom: 16 },
-  fullButton: { width: '100%', marginVertical: 8 },
+  fullButton: {
+    width: 250, // ou outro valor fixo
+    alignSelf: 'center',
+    marginVertical: 12,
+    borderRadius: 12,
+    backgroundColor: '#19a0a4',
+  },
   mapButton: { position: 'absolute', top: 16, right: 16, zIndex: 101, elevation: 10 },
   mapIcon: { fontSize: 40 },
   menuButton: { position: 'absolute', top: 16, left: 16, zIndex: 101, elevation: 10 },

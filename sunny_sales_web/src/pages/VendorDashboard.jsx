@@ -141,12 +141,14 @@ const styles = {
     fontWeight: 'bold',
   },
   logout: {
-    marginTop: '1rem',
+    width: 250,
+    margin: '12px auto',
     padding: '0.5rem 1rem',
     border: 'none',
-    borderRadius: '8px',
-    backgroundColor: '#f9c200',
+    borderRadius: '12px',
+    backgroundColor: '#19a0a4',
     cursor: 'pointer',
+    display: 'block',
   },
   menuButton: {
     position: 'absolute',

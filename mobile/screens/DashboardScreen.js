@@ -488,11 +488,12 @@ const styles = StyleSheet.create({
     borderWidth: 2, 
     borderColor: '#FDC500' // cor do amarelo principal 
   },
-  fullButton: { 
-    width: '100%', 
-    marginVertical: 8, 
-    borderRadius: 12, 
-    backgroundColor: '#FDC500' 
+  fullButton: {
+    width: 250, // ou outro valor fixo
+    alignSelf: 'center',
+    marginVertical: 12,
+    borderRadius: 12,
+    backgroundColor: '#19a0a4',
   },
   row: { 
     flexDirection: 'row', 

@@ -66,7 +66,7 @@ export default function MapScreenWeb() {
   }, []);
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div style={{ padding: '1rem 2rem' }}>
       <h2>🌞 Localização dos Vendedores</h2>
 
       <div style={{ marginBottom: '1rem' }}>

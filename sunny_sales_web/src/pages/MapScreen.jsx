@@ -89,7 +89,7 @@ export default function MapScreenWeb() {
         />
       </div>
 
-      <div style={{ height: '500px', width: '100%' }}>
+      <div style={{ height: '500px', width: '100%', borderRadius: '0 0 12px 12px', overflow: 'hidden' }}>
         <MapContainer center={[38.7169, -9.1399]} zoom={zoom} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {userPosition && <ChangeMapView coords={[userPosition.lat, userPosition.lng]} zoom={zoom} />}

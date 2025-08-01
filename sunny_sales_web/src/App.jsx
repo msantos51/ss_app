@@ -25,7 +25,7 @@ export default function App() {
 return (
 <Router>
   <div style={styles.navbar}>
-    <Link style={styles.link} to="/">🏖️ Sunny Sales</Link>
+    <Link style={{ ...styles.link, marginLeft: 0 }} to="/">🏖️ Sunny Sales</Link>
     <div>
       <Link style={styles.link} to="/about">Sobre</Link>
       <Link style={styles.link} to="/settings">Definições</Link>
